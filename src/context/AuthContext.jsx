@@ -1,18 +1,24 @@
+// src/context/AuthContext.jsx
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { auth, googleProvider } from '../utils/firebase';
-import { onAuthStateChanged, signInWithPopup, signOut } from 'firebase/auth';
+import { 
+  onAuthStateChanged, 
+  signInWithPopup, 
+  signInWithEmailAndPassword, 
+  signOut 
+} from 'firebase/auth';
 
 const AuthContext = createContext();
 
-// 🚨 YAHAN APNE AUR APNE DOSTON KE EMAILS DAAL (Strict Security)
-const ALLOWED_EMAILS =[
+// 🚨 SIRF YE EMAILS ACCESS KAR PAYENGE
+const ALLOWED_EMAILS = [
   "tera.email@gmail.com", 
   "affan.champion@gmail.com"
 ];
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  const[loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
@@ -20,25 +26,34 @@ export const AuthProvider = ({ children }) => {
         setUser(currentUser);
       } else {
         setUser(null);
-        if(currentUser) signOut(auth); // Agar unauthorized hai toh turant bahar
+        if(currentUser) signOut(auth);
       }
       setLoading(false);
     });
     return unsubscribe;
-  },[]);
+  }, []);
 
+  // Google Login
   const loginWithGoogle = async () => {
     const result = await signInWithPopup(auth, googleProvider);
     if (!ALLOWED_EMAILS.includes(result.user.email)) {
       await signOut(auth);
-      throw new Error("UNAUTHORIZED ACCESS: Your email is not whitelisted.");
+      throw new Error("UNAUTHORIZED: Your email is not whitelisted.");
     }
+  };
+
+  // Email Login (WAPAS AA GYA)
+  const loginWithEmail = async (email, password) => {
+    if (!ALLOWED_EMAILS.includes(email)) {
+      throw new Error("UNAUTHORIZED: This email does not have access.");
+    }
+    await signInWithEmailAndPassword(auth, email, password);
   };
 
   const logout = () => signOut(auth);
 
   return (
-    <AuthContext.Provider value={{ user, loginWithGoogle, logout, loading }}>
+    <AuthContext.Provider value={{ user, loginWithGoogle, loginWithEmail, logout, loading }}>
       {!loading && children}
     </AuthContext.Provider>
   );
