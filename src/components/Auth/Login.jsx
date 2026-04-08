@@ -1,19 +1,52 @@
 import { useState } from "react";
+import { auth, googleProvider } from "../../utils/firebase";
+import {
+  signInWithEmailAndPassword,
+  signInWithPopup,
+} from "firebase/auth";
 
-export default function Login({ onLogin }) {
+export default function Login() {
   const [data, setData] = useState({ email: "", password: "" });
+  const [loading, setLoading] = useState(false);
+
+  const handleLogin = async () => {
+    try {
+      setLoading(true);
+      await signInWithEmailAndPassword(
+        auth,
+        data.email,
+        data.password
+      );
+      alert("Login successful");
+    } catch (err) {
+      alert(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleGoogleLogin = async () => {
+    try {
+      await signInWithPopup(auth, googleProvider);
+      alert("Google login success");
+    } catch (err) {
+      alert(err.message);
+    }
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#e5eaf5]">
-      <div className="bg-white/40 backdrop-blur-xl p-6 rounded-2xl shadow-md w-[350px]">
-
-        <h2 className="text-xl font-semibold text-[#8458B3] mb-4">
+      
+      <div className="bg-white/70 backdrop-blur-xl p-8 rounded-2xl shadow-lg w-[360px]">
+        
+        <h2 className="text-2xl font-semibold text-[#8458B3] mb-6 text-center">
           Login
         </h2>
 
         <input
+          type="email"
           placeholder="Email"
-          className="w-full mb-3 p-2 border rounded-lg"
+          className="w-full mb-3 p-3 rounded-lg bg-white/80 text-gray-800 border border-[#d0bdf4]"
           onChange={(e) =>
             setData({ ...data, email: e.target.value })
           }
@@ -22,17 +55,33 @@ export default function Login({ onLogin }) {
         <input
           type="password"
           placeholder="Password"
-          className="w-full mb-3 p-2 border rounded-lg"
+          className="w-full mb-4 p-3 rounded-lg bg-white/80 text-gray-800 border border-[#d0bdf4]"
           onChange={(e) =>
             setData({ ...data, password: e.target.value })
           }
         />
 
         <button
-          onClick={() => onLogin(data)}
-          className="w-full bg-[#8458B3] text-white py-2 rounded-xl"
+          onClick={handleLogin}
+          disabled={loading}
+          className="w-full bg-[#8458B3] text-white py-3 rounded-xl hover:bg-[#6d4696] transition font-medium shadow-md"
         >
-          Login
+          {loading ? "Logging in..." : "Login"}
+        </button>
+
+        {/* Divider */}
+        <div className="my-4 text-center text-gray-500">OR</div>
+
+        {/* Google Login */}
+        <button
+          onClick={handleGoogleLogin}
+          className="w-full border border-gray-300 py-3 rounded-xl flex items-center justify-center gap-2 hover:bg-gray-100 transition"
+        >
+          <img
+            src="https://www.svgrepo.com/show/475656/google-color.svg"
+            className="w-5 h-5"
+          />
+          Continue with Google
         </button>
       </div>
     </div>
