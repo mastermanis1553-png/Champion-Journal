@@ -8,7 +8,11 @@ import Positions from './pages/Positions';
 import Summary from './pages/Summary';
 import Dashboard from './pages/Dashboard';
 import Settings from './pages/Settings';
+// ... upar import mein add karo
+import Help from './pages/Help';
 
+// ... <Routes> ke andar add karo
+<Route path="help" element={<Help />} />
 // --- AUTH IMPORTS ---
 import Login from './components/Auth/Login';
 import Signup from './components/Auth/Signup'; // YAHAN SIGNUP IMPORT KIYA HAI

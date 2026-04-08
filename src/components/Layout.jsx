@@ -39,6 +39,16 @@ export default function Layout() {
             </h1>
           </div>
 
+// ... (imports same as before, replace <nav> inside header)
+        <nav className="flex space-x-2">
+          <NavItem to="/dashboard" label="Dashboard" />
+          <NavItem to="/trades" label="Trades" />
+          <NavItem to="/positions" label="Positions" />
+          <NavItem to="/summary" label="Matrix" />
+          <NavItem to="/settings" label="Settings" />
+          <NavItem to="/help" label="Help Guide" /> {/* NAYA TAB */}
+        </nav>
+// ...
           {/* Desktop Nav */}
           <nav className="hidden md:flex space-x-1">
             <NavItem to="/dashboard" label="Dashboard" />
