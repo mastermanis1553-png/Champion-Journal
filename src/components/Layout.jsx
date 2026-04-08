@@ -39,7 +39,7 @@ export default function Layout() {
             </h1>
           </div>
 
-// ... (imports same as before, replace <nav> inside header)
+// ... imports same as before, replace inside header
         <nav className="flex space-x-2">
           <NavItem to="/dashboard" label="Dashboard" />
           <NavItem to="/trades" label="Trades" />
