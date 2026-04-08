@@ -1,39 +1,31 @@
 @import "tailwindcss";
 
 body {
-  background-color: #050B14; /* Deep premium dark */
-  color: #e2e8f0;
+  background-color: #0f172a; /* Slate 900 - Medium Dark */
+  color: #f8fafc; /* Slate 50 */
   font-family: 'Inter', system-ui, sans-serif;
   margin: 0;
 }
 
-/* Premium Sharp Grids & Tables */
+/* Custom Scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: #0f172a; }
+::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
+
+/* Uniform Table Grids */
 .pro-table th {
-  background-color: #0B1320;
-  color: #64748b;
-  font-weight: 900;
-  font-size: 11px;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  border-bottom: 1px solid #1e293b; /* Sharp Grid Line */
-  border-right: 1px solid #1e293b;
-  padding: 16px;
+  background-color: #1e293b; /* Slate 800 */
+  color: #94a3b8; /* Slate 400 */
+  border: 1px solid #334155; /* Slate 700 */
 }
-
 .pro-table td {
-  border-bottom: 1px solid #1e293b; /* Sharp Grid Line */
-  border-right: 1px solid #1e293b;
-  padding: 16px;
-  font-size: 14px;
-  font-weight: 600;
-  color: #cbd5e1;
+  border: 1px solid #334155;
+  background-color: #1e293b;
 }
 
-/* Make numbers align perfectly like an Excel sheet */
-.tabular-data {
-  font-variant-numeric: tabular-nums;
+/* Chrome/Safari input number arrows removal */
+input[type=number]::-webkit-inner-spin-button, 
+input[type=number]::-webkit-outer-spin-button { 
+  -webkit-appearance: none; 
+  margin: 0; 
 }
-
-::-webkit-scrollbar { width: 5px; }
-::-webkit-scrollbar-track { background: #050B14; }
-::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 10px; }
