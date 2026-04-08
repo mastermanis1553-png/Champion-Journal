@@ -24,7 +24,7 @@ export default function Layout() {
   const NavItem = ({ to, label }) => (
     <NavLink 
       to={to} 
-      className={({ isActive }) => `px-4 py-3 text-sm font-semibold border-b-4 transition-all duration-200 nav-link ${isActive ? 'border-[#8458B3] text-[#8458B3] active' : 'border-transparent text-[#a28089]'}`}
+      className={({ isActive }) => `px-4 py-3 text-sm font-semibold border-b-4 transition-all duration-200 ${isActive ? 'border-[#8458B3] text-[#8458B3]' : 'border-transparent text-[#a28089] hover:text-[#8458B3]'}`}
     >
       {label}
     </NavLink>
@@ -33,7 +33,7 @@ export default function Layout() {
   return (
     <div className="flex flex-col h-screen bg-[#e5eaf5] font-sans relative overflow-hidden">
       
-      {/* HEADER NAVBAR - Premium Glassmorphism */}
+      {/* HEADER NAVBAR */}
       <header className="relative z-20 bg-white/70 backdrop-blur-xl border-b-2 border-[#d0bdf4] shadow-lg flex items-center justify-between px-8 py-5">
         <div className="flex items-center gap-6">
           <div className="flex items-center gap-4">
@@ -41,14 +41,14 @@ export default function Layout() {
               <Activity size={26} className="text-white" />
             </div>
             <div className="flex flex-col">
-              <h1 className="text-3xl font-black text-[#8458B3] tracking-tight" style={{ fontFamily: 'Poppins, sans-serif' }}>
+              <h1 className="text-3xl font-black text-[#8458B3] tracking-tight" style={{ fontStyle: 'normal' }}>
                 R Trades
               </h1>
               <p className="text-xs font-semibold text-[#a28089] tracking-wide">Trading Terminal</p>
             </div>
           </div>
           
-          {/* Navigation Links */}
+          {/* Navigation */}
           <nav className="flex space-x-1 ml-8">
             <NavItem to="/dashboard" label="Dashboard" />
             <NavItem to="/trades" label="Trades" />
@@ -61,15 +61,11 @@ export default function Layout() {
         
         {/* RIGHT CONTROLS */}
         <div className="flex items-center space-x-4">
-          <div className="bg-[#d0bdf4]/40 border border-[#d0bdf4] rounded-lg px-4 py-2.5 text-xs font-bold tracking-wider text-[#8458B3] shadow-sm hidden md:block" style={{ fontFamily: 'Poppins, sans-serif' }}>
+          <div className="bg-[#d0bdf4]/40 border border-[#d0bdf4] rounded-lg px-4 py-2.5 text-xs font-bold tracking-wider text-[#8458B3] shadow-sm hidden md:block">
             Market: <span className="text-[#8458B3] font-black ml-2">INDIA (NSE)</span>
           </div>
 
-          <button 
-            onClick={exportToCSV} 
-            className="flex items-center gap-2 bg-gradient-to-r from-[#a0d2eb]/50 to-[#d0bdf4]/50 hover:from-[#a0d2eb] hover:to-[#d0bdf4] text-[#8458B3] px-5 py-2.5 rounded-lg text-xs font-bold tracking-wider transition-all duration-200 shadow-md hover:shadow-lg uppercase"
-            style={{ fontFamily: 'Poppins, sans-serif' }}
-          >
+          <button onClick={exportToCSV} className="flex items-center gap-2 bg-gradient-to-r from-[#a0d2eb]/50 to-[#d0bdf4]/50 hover:from-[#a0d2eb] hover:to-[#d0bdf4] text-[#8458B3] px-5 py-2.5 rounded-lg text-xs font-bold tracking-wider transition-all duration-200 shadow-md hover:shadow-lg uppercase">
             <Download size={14} /> EXPORT
           </button>
           
@@ -81,7 +77,7 @@ export default function Layout() {
         </div>
       </header>
 
-      {/* MAIN CONTENT OUTLET */}
+      {/* MAIN CONTENT */}
       <main className="relative z-10 flex-1 overflow-auto p-8">
         <div className="max-w-[1400px] mx-auto">
           <Outlet />

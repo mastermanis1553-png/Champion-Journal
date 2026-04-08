@@ -35,20 +35,22 @@ export default function Login() {
           <div className="inline-flex p-4 bg-white/60 backdrop-blur-md border border-[#d0bdf4] rounded-2xl mb-4 shadow-lg">
             <Activity className="text-[#8458B3]" size={32} />
           </div>
-          <h2 className="text-3xl font-black text-[#8458B3] uppercase tracking-tight">R Trades <span className="text-[#a0d2eb]">Terminal</span></h2>
+          <h1 className="text-3xl font-black text-[#8458B3] uppercase tracking-tight" style={{ fontStyle: 'normal' }}>
+            R Trades <span className="text-[#a0d2eb]">Terminal</span>
+          </h1>
+          <p className="text-sm text-[#a28089] mt-2 font-medium">Professional Trading Journal</p>
         </div>
 
         <div className="bg-white/70 backdrop-blur-xl border-2 border-[#d0bdf4] p-8 rounded-[2rem] shadow-lg">
           {error && <p className="text-xs font-bold text-red-600 bg-red-50 p-3 rounded-lg text-center mb-6 border border-red-200 uppercase">{error}</p>}
           
-          {/* EMAIL FORM */}
           <form onSubmit={handleEmailLogin} className="space-y-4">
             <div className="relative">
               <Mail className="absolute left-4 top-4 text-[#a28089]" size={18} />
               <input 
                 type="email" 
                 placeholder="Email Address"
-                className="w-full bg-white border-2 border-[#d0bdf4] p-4 pl-12 rounded-xl text-sm focus:border-[#8458B3] focus:outline-none focus:ring-2 focus:ring-[#8458B3]/30 text-[#333] font-bold transition-all duration-200"
+                className="w-full bg-white border-2 border-[#d0bdf4] p-4 pl-12 rounded-xl text-sm focus:border-[#8458B3] focus:outline-none focus:ring-2 focus:ring-[#8458B3]/30 text-[#1a1a2e] font-medium transition-all duration-200"
                 value={email} onChange={e => setEmail(e.target.value)} required
               />
             </div>
@@ -57,7 +59,7 @@ export default function Login() {
               <input 
                 type="password" 
                 placeholder="Secure Password"
-                className="w-full bg-white border-2 border-[#d0bdf4] p-4 pl-12 rounded-xl text-sm focus:border-[#8458B3] focus:outline-none focus:ring-2 focus:ring-[#8458B3]/30 text-[#333] font-bold transition-all duration-200"
+                className="w-full bg-white border-2 border-[#d0bdf4] p-4 pl-12 rounded-xl text-sm focus:border-[#8458B3] focus:outline-none focus:ring-2 focus:ring-[#8458B3]/30 text-[#1a1a2e] font-medium transition-all duration-200"
                 value={password} onChange={e => setPassword(e.target.value)} required
               />
             </div>
@@ -71,10 +73,9 @@ export default function Login() {
             <span className="relative bg-white/70 px-4 text-xs font-black text-[#a28089] uppercase">Or Continue with</span>
           </div>
 
-          {/* GOOGLE BUTTON */}
           <button 
             onClick={handleGoogleLogin} 
-            className="w-full flex items-center justify-center gap-3 bg-white hover:bg-[#f0f0f0] text-[#333] font-black py-4 rounded-xl transition-all duration-200 active:scale-95 shadow-md hover:shadow-lg border-2 border-[#d0bdf4]"
+            className="w-full flex items-center justify-center gap-3 bg-white hover:bg-[#f0f0f0] text-[#1a1a2e] font-black py-4 rounded-xl transition-all duration-200 active:scale-95 shadow-md hover:shadow-lg border-2 border-[#d0bdf4]"
           >
             <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" className="w-5 h-5" />
             GOOGLE AUTH

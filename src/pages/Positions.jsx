@@ -9,22 +9,28 @@ export default function Positions() {
   const globalR = settings?.rValue || 1250;
 
   return (
-    <div className="space-y-6">
-      <h1 className="text-4xl font-black text-[#8458B3] uppercase italic">Live <span className="text-[#a0d2eb]">Positions</span></h1>
+    <div className="space-y-8">
+      {/* HEADER */}
+      <div className="mb-10">
+        <h1 className="text-4xl font-black text-[#8458B3] uppercase tracking-tight" style={{ fontStyle: 'normal' }}>
+          Live <span className="text-[#a0d2eb]">Positions</span>
+        </h1>
+        <p className="text-[#a28089] text-sm mt-3 font-medium">Monitor all active trading positions in real-time</p>
+      </div>
 
-      {/* TOP SUMMARY CARDS */}
+      {/* METRICS CARDS */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="bg-white/70 backdrop-blur-md border-2 border-[#d0bdf4] p-6 rounded-2xl shadow-lg">
-          <p className="text-xs font-black text-[#8458B3] uppercase tracking-widest">Total Exposure</p>
-          <h2 className="text-2xl font-black text-[#333] mt-2">₹{pm.totalExposure.toLocaleString()}</h2>
+          <p className="text-xs font-black text-[#8458B3] uppercase tracking-widest mb-2">Total Exposure</p>
+          <h2 className="text-2xl font-black text-[#1a1a2e]" style={{ fontStyle: 'normal' }}>₹{pm.totalExposure.toLocaleString()}</h2>
         </div>
         <div className="bg-white/70 backdrop-blur-md border-2 border-[#d0bdf4] p-6 rounded-2xl shadow-lg">
-          <p className="text-xs font-black text-[#8458B3] uppercase tracking-widest">Open Risk</p>
-          <h2 className="text-2xl font-black text-rose-600 mt-2">₹{pm.totalOpenRisk.toLocaleString()} <span className="text-sm text-[#a28089]">({(pm.totalOpenRisk/globalR).toFixed(2)}R)</span></h2>
+          <p className="text-xs font-black text-[#8458B3] uppercase tracking-widest mb-2">Open Risk</p>
+          <h2 className="text-2xl font-black text-rose-600" style={{ fontStyle: 'normal' }}>₹{pm.totalOpenRisk.toLocaleString()} <span className="text-sm text-[#a28089]">({(pm.totalOpenRisk/globalR).toFixed(2)}R)</span></h2>
         </div>
         <div className="bg-white/70 backdrop-blur-md border-2 border-[#d0bdf4] p-6 rounded-2xl shadow-lg">
-          <p className="text-xs font-black text-[#8458B3] uppercase tracking-widest">Unrealized P&L</p>
-          <h2 className={`text-2xl font-black mt-2 ${pm.totalUnrealized >= 0 ? 'text-emerald-600' : 'text-rose-600'}`}>
+          <p className="text-xs font-black text-[#8458B3] uppercase tracking-widest mb-2">Unrealized P&L</p>
+          <h2 className={`text-2xl font-black ${pm.totalUnrealized >= 0 ? 'text-emerald-600' : 'text-rose-600'}`} style={{ fontStyle: 'normal' }}>
             ₹{Math.floor(pm.totalUnrealized).toLocaleString()}
           </h2>
         </div>
@@ -45,7 +51,7 @@ export default function Positions() {
                 <th className="p-4">Unrealized</th>
               </tr>
             </thead>
-            <tbody className="text-sm font-bold text-[#333]">
+            <tbody className="text-sm font-bold text-[#1a1a2e]">
               {openTrades.map(t => {
                 const liveR = calculateLiveR(t, t.cmp || t.entry);
                 const unrealized = ( (t.cmp || t.entry) - t.entry ) * t.quantity;
@@ -67,7 +73,7 @@ export default function Positions() {
               })}
               {openTrades.length === 0 && (
                 <tr>
-                  <td colSpan="7" className="p-10 text-[#a28089] italic font-medium">No active positions to monitor.</td>
+                  <td colSpan="7" className="p-10 text-[#a28089] font-medium">No active positions to monitor.</td>
                 </tr>
               )}
             </tbody>

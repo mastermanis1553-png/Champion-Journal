@@ -8,9 +8,9 @@ export default function Summary() {
   const groups = groupTrades(trades, tab);
   const keys = Object.keys(groups).sort().reverse();
 
-  const Row = ({ label, func, color = "text-[#333]", isR = false, isP = false, isMoney = false, bg = "bg-white/50" }) => (
+  const Row = ({ label, func, color = "text-[#1a1a2e]", isR = false, isP = false, isMoney = false, bg = "bg-white/50" }) => (
     <tr>
-      <td className={`p-4 font-black text-[#8458B3] border border-[#d0bdf4] text-xs uppercase tracking-wider ${bg}`}>{label}</td>
+      <td className={`p-4 font-black text-[#8458B3] border border-[#d0bdf4] text-xs uppercase tracking-wider ${bg}`} style={{ fontStyle: 'normal' }}>{label}</td>
       {keys.map(k => {
         const m = calculateMetrics(groups[k], settings?.rValue || 1250);
         const val = func(m, groups[k]) || 0;
@@ -28,9 +28,15 @@ export default function Summary() {
   const Spacer = () => <tr><td colSpan={keys.length + 1} className="h-4 bg-[#e5eaf5]"></td></tr>;
 
   return (
-    <div>
-      <div className="flex justify-between items-center mb-8">
-        <h1 className="text-4xl font-black text-[#8458B3] uppercase">Performance <span className="text-[#a0d2eb]">Matrix</span></h1>
+    <div className="space-y-8">
+      {/* HEADER */}
+      <div className="flex flex-col md:flex-row justify-between md:items-end gap-6">
+        <div>
+          <h1 className="text-4xl font-black text-[#8458B3] uppercase tracking-tight" style={{ fontStyle: 'normal' }}>
+            Performance <span className="text-[#a0d2eb]">Matrix</span>
+          </h1>
+          <p className="text-[#a28089] text-sm mt-3 font-medium">Detailed breakdown of trading metrics by period</p>
+        </div>
         <div className="bg-white/70 border-2 border-[#d0bdf4] p-1 rounded-xl flex gap-1">
           {['Monthly', 'Quarterly', 'Yearly'].map(t => (
             <button key={t} onClick={() => setTab(t)} className={`px-5 py-2.5 rounded-lg text-sm font-black transition-all ${tab === t ? 'bg-[#8458B3] text-white shadow-md' : 'text-[#a28089] hover:text-[#8458B3]'}`}>
@@ -40,6 +46,7 @@ export default function Summary() {
         </div>
       </div>
 
+      {/* TABLE */}
       <div className="overflow-x-auto rounded-2xl border-2 border-[#d0bdf4] shadow-lg bg-white/70 backdrop-blur-md">
         <table className="w-full text-left border-collapse whitespace-nowrap">
           <thead>
@@ -57,7 +64,7 @@ export default function Summary() {
             <Row label="Winners + Losers" func={(m) => m.winners + m.losers} />
             <Row label="Winners" func={(m) => m.winners} color="text-emerald-600" />
             <Row label="Losers" func={(m) => m.losers} color="text-rose-600" />
-            <Row label="Win Rate" func={(m) => m.winRate} isP color="text-[#333]" />
+            <Row label="Win Rate" func={(m) => m.winRate} isP color="text-[#1a1a2e]" />
             <Spacer />
             <Row label="Avg Loss (Losers)" func={(m) => m.avgLossMoney} isMoney color="text-rose-600" bg="bg-[#a0d2eb]/10" />
             <Row label="Avg Gain (Winners)" func={(m) => m.avgGainMoney} isMoney color="text-emerald-600" bg="bg-[#a0d2eb]/10" />
@@ -65,14 +72,14 @@ export default function Summary() {
             <Spacer />
             <Row label="Avg R Loss (Losers)" func={(m) => m.avgRLoss} isR color="text-rose-600" />
             <Row label="Avg R Gain (Winners)" func={(m) => m.avgRGain} isR color="text-emerald-600" />
-            <Row label="ARR" func={(m) => m.arr} isR color="text-[#333]" />
+            <Row label="ARR" func={(m) => m.arr} isR color="text-[#1a1a2e]" />
             <Row label="Avg R Loss (BE)" func={(m) => m.avgRBe} isR color="text-[#8458B3]" />
             <Spacer />
             <Row label="Trade Expectancy (in R)" func={(m) => m.expectancy} isR color="text-emerald-600" />
             <Row label="Trades Closed" func={(m) => m.total} />
             <Row label="Total R Gained" func={(m) => m.totalR} isR color="text-emerald-600" />
             <Spacer />
-            <Row label="Avg Risk (R)" func={() => settings?.rValue || 1250} isMoney color="text-[#333]" />
+            <Row label="Avg Risk (R)" func={() => settings?.rValue || 1250} isMoney color="text-[#1a1a2e]" />
             <Row label="Total Profit (By Close Date)" func={(m) => m.totalProfit} isMoney color="text-emerald-600" />
           </tbody>
         </table>
