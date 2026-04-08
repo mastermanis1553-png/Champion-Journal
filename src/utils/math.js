@@ -1,7 +1,8 @@
+export const R_VALUE = 1250;
+
 export const calculateMetrics = (trades, globalR = 1250) => {
   const closed = trades.filter(t => t.status !== 'Open');
   const open = trades.filter(t => t.status === 'Open');
-  
   const total = closed.length;
   const winners = closed.filter(t => t.rMultiple > 0.1);
   const losers = closed.filter(t => t.rMultiple < -0.1);
@@ -15,10 +16,8 @@ export const calculateMetrics = (trades, globalR = 1250) => {
 
   const arr = avgRLoss > 0 ? avgRGain / avgRLoss : 0;
   const expectancy = (winRate * avgRGain) - (lossRate * avgRLoss);
-  
   const totalR = closed.reduce((s, t) => s + t.rMultiple, 0);
 
-  // FIX: Intensity is in 'R' (Expectancy * Trades). Net P&L is in 'Money'.
   const intensity = expectancy * total;
   const netPnl = totalR * globalR;
 
@@ -32,6 +31,20 @@ export const calculateMetrics = (trades, globalR = 1250) => {
     total, winners: winners.length, losers: losers.length, be: be.length,
     winRate, avgRGain, avgRLoss, arr, expectancy, totalR, tor, intensity, netPnl
   };
+};
+
+// --- YAHAN HAI WO MISSING FUNCTION JO VERCEL MANG RAHA HAI ---
+export const calculatePositionsMetrics = (trades) => {
+  const open = trades.filter(t => t.status === 'Open');
+  
+  const totalExposure = open.reduce((s, t) => s + (t.entry * t.quantity), 0);
+  const totalOpenRisk = open.reduce((s, t) => s + (Math.abs(t.entry - t.sl) * t.quantity), 0);
+  const totalUnrealized = open.reduce((s, t) => {
+    const cmp = t.cmp || t.entry;
+    return s + ((cmp - t.entry) * t.quantity);
+  }, 0);
+
+  return { totalExposure, totalOpenRisk, totalUnrealized };
 };
 
 export const calculateLiveR = (trade, cmp) => {
@@ -55,7 +68,6 @@ export const groupTrades = (trades, type) => {
     if (type === 'Monthly') key = d.toLocaleString('default', { month: 'short' }) + " " + d.getFullYear();
     else if (type === 'Yearly') key = d.getFullYear().toString();
     else key = `Q${Math.floor(d.getMonth() / 3) + 1} ${d.getFullYear()}`;
-    
     if (!groups[key]) groups[key] =[];
     groups[key].push(t);
   });

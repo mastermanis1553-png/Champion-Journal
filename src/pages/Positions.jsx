@@ -1,72 +1,79 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useTrades } from '../context/TradeContext';
-import { calculatePositionsMetrics } from '../utils/math';
-import EditTradeModal from '../components/EditTradeModal';
-import { Edit3 } from 'lucide-react';
+import { calculatePositionsMetrics, calculateLiveR } from '../utils/math';
 
 export default function Positions() {
   const { trades, settings } = useTrades();
-  const [editingTrade, setEditingTrade] = useState(null);
   const openTrades = trades.filter(t => t.status === 'Open');
-  const globalR = parseFloat(settings?.rValue) || 1250;
-  const pm = calculatePositionsMetrics(trades, globalR);
-
-  const Stat = ({ label, val, sub, c = "text-slate-900" }) => (
-    <div className="p-5 border-r border-slate-200 last:border-0 flex-1">
-      <p className="text-[11px] font-black text-slate-400 uppercase mb-2 tracking-widest">{label}</p>
-      <div className="flex items-baseline gap-2">
-        <h2 className={`text-2xl font-black tracking-tight ${c}`}>{val.toLocaleString(undefined, {maximumFractionDigits:0})}</h2>
-        {sub && <span className="text-[10px] font-bold text-slate-400 uppercase">{sub}</span>}
-      </div>
-    </div>
-  );
+  const pm = calculatePositionsMetrics(trades);
+  const globalR = settings?.rValue || 1250;
 
   return (
-    <div className="bg-white border border-slate-200 rounded shadow-sm">
-      <div className="flex border-b border-slate-200 bg-[#fafafa]">
-        <Stat label="Exposure" val={pm.exposure} />
-        <Stat label="Open Risk" val={-pm.openRiskMoney} sub={`(-${pm.openRiskR.toFixed(1)}R)`} />
-        <Stat label="Unrealised Gains" val={pm.unrealisedMoney} c="text-green-600" />
+    <div className="space-y-6 animate-in fade-in duration-500">
+      <h1 className="text-2xl font-black text-slate-100 uppercase italic">Live <span className="text-blue-500">Positions</span></h1>
+
+      {/* TOP SUMMARY CARDS */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="bg-slate-800 border border-slate-700 p-6 rounded-2xl shadow-sm">
+          <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Total Exposure</p>
+          <h2 className="text-2xl font-black text-slate-100 mt-1">₹{pm.totalExposure.toLocaleString()}</h2>
+        </div>
+        <div className="bg-slate-800 border border-slate-700 p-6 rounded-2xl shadow-sm">
+          <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Open Risk</p>
+          <h2 className="text-2xl font-black text-rose-400 mt-1">₹{pm.totalOpenRisk.toLocaleString()} <span className="text-xs text-slate-500">({(pm.totalOpenRisk/globalR).toFixed(2)}R)</span></h2>
+        </div>
+        <div className="bg-slate-800 border border-slate-700 p-6 rounded-2xl shadow-sm">
+          <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Unrealized P&L</p>
+          <h2 className={`text-2xl font-black mt-1 ${pm.totalUnrealized >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
+            ₹{Math.floor(pm.totalUnrealized).toLocaleString()}
+          </h2>
+        </div>
       </div>
-      <div className="overflow-x-auto">
-        <table className="w-full text-center border-collapse">
-          <thead>
-            <tr className="bg-slate-50 text-slate-500 text-[10px] font-black uppercase border-b border-slate-200 tracking-tighter">
-              <th className="p-3 border-r border-slate-200">#</th>
-              <th className="p-3 border-r border-slate-200">Symbol</th>
-              <th className="p-3 border-r border-slate-200">Current SL</th>
-              <th className="p-3 border-r border-slate-200">Exposure</th>
-              <th className="p-3 border-r border-slate-200">Open Risk R</th>
-              <th className="p-3 border-r border-slate-200">CMP</th>
-              <th className="p-3">Unrealised</th>
-            </tr>
-          </thead>
-          <tbody className="text-[13px] font-bold text-slate-700">
-            {openTrades.map((t, i) => {
-              const rpt = parseFloat(t.riskAmount) || globalR;
-              const cmp = t.cmp || t.entry;
-              const riskR = Math.max(0, (t.entry - t.sl) * t.quantity) / rpt;
-              const unrealised = (cmp - t.entry) * t.quantity;
-              return (
-                <tr key={t.id} className="border-b border-slate-100 hover:bg-slate-50">
-                  <td className="p-3 border-r border-slate-100 text-slate-400 text-xs">{openTrades.length - i}</td>
-                  <td className="p-3 border-r border-slate-100 text-blue-600 font-black italic">{t.symbol}</td>
-                  <td className="p-3 border-r border-slate-100 flex items-center justify-center gap-2">
-                    {t.sl} <button onClick={() => setEditingTrade(t)}><Edit3 size={12}/></button>
-                  </td>
-                  <td className="p-3 border-r border-slate-100">₹{(cmp * t.quantity).toLocaleString()}</td>
-                  <td className="p-3 border-r border-slate-100 text-red-500">-{riskR.toFixed(2)}R</td>
-                  <td className="p-3 border-r border-slate-100 flex items-center justify-center gap-2">
-                    {cmp} <button onClick={() => setEditingTrade(t)}><Edit3 size={12}/></button>
-                  </td>
-                  <td className={`p-3 font-black ${unrealised >= 0 ? 'text-green-600' : 'text-red-500'}`}>₹{Math.floor(unrealised).toLocaleString()}</td>
+
+      {/* POSITIONS TABLE */}
+      <div className="bg-slate-800 border border-slate-700 rounded-2xl overflow-hidden shadow-sm">
+        <div className="overflow-x-auto">
+          <table className="w-full text-center whitespace-nowrap pro-table">
+            <thead>
+              <tr className="bg-slate-900 text-[10px] font-black uppercase tracking-widest text-slate-500 border-b border-slate-700">
+                <th className="p-4">Symbol</th>
+                <th className="p-4">Qty</th>
+                <th className="p-4">Avg Entry</th>
+                <th className="p-4">Current SL</th>
+                <th className="p-4">CMP</th>
+                <th className="p-4">Open Risk (R)</th>
+                <th className="p-4">Unrealized</th>
+              </tr>
+            </thead>
+            <tbody className="text-sm font-bold text-slate-300">
+              {openTrades.map(t => {
+                const liveR = calculateLiveR(t, t.cmp || t.entry);
+                const unrealized = ( (t.cmp || t.entry) - t.entry ) * t.quantity;
+                const riskR = (Math.abs(t.entry - t.sl) * t.quantity) / globalR;
+
+                return (
+                  <tr key={t.id} className="hover:bg-slate-700/30 transition-colors">
+                    <td className="p-4 font-black text-blue-400">{t.symbol}</td>
+                    <td className="p-4">{t.quantity}</td>
+                    <td className="p-4">₹{t.entry}</td>
+                    <td className={`p-4 ${t.isRiskFree ? 'text-emerald-400' : 'text-rose-400'}`}>₹{t.sl}</td>
+                    <td className="p-4 text-slate-400">₹{t.cmp || t.entry}</td>
+                    <td className="p-4 text-rose-400">{riskR.toFixed(2)}R</td>
+                    <td className={`p-4 font-black ${unrealized >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
+                      ₹{Math.floor(unrealized).toLocaleString()}
+                    </td>
+                  </tr>
+                );
+              })}
+              {openTrades.length === 0 && (
+                <tr>
+                  <td colSpan="7" className="p-10 text-slate-500 italic">No active positions to monitor.</td>
                 </tr>
-              );
-            })}
-          </tbody>
-        </table>
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
-      {editingTrade && <EditTradeModal trade={editingTrade} onClose={() => setEditingTrade(null)} />}
     </div>
   );
 }
