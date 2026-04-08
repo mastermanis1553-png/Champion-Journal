@@ -12,7 +12,7 @@ const AuthContext = createContext();
 
 // 🚨 SIRF YE EMAILS ACCESS KAR PAYENGE
 const ALLOWED_EMAILS = [
-  "tera.email@gmail.com", 
+  "mastermanis1553@gmail.com", 
   "affan.champion@gmail.com"
 ];
 
