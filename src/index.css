@@ -1,109 +1,544 @@
 @import "tailwindcss";
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&family=Inter:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+/* ============================================
+   PREMIUM TYPOGRAPHY SYSTEM
+   ============================================ */
+
+* {
+  font-family: 'Inter', system-ui, sans-serif;
+}
 
 body {
-  background: #e5eaf5; /* Freeze Purple */
-  color: #22223b;
+  background: linear-gradient(135deg, #e5eaf5 0%, #f0f2f8 100%);
+  color: #1a1a2e;
   font-family: 'Inter', system-ui, sans-serif;
+  font-size: 15px;
+  font-weight: 400;
+  line-height: 1.6;
+  letter-spacing: -0.3px;
+  margin: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ============================================
+   HEADING HIERARCHY - POPPINS
+   ============================================ */
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Poppins', system-ui, sans-serif;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  line-height: 1.3;
+  color: #1a1a2e;
   margin: 0;
 }
 
-* {
-  font-family: inherit;
-}
-
-h1, h2, h3, h4 {
-  font-family: 'Poppins', 'Inter', system-ui, sans-serif;
-  font-weight: 700;
-  letter-spacing: .01em;
-}
-
-::-webkit-scrollbar { width: 6px; height: 6px; }
-::-webkit-scrollbar-track { background: #e5eaf5; }
-::-webkit-scrollbar-thumb { background: #d0bdf4; border-radius: 10px; }
-
-/* Buttons */
-.btn-primary {
-  background: #8458B3;
-  color: #fff;
-  border-radius: 14px;
-  padding: 0.75rem 1.5rem;
-  font-weight: 700;
-  font-family: 'Poppins',sans-serif;
-  box-shadow: 0 2px 10px 0 #d0bdf4cc;
-  transition: background 0.2s, box-shadow 0.2s;
-}
-.btn-primary:hover, .btn-primary:focus {
-  background: #a0d2eb;
+h1 {
+  font-size: 3.5rem;
+  font-weight: 900;
+  letter-spacing: -1px;
+  line-height: 1.1;
+  text-transform: uppercase;
   color: #8458B3;
-  box-shadow: 0 4px 18px 0 #8458b311;
 }
 
-/* Inputs */
-.input {
-  background: rgba(255,255,255,0.8);
-  border: 1.5px solid #d0bdf4;
-  border-radius: 12px;
-  padding: 0.75rem 1rem;
-  font-size: 1rem;
+h2 {
+  font-size: 2.5rem;
+  font-weight: 800;
+  letter-spacing: -0.7px;
+  line-height: 1.2;
+  color: #1a1a2e;
+}
+
+h2 span {
+  color: #a0d2eb;
+  font-weight: 900;
+}
+
+h3 {
+  font-size: 1.75rem;
+  font-weight: 700;
+  letter-spacing: -0.4px;
+  color: #8458B3;
+}
+
+h4 {
+  font-size: 1.3rem;
+  font-weight: 700;
+  letter-spacing: -0.3px;
+  color: #1a1a2e;
+}
+
+h5 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  letter-spacing: -0.2px;
   color: #333;
-  font-family: inherit;
-  transition: border 0.2s, box-shadow 0.2s;
-}
-.input:focus {
-  outline: none;
-  border-color: #8458B3;
-  box-shadow: 0 0 0 2px #8458B322;
 }
 
-.card {
-  background: rgba(255,255,255,0.6);
-  backdrop-filter: blur(16px);
-  border-radius: 16px;
-  box-shadow: 0 4px 18px 0 #a0d2eb11;
-  border: 1.5px solid #d0bdf4;
-  padding: 2rem;
+h6 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #555;
 }
 
-.table {
-  background: #fff;
-  border-radius: 12px;
-  box-shadow: 0 1.5px 6px #d0bdf41e;
-  border: 1.5px solid #d0bdf4;
-  font-size: 0.97rem;
-}
+/* ============================================
+   TEXT VARIANTS
+   ============================================ */
 
-.table th {
-  background: #f8fafc;
+.text-display {
+  font-family: 'Poppins', system-ui, sans-serif;
+  font-size: 4rem;
+  font-weight: 900;
+  letter-spacing: -1.2px;
   color: #8458B3;
-  font-family: 'Poppins',sans-serif;
-  border-bottom: 1.5px solid #d0bdf4;
+  text-transform: uppercase;
+  line-height: 1.1;
 }
 
-.table td {
-  background: #fff;
-  color: #22223b;
-  border-bottom: 1px solid #e5eaf5;
-}  
+.text-heading-large {
+  font-family: 'Poppins', system-ui, sans-serif;
+  font-size: 2.5rem;
+  font-weight: 800;
+  letter-spacing: -0.7px;
+  color: #1a1a2e;
+  line-height: 1.2;
+}
 
-/* Muted text */
+.text-heading-medium {
+  font-family: 'Poppins', system-ui, sans-serif;
+  font-size: 1.875rem;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  color: #1a1a2e;
+  line-height: 1.3;
+}
+
+.text-heading-small {
+  font-family: 'Poppins', system-ui, sans-serif;
+  font-size: 1.25rem;
+  font-weight: 600;
+  letter-spacing: -0.3px;
+  color: #1a1a2e;
+  line-height: 1.4;
+}
+
+.text-body-large {
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 1.125rem;
+  font-weight: 500;
+  letter-spacing: -0.2px;
+  line-height: 1.7;
+  color: #2a2a3e;
+}
+
+.text-body {
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 1rem;
+  font-weight: 400;
+  letter-spacing: -0.3px;
+  line-height: 1.6;
+  color: #3a3a4e;
+}
+
+.text-body-sm {
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 0.95rem;
+  font-weight: 400;
+  letter-spacing: -0.2px;
+  line-height: 1.5;
+  color: #555;
+}
+
+.text-caption {
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 0.875rem;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  line-height: 1.4;
+  color: #8458B3;
+  font-weight: 600;
+}
+
+.text-label {
+  font-family: 'Poppins', system-ui, sans-serif;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  color: #8458B3;
+  line-height: 1.3;
+}
+
+.text-label-small {
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: #8458B3;
+  line-height: 1.2;
+}
+
 .text-muted {
+  color: #a28089;
+  font-weight: 500;
+}
+
+.text-subtle {
+  color: #b0a0b8;
+  font-weight: 400;
+}
+
+.text-accent {
+  color: #8458B3;
+  font-weight: 600;
+}
+
+.text-secondary {
+  color: #a0d2eb;
+  font-weight: 600;
+}
+
+/* ============================================
+   BUTTON TYPOGRAPHY
+   ============================================ */
+
+button, .btn-primary, .btn-secondary, .btn {
+  font-family: 'Poppins', system-ui, sans-serif;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  font-size: 0.95rem;
+  line-height: 1.4;
+}
+
+button:hover, .btn-primary:hover {
+  transition: all 0.2s ease-in-out;
+}
+
+/* ============================================
+   FORM LABELS & INPUT TYPOGRAPHY
+   ============================================ */
+
+label, .label {
+  font-family: 'Poppins', system-ui, sans-serif;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  color: #8458B3;
+  line-height: 1.3;
+}
+
+input::placeholder, textarea::placeholder {
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 0.95rem;
+  font-weight: 400;
+  letter-spacing: -0.2px;
   color: #a28089;
 }
 
-.bg-primary { background: #8458B3 !important; }
-.bg-accent { background: #d0bdf4 !important; }
-.bg-secondary { background: #a0d2eb !important; }
-.bg-background { background: #e5eaf5 !important; }
-.bg-glass { background: rgba(255,255,255,0.6); backdrop-filter: blur(10px); }
+input, textarea, select {
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 1rem;
+  font-weight: 500;
+  letter-spacing: -0.2px;
+  line-height: 1.5;
+  color: #1a1a2e;
+}
 
-.rounded-xl { border-radius: 16px !important; }
+/* ============================================
+   TABLE TYPOGRAPHY
+   ============================================ */
 
-/* You can add section spacing helpers */
-.section { padding: 2.5rem 0; }
+table {
+  font-family: 'Inter', system-ui, sans-serif;
+}
 
-@media (max-width: 640px) {
-  .card, .section { padding: 1.25rem !important; }
-  .btn-primary { padding: 0.5rem 1rem; font-size: 1rem; }
-  .input { padding: 0.45rem 0.75rem; font-size: 1rem; }
+table thead th {
+  font-family: 'Poppins', system-ui, sans-serif;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  color: #8458B3;
+  line-height: 1.3;
+}
+
+table tbody td {
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 0.95rem;
+  font-weight: 500;
+  letter-spacing: -0.2px;
+  line-height: 1.6;
+  color: #1a1a2e;
+}
+
+table tbody tr:hover td {
+  color: #8458B3;
+}
+
+/* ============================================
+   CARD & CONTAINER TYPOGRAPHY
+   ============================================ */
+
+.card h3, .card-title {
+  font-family: 'Poppins', system-ui, sans-serif;
+  font-size: 1.375rem;
+  font-weight: 700;
+  letter-spacing: -0.4px;
+  color: #1a1a2e;
+}
+
+.card p, .card-text {
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 0.95rem;
+  font-weight: 400;
+  letter-spacing: -0.2px;
+  line-height: 1.6;
+  color: #555;
+}
+
+/* ============================================
+   METRIC CARD TYPOGRAPHY
+   ============================================ */
+
+.metric-title {
+  font-family: 'Poppins', system-ui, sans-serif;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: #8458B3;
+}
+
+.metric-value {
+  font-family: 'Poppins', system-ui, sans-serif;
+  font-size: 2.5rem;
+  font-weight: 900;
+  letter-spacing: -0.7px;
+  color: #1a1a2e;
+}
+
+.metric-subtitle {
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  color: #a28089;
+  text-transform: uppercase;
+}
+
+/* ============================================
+   NAV & HEADER TYPOGRAPHY
+   ============================================ */
+
+.nav-link {
+  font-family: 'Poppins', system-ui, sans-serif;
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  text-transform: capitalize;
+  color: #a28089;
+  transition: color 0.2s ease;
+}
+
+.nav-link.active {
+  color: #8458B3;
+  font-weight: 700;
+}
+
+.header-title {
+  font-family: 'Poppins', system-ui, sans-serif;
+  font-size: 1.875rem;
+  font-weight: 900;
+  letter-spacing: -0.5px;
+  text-transform: uppercase;
+  color: #8458B3;
+}
+
+/* ============================================
+   COLOR SEMANTIC CLASSES
+   ============================================ */
+
+.text-success {
+  color: #10b981;
+  font-weight: 600;
+}
+
+.text-danger {
+  color: #ef4444;
+  font-weight: 600;
+}
+
+.text-warning {
+  color: #f59e0b;
+  font-weight: 600;
+}
+
+.text-info {
+  color: #a0d2eb;
+  font-weight: 600;
+}
+
+.text-primary {
+  color: #8458B3;
+  font-weight: 700;
+}
+
+/* ============================================
+   SCROLLBAR
+   ============================================ */
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #e5eaf5;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #8458B3, #a0d2eb);
+  border-radius: 10px;
+  transition: background 0.2s;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #a0d2eb, #d0bdf4);
+}
+
+/* ============================================
+   UTILITY CLASSES
+   ============================================ */
+
+.font-display { font-family: 'Poppins', system-ui, sans-serif; font-weight: 900; letter-spacing: -1px; }
+.font-heading { font-family: 'Poppins', system-ui, sans-serif; font-weight: 700; letter-spacing: -0.5px; }
+.font-subheading { font-family: 'Poppins', system-ui, sans-serif; font-weight: 600; letter-spacing: -0.3px; }
+.font-body { font-family: 'Inter', system-ui, sans-serif; font-weight: 400; letter-spacing: -0.3px; }
+.font-caption { font-family: 'Inter', system-ui, sans-serif; font-size: 0.875rem; font-weight: 500; }
+.font-label { font-family: 'Poppins', system-ui, sans-serif; font-size: 0.75rem; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
+
+.tracking-tight { letter-spacing: -0.5px; }
+.tracking-normal { letter-spacing: -0.3px; }
+.tracking-wide { letter-spacing: 0.5px; }
+.tracking-wider { letter-spacing: 0.8px; }
+.tracking-widest { letter-spacing: 1px; }
+
+.leading-tight { line-height: 1.2; }
+.leading-normal { line-height: 1.5; }
+.leading-relaxed { line-height: 1.7; }
+
+/* ============================================
+   RESPONSIVE TYPOGRAPHY
+   ============================================ */
+
+@media (max-width: 768px) {
+  h1 {
+    font-size: 2.5rem;
+    letter-spacing: -0.7px;
+  }
+
+  h2 {
+    font-size: 1.875rem;
+  }
+
+  h3 {
+    font-size: 1.375rem;
+  }
+
+  .text-display {
+    font-size: 2.5rem;
+    letter-spacing: -0.8px;
+  }
+
+  .text-heading-large {
+    font-size: 1.875rem;
+  }
+
+  .text-heading-medium {
+    font-size: 1.375rem;
+  }
+
+  .metric-value {
+    font-size: 2rem;
+  }
+
+  .header-title {
+    font-size: 1.5rem;
+  }
+
+  label, .label, .text-label {
+    font-size: 0.75rem;
+  }
+
+  input, textarea, select {
+    font-size: 16px; /* Prevents zoom on iOS */
+  }
+}
+
+@media (max-width: 480px) {
+  body {
+    font-size: 14px;
+  }
+
+  h1 {
+    font-size: 1.875rem;
+  }
+
+  h2 {
+    font-size: 1.5rem;
+  }
+
+  h3 {
+    font-size: 1.2rem;
+  }
+
+  .text-display {
+    font-size: 1.875rem;
+  }
+
+  .metric-value {
+    font-size: 1.75rem;
+  }
+
+  .header-title {
+    font-size: 1.25rem;
+  }
+
+  table tbody td {
+    font-size: 0.85rem;
+  }
+
+  table thead th {
+    font-size: 0.7rem;
+  }
+}
+
+/* ============================================
+   DARK MODE TYPOGRAPHY (Optional)
+   ============================================ */
+
+@media (prefers-color-scheme: dark) {
+  body {
+    color: #f5f5f7;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    color: #ffffff;
+  }
+
+  .text-body, .text-body-sm {
+    color: #e5e5ea;
+  }
+
+  input, textarea, select {
+    color: #f5f5f7;
+    background: rgba(255, 255, 255, 0.1);
+  }
 }

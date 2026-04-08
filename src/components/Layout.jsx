@@ -24,29 +24,32 @@ export default function Layout() {
   const NavItem = ({ to, label }) => (
     <NavLink 
       to={to} 
-      className={({ isActive }) => `px-4 py-3 text-sm font-bold border-b-4 transition-all duration-200 ${isActive ? 'border-[#8458B3] text-[#8458B3]' : 'border-transparent text-[#a28089] hover:text-[#8458B3]'}`}
+      className={({ isActive }) => `px-4 py-3 text-sm font-semibold border-b-4 transition-all duration-200 nav-link ${isActive ? 'border-[#8458B3] text-[#8458B3] active' : 'border-transparent text-[#a28089]'}`}
     >
       {label}
     </NavLink>
   );
 
   return (
-    <div className="flex flex-col h-screen bg-[#e5eaf5] font-sans relative overflow-hidden text-[#333]">
+    <div className="flex flex-col h-screen bg-[#e5eaf5] font-sans relative overflow-hidden">
       
-      {/* HEADER NAVBAR - Light Theme with Glassmorphism */}
-      <header className="relative z-20 bg-white/70 backdrop-blur-md border-b-2 border-[#d0bdf4] shadow-sm flex items-center justify-between px-8 py-4">
+      {/* HEADER NAVBAR - Premium Glassmorphism */}
+      <header className="relative z-20 bg-white/70 backdrop-blur-xl border-b-2 border-[#d0bdf4] shadow-lg flex items-center justify-between px-8 py-5">
         <div className="flex items-center gap-6">
-          <div className="flex items-center gap-3">
-            <div className="bg-[#8458B3] p-2.5 rounded-xl">
-              <Activity size={24} className="text-white" />
+          <div className="flex items-center gap-4">
+            <div className="bg-gradient-to-br from-[#8458B3] to-[#a0d2eb] p-2.5 rounded-xl shadow-lg">
+              <Activity size={26} className="text-white" />
             </div>
-            <h1 className="text-2xl font-black text-[#8458B3] tracking-tight uppercase italic pr-4 border-r-2 border-[#d0bdf4]">
-              R Trades
-            </h1>
+            <div className="flex flex-col">
+              <h1 className="text-3xl font-black text-[#8458B3] tracking-tight" style={{ fontFamily: 'Poppins, sans-serif' }}>
+                R Trades
+              </h1>
+              <p className="text-xs font-semibold text-[#a28089] tracking-wide">Trading Terminal</p>
+            </div>
           </div>
           
           {/* Navigation Links */}
-          <nav className="flex space-x-1">
+          <nav className="flex space-x-1 ml-8">
             <NavItem to="/dashboard" label="Dashboard" />
             <NavItem to="/trades" label="Trades" />
             <NavItem to="/positions" label="Positions" />
@@ -58,18 +61,22 @@ export default function Layout() {
         
         {/* RIGHT CONTROLS */}
         <div className="flex items-center space-x-4">
-          <div className="bg-[#d0bdf4]/40 border border-[#d0bdf4] rounded-lg px-4 py-2 text-xs font-bold text-[#8458B3] shadow-sm hidden md:block">
-            Market: <span className="text-[#8458B3] font-black">INDIA (NSE)</span>
+          <div className="bg-[#d0bdf4]/40 border border-[#d0bdf4] rounded-lg px-4 py-2.5 text-xs font-bold tracking-wider text-[#8458B3] shadow-sm hidden md:block" style={{ fontFamily: 'Poppins, sans-serif' }}>
+            Market: <span className="text-[#8458B3] font-black ml-2">INDIA (NSE)</span>
           </div>
 
-          <button onClick={exportToCSV} className="flex items-center gap-2 bg-[#a0d2eb]/50 border border-[#a0d2eb] text-[#8458B3] px-4 py-2 rounded-lg text-xs font-bold hover:bg-[#a0d2eb] transition-all duration-200 shadow-sm">
+          <button 
+            onClick={exportToCSV} 
+            className="flex items-center gap-2 bg-gradient-to-r from-[#a0d2eb]/50 to-[#d0bdf4]/50 hover:from-[#a0d2eb] hover:to-[#d0bdf4] text-[#8458B3] px-5 py-2.5 rounded-lg text-xs font-bold tracking-wider transition-all duration-200 shadow-md hover:shadow-lg uppercase"
+            style={{ fontFamily: 'Poppins, sans-serif' }}
+          >
             <Download size={14} /> EXPORT
           </button>
           
           <TradeForm />
           
-          <button onClick={logout} className="text-[#a28089] hover:text-[#8458B3] p-2 transition-colors duration-200">
-            <LogOut size={18}/>
+          <button onClick={logout} className="text-[#a28089] hover:text-[#8458B3] p-2.5 transition-colors duration-200 hover:bg-white/30 rounded-lg">
+            <LogOut size={20}/>
           </button>
         </div>
       </header>
