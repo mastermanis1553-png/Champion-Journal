@@ -1,31 +1,109 @@
 @import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&family=Inter:wght@400;700&display=swap');
 
 body {
-  background-color: #0f172a; /* Slate 900 - Medium Dark */
-  color: #f8fafc; /* Slate 50 */
+  background: #e5eaf5; /* Freeze Purple */
+  color: #22223b;
   font-family: 'Inter', system-ui, sans-serif;
   margin: 0;
 }
 
-/* Custom Scrollbar */
+* {
+  font-family: inherit;
+}
+
+h1, h2, h3, h4 {
+  font-family: 'Poppins', 'Inter', system-ui, sans-serif;
+  font-weight: 700;
+  letter-spacing: .01em;
+}
+
 ::-webkit-scrollbar { width: 6px; height: 6px; }
-::-webkit-scrollbar-track { background: #0f172a; }
-::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
+::-webkit-scrollbar-track { background: #e5eaf5; }
+::-webkit-scrollbar-thumb { background: #d0bdf4; border-radius: 10px; }
 
-/* Uniform Table Grids */
-.pro-table th {
-  background-color: #1e293b; /* Slate 800 */
-  color: #94a3b8; /* Slate 400 */
-  border: 1px solid #334155; /* Slate 700 */
+/* Buttons */
+.btn-primary {
+  background: #8458B3;
+  color: #fff;
+  border-radius: 14px;
+  padding: 0.75rem 1.5rem;
+  font-weight: 700;
+  font-family: 'Poppins',sans-serif;
+  box-shadow: 0 2px 10px 0 #d0bdf4cc;
+  transition: background 0.2s, box-shadow 0.2s;
 }
-.pro-table td {
-  border: 1px solid #334155;
-  background-color: #1e293b;
+.btn-primary:hover, .btn-primary:focus {
+  background: #a0d2eb;
+  color: #8458B3;
+  box-shadow: 0 4px 18px 0 #8458b311;
 }
 
-/* Chrome/Safari input number arrows removal */
-input[type=number]::-webkit-inner-spin-button, 
-input[type=number]::-webkit-outer-spin-button { 
-  -webkit-appearance: none; 
-  margin: 0; 
+/* Inputs */
+.input {
+  background: rgba(255,255,255,0.8);
+  border: 1.5px solid #d0bdf4;
+  border-radius: 12px;
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
+  color: #333;
+  font-family: inherit;
+  transition: border 0.2s, box-shadow 0.2s;
+}
+.input:focus {
+  outline: none;
+  border-color: #8458B3;
+  box-shadow: 0 0 0 2px #8458B322;
+}
+
+.card {
+  background: rgba(255,255,255,0.6);
+  backdrop-filter: blur(16px);
+  border-radius: 16px;
+  box-shadow: 0 4px 18px 0 #a0d2eb11;
+  border: 1.5px solid #d0bdf4;
+  padding: 2rem;
+}
+
+.table {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 1.5px 6px #d0bdf41e;
+  border: 1.5px solid #d0bdf4;
+  font-size: 0.97rem;
+}
+
+.table th {
+  background: #f8fafc;
+  color: #8458B3;
+  font-family: 'Poppins',sans-serif;
+  border-bottom: 1.5px solid #d0bdf4;
+}
+
+.table td {
+  background: #fff;
+  color: #22223b;
+  border-bottom: 1px solid #e5eaf5;
+}  
+
+/* Muted text */
+.text-muted {
+  color: #a28089;
+}
+
+.bg-primary { background: #8458B3 !important; }
+.bg-accent { background: #d0bdf4 !important; }
+.bg-secondary { background: #a0d2eb !important; }
+.bg-background { background: #e5eaf5 !important; }
+.bg-glass { background: rgba(255,255,255,0.6); backdrop-filter: blur(10px); }
+
+.rounded-xl { border-radius: 16px !important; }
+
+/* You can add section spacing helpers */
+.section { padding: 2.5rem 0; }
+
+@media (max-width: 640px) {
+  .card, .section { padding: 1.25rem !important; }
+  .btn-primary { padding: 0.5rem 1rem; font-size: 1rem; }
+  .input { padding: 0.45rem 0.75rem; font-size: 1rem; }
 }
