@@ -1,13 +1,14 @@
 import React from 'react';
-import { Outlet, NavLink } from 'react-router-dom';
+import { Outlet, NavLink, useNavigate } from 'react-router-dom';
 import TradeForm from './TradeForm';
 import { LogOut, Activity, Download } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useTrades } from '../context/TradeContext';
 
 export default function Layout() {
-  const { logout } = useAuth();
+  const { logout, user } = useAuth();
   const { trades } = useTrades();
+  const navigate = useNavigate();
 
   const exportToCSV = () => {
     const headers = ["Date,Symbol,Entry,SL,Target,Qty,Status,R-Earned\n"];
@@ -19,6 +20,11 @@ export default function Layout() {
     a.href = url;
     a.download = 'R_Trades_Export.csv';
     a.click();
+  };
+
+  const handleLogout = async () => {
+    await logout();
+    navigate('/');
   };
 
   const NavItem = ({ to, label }) => (
@@ -50,19 +56,18 @@ export default function Layout() {
           
           {/* Navigation */}
           <nav className="flex space-x-1 ml-8">
-            <NavItem to="/dashboard" label="Dashboard" />
-            <NavItem to="/trades" label="Trades" />
-            <NavItem to="/positions" label="Positions" />
-            <NavItem to="/summary" label="Matrix" />
-            <NavItem to="/settings" label="Settings" />
-            <NavItem to="/help" label="Help Guide" />
+            <NavItem to="trades" label="Trades" />
+            <NavItem to="positions" label="Positions" />
+            <NavItem to="summary" label="Matrix" />
+            <NavItem to="settings" label="Settings" />
+            <NavItem to="help" label="Help Guide" />
           </nav>
         </div>
         
         {/* RIGHT CONTROLS */}
         <div className="flex items-center space-x-4">
           <div className="bg-[#d0bdf4]/40 border border-[#d0bdf4] rounded-lg px-4 py-2.5 text-xs font-bold tracking-wider text-[#8458B3] shadow-sm hidden md:block">
-            Market: <span className="text-[#8458B3] font-black ml-2">INDIA (NSE)</span>
+            {user?.email && <span title={user.email}>{user.email.split('@')[0]}</span>}
           </div>
 
           <button onClick={exportToCSV} className="flex items-center gap-2 bg-gradient-to-r from-[#a0d2eb]/50 to-[#d0bdf4]/50 hover:from-[#a0d2eb] hover:to-[#d0bdf4] text-[#8458B3] px-5 py-2.5 rounded-lg text-xs font-bold tracking-wider transition-all duration-200 shadow-md hover:shadow-lg uppercase">
@@ -71,7 +76,7 @@ export default function Layout() {
           
           <TradeForm />
           
-          <button onClick={logout} className="text-[#a28089] hover:text-[#8458B3] p-2.5 transition-colors duration-200 hover:bg-white/30 rounded-lg">
+          <button onClick={handleLogout} className="text-[#a28089] hover:text-[#8458B3] p-2.5 transition-colors duration-200 hover:bg-white/30 rounded-lg" title="Logout">
             <LogOut size={20}/>
           </button>
         </div>

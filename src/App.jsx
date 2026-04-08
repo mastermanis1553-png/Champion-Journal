@@ -11,41 +11,69 @@ import Settings from './pages/Settings';
 import Help from './pages/Help';
 
 // --- AUTH IMPORTS ---
-import Signup from './components/Auth/Signup'; // YAHAN SIGNUP IMPORT KIYA HAI
+import Signup from './components/Auth/Signup';
 import Login from './components/Auth/Login';
 import { useAuth } from './context/AuthContext';
 
-// --- PROTECTED ROUTE LOGIC ---
-// Ye check karta hai ki user logged in hai ya nahi. Nahi hai toh Login pe bhej dega.
+// ============================================
+// PROTECTED ROUTE - Checks auth + approval
+// ============================================
 const ProtectedRoute = ({ children }) => {
-  const { user, loading } = useAuth();
+  const { user, userApproved, loading } = useAuth();
 
-  // Jab tak Firebase check kar raha hai tab tak kuch mat dikhao (prevents flicker)
   if (loading) return null;
 
-  return user ? children : <Navigate to="/login" replace />;
+  // Must be both logged in AND approved
+  if (user && userApproved) {
+    return children;
+  }
+
+  // Not authenticated or not approved - redirect to signup
+  return <Navigate to="/" replace />;
+};
+
+// ============================================
+// PUBLIC ROUTES - Redirect if already authenticated
+// ============================================
+const PublicRoute = ({ children }) => {
+  const { user, userApproved, loading } = useAuth();
+
+  if (loading) return null;
+
+  // Already authenticated and approved - redirect to dashboard
+  if (user && userApproved) {
+    return <Navigate to="/dashboard" replace />;
+  }
+
+  return children;
 };
 
 export default function App() {
   return (
     <Routes>
-      {/* 🔴 PUBLIC ROUTES (Bina login ke khulne chahiye) */}
-      <Route path="/login" element={<Login />} />
-      <Route path="/signup" element={<Signup />} /> {/* YAHAN SIGNUP KA ROUTE DAALA HAI */}
+      {/* ============================================
+          PUBLIC ROUTES (Default signup first)
+          ============================================ */}
+      <Route path="/" element={<PublicRoute><Signup /></PublicRoute>} />
+      <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
 
-      {/* 🟢 PROTECTED ROUTES (Login ke baad Dashboard/Layout ke andar khulenge) */}
-      <Route path="/" element={<ProtectedRoute><Layout /></ProtectedRoute>}>
-        {/* Jaise hi koi / par aayega, use auto-redirect karke /trades par bhej denge */}
+      {/* ============================================
+          PROTECTED ROUTES (Dashboard & internal pages)
+          ============================================ */}
+      <Route path="/dashboard" element={<ProtectedRoute><Layout /></ProtectedRoute>}>
+        {/* Auto-redirect /dashboard to /dashboard/trades */}
         <Route index element={<Navigate to="trades" replace />} />
 
-        {/* Tere saare internal pages */}
+        {/* All internal pages */}
         <Route path="trades" element={<Trades />} />
         <Route path="positions" element={<Positions />} />
         <Route path="summary" element={<Summary />} />
-        <Route path="dashboard" element={<Dashboard />} />
         <Route path="settings" element={<Settings />} />
         <Route path="help" element={<Help />} />
       </Route>
+
+      {/* Catch-all - redirect unknown routes to signup */}
+      <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
 }

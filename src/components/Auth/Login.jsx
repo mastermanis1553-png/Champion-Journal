@@ -1,28 +1,48 @@
 import React, { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
-import { useNavigate } from 'react-router-dom';
-import { Activity, Mail, Lock } from 'lucide-react';
+import { useNavigate, Link } from 'react-router-dom';
+import { Activity, Mail, Lock, AlertCircle } from 'lucide-react';
 
 export default function Login() {
-  const { loginWithGoogle, loginWithEmail } = useAuth();
+  const { loginWithEmail, loginWithGoogle, loading: authLoading } = useAuth();
   const navigate = useNavigate();
+  
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const handleEmailLogin = async (e) => {
     e.preventDefault();
+    setError('');
+
+    if (!email || !password) {
+      setError('Please enter email and password.');
+      return;
+    }
+
     try {
+      setLoading(true);
       await loginWithEmail(email, password);
-      navigate('/');
-    } catch (err) { setError(err.message); }
+      navigate('/dashboard');
+    } catch (err) {
+      setError(err.message || 'Login failed. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleGoogleLogin = async () => {
+    setError('');
     try {
+      setLoading(true);
       await loginWithGoogle();
-      navigate('/');
-    } catch (err) { setError(err.message); }
+      navigate('/dashboard');
+    } catch (err) {
+      setError(err.message || 'Google login failed. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -42,16 +62,29 @@ export default function Login() {
         </div>
 
         <div className="bg-white/70 backdrop-blur-xl border-2 border-[#d0bdf4] p-8 rounded-[2rem] shadow-lg">
-          {error && <p className="text-xs font-bold text-red-600 bg-red-50 p-3 rounded-lg text-center mb-6 border border-red-200 uppercase">{error}</p>}
+          {/* ERROR MESSAGE */}
+          {error && (
+            <div className="mb-6 p-4 bg-red-50 border-2 border-red-200 rounded-xl flex items-start gap-3">
+              <AlertCircle className="text-red-600 flex-shrink-0" size={20} />
+              <div>
+                <p className="text-sm font-bold text-red-700 mb-1">Login Failed</p>
+                <p className="text-xs text-red-600">{error}</p>
+              </div>
+            </div>
+          )}
           
+          {/* EMAIL FORM */}
           <form onSubmit={handleEmailLogin} className="space-y-4">
             <div className="relative">
               <Mail className="absolute left-4 top-4 text-[#a28089]" size={18} />
               <input 
                 type="email" 
                 placeholder="Email Address"
-                className="w-full bg-white border-2 border-[#d0bdf4] p-4 pl-12 rounded-xl text-sm focus:border-[#8458B3] focus:outline-none focus:ring-2 focus:ring-[#8458B3]/30 text-[#1a1a2e] font-medium transition-all duration-200"
-                value={email} onChange={e => setEmail(e.target.value)} required
+                disabled={loading}
+                className="w-full bg-white border-2 border-[#d0bdf4] p-4 pl-12 rounded-xl text-sm focus:border-[#8458B3] focus:outline-none focus:ring-2 focus:ring-[#8458B3]/30 text-[#1a1a2e] font-medium transition-all duration-200 disabled:opacity-50"
+                value={email} 
+                onChange={e => setEmail(e.target.value)} 
+                required
               />
             </div>
             <div className="relative">
@@ -59,12 +92,19 @@ export default function Login() {
               <input 
                 type="password" 
                 placeholder="Secure Password"
-                className="w-full bg-white border-2 border-[#d0bdf4] p-4 pl-12 rounded-xl text-sm focus:border-[#8458B3] focus:outline-none focus:ring-2 focus:ring-[#8458B3]/30 text-[#1a1a2e] font-medium transition-all duration-200"
-                value={password} onChange={e => setPassword(e.target.value)} required
+                disabled={loading}
+                className="w-full bg-white border-2 border-[#d0bdf4] p-4 pl-12 rounded-xl text-sm focus:border-[#8458B3] focus:outline-none focus:ring-2 focus:ring-[#8458B3]/30 text-[#1a1a2e] font-medium transition-all duration-200 disabled:opacity-50"
+                value={password} 
+                onChange={e => setPassword(e.target.value)} 
+                required
               />
             </div>
-            <button type="submit" className="w-full bg-[#8458B3] hover:bg-[#a0d2eb] hover:text-[#8458B3] text-white font-black py-4 rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl uppercase text-sm tracking-wider">
-              LOGIN TO TERMINAL
+            <button 
+              type="submit" 
+              disabled={loading}
+              className="w-full bg-[#8458B3] hover:bg-[#a0d2eb] hover:text-[#8458B3] disabled:opacity-50 disabled:cursor-not-allowed text-white font-black py-4 rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl uppercase text-sm tracking-wider"
+            >
+              {loading ? 'Signing In...' : 'LOGIN TO TERMINAL'}
             </button>
           </form>
 
@@ -73,13 +113,28 @@ export default function Login() {
             <span className="relative bg-white/70 px-4 text-xs font-black text-[#a28089] uppercase">Or Continue with</span>
           </div>
 
+          {/* GOOGLE BUTTON */}
           <button 
-            onClick={handleGoogleLogin} 
-            className="w-full flex items-center justify-center gap-3 bg-white hover:bg-[#f0f0f0] text-[#1a1a2e] font-black py-4 rounded-xl transition-all duration-200 active:scale-95 shadow-md hover:shadow-lg border-2 border-[#d0bdf4]"
+            onClick={handleGoogleLogin}
+            disabled={loading}
+            className="w-full flex items-center justify-center gap-3 bg-white hover:bg-[#f0f0f0] disabled:opacity-50 disabled:cursor-not-allowed text-[#1a1a2e] font-black py-4 rounded-xl transition-all duration-200 active:scale-95 shadow-md hover:shadow-lg border-2 border-[#d0bdf4] uppercase text-xs tracking-wider"
           >
             <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" className="w-5 h-5" />
-            GOOGLE AUTH
+            {loading ? 'SIGNING IN...' : 'GOOGLE AUTH'}
           </button>
+
+          {/* NEW USER LINK */}
+          <div className="relative my-6 text-center">
+            <div className="absolute inset-0 flex items-center"><div className="w-full border-t-2 border-[#d0bdf4]"></div></div>
+            <span className="relative bg-white/70 px-4 text-xs font-black text-[#a28089] uppercase">New to R Trades?</span>
+          </div>
+
+          <Link 
+            to="/" 
+            className="w-full flex items-center justify-center bg-gradient-to-r from-[#8458B3]/20 to-[#a0d2eb]/20 hover:from-[#8458B3]/40 hover:to-[#a0d2eb]/40 text-[#8458B3] font-black py-3 rounded-xl transition-all duration-200 border-2 border-[#d0bdf4] uppercase text-xs tracking-wider"
+          >
+            Create Account
+          </Link>
         </div>
       </div>
     </div>
