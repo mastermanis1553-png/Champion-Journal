@@ -23,18 +23,18 @@ export default function TradeLogs() {
   };
 
   return (
-    <div className="overflow-x-auto bg-white rounded-xl shadow-sm border border-slate-200">
+    <div className="overflow-x-auto bg-white rounded-2xl shadow-lg border-2 border-[#d0bdf4]">
       <table className="w-full text-center border-collapse">
         <thead>
-          <tr className="bg-slate-50 text-slate-500 text-[10px] uppercase font-black tracking-widest">
-            <th className="p-4 border-b border-slate-200">Date</th>
-            <th className="p-4 border-b border-slate-200">Symbol</th>
-            <th className="p-4 border-b border-slate-200">Pos. Size / Qty</th>
-            <th className="p-4 border-b border-slate-200">Entry</th>
-            <th className="p-4 border-b border-slate-200">SL / CMP</th>
-            <th className="p-4 border-b border-slate-200">Status</th>
-            <th className="p-4 border-b border-slate-200">R-Earned</th>
-            <th className="p-4 border-b border-slate-200">Actions</th>
+          <tr className="bg-[#f8fafc] text-[#8458B3] text-xs uppercase font-black tracking-widest border-b-2 border-[#d0bdf4]">
+            <th className="p-4">Date</th>
+            <th className="p-4">Symbol</th>
+            <th className="p-4">Pos. Size / Qty</th>
+            <th className="p-4">Entry</th>
+            <th className="p-4">SL / CMP</th>
+            <th className="p-4">Status</th>
+            <th className="p-4">R-Earned</th>
+            <th className="p-4">Actions</th>
           </tr>
         </thead>
         <tbody className="text-sm font-semibold">
@@ -43,37 +43,37 @@ export default function TradeLogs() {
             const posSize = t.quantity * t.entry;
 
             return (
-              <tr key={t.id} className="hover:bg-slate-50 transition-colors">
-                <td className="p-4 border-b border-slate-100 text-slate-500 text-xs">{new Date(t.date.seconds * 1000).toLocaleDateString('en-GB')}</td>
-                <td className="p-4 border-b border-slate-100 font-black text-slate-900">{t.symbol}</td>
-                <td className="p-4 border-b border-slate-100">
+              <tr key={t.id} className="hover:bg-[#f8fafc] transition-colors border-b border-[#e5eaf5]">
+                <td className="p-4 text-[#a28089] text-xs">{new Date(t.date.seconds * 1000).toLocaleDateString('en-GB')}</td>
+                <td className="p-4 font-black text-[#8458B3]">{t.symbol}</td>
+                <td className="p-4">
                   <div className="flex flex-col items-center">
-                    <span className="text-slate-900 font-bold">₹{posSize.toLocaleString()}</span>
-                    <span className="text-xs text-slate-500">{t.quantity} Qty</span>
+                    <span className="text-[#333] font-bold">₹{posSize.toLocaleString()}</span>
+                    <span className="text-xs text-[#a28089]">{t.quantity} Qty</span>
                   </div>
                 </td>
-                <td className="p-4 border-b border-slate-100 text-slate-900 font-bold">₹{t.entry}</td>
-                <td className="p-4 border-b border-slate-100">
+                <td className="p-4 text-[#333] font-bold">₹{t.entry}</td>
+                <td className="p-4">
                   <div className="flex flex-col items-center">
-                    <span className="text-xs font-bold text-slate-900">SL: ₹{t.sl} {t.isRiskFree && '(RF)'}</span>
-                    <span className="text-xs font-bold text-slate-500 mt-1">CMP: ₹{t.cmp || t.entry}</span>
+                    <span className="text-xs font-bold text-[#333]">SL: ₹{t.sl} {t.isRiskFree && '(RF)'}</span>
+                    <span className="text-xs font-bold text-[#a28089] mt-1">CMP: ₹{t.cmp || t.entry}</span>
                   </div>
                 </td>
-                <td className="p-4 border-b border-slate-100 align-middle">
-                  <span className="px-3 py-1 rounded-md text-[10px] font-black uppercase border border-slate-300 text-slate-900 bg-white">
+                <td className="p-4 align-middle">
+                  <span className="px-3 py-1 rounded-lg text-xs font-black uppercase border-2 border-[#d0bdf4] text-[#8458B3] bg-[#a0d2eb]/20">
                     {t.status}
                   </span>
                 </td>
-                <td className="p-4 border-b border-slate-100 font-black text-base text-slate-900">
+                <td className="p-4 font-black text-base text-[#333]">
                   {liveR > 0 ? '+' : ''}{liveR.toFixed(2)}R
                 </td>
-                <td className="p-4 border-b border-slate-100">
-                  <div className="flex justify-center gap-3 text-slate-500">
-                    <button onClick={() => setEditingTrade(t)} className="hover:text-slate-900 transition" title="Edit Position"><Edit3 size={18} /></button>
+                <td className="p-4">
+                  <div className="flex justify-center gap-3 text-[#a28089]">
+                    <button onClick={() => setEditingTrade(t)} className="hover:text-[#8458B3] transition-colors" title="Edit Position"><Edit3 size={18} /></button>
                     {t.status === 'Open' && (
-                      <button onClick={() => handleFinalClose(t)} className="hover:text-slate-900 transition" title="Close Trade"><CheckCircle2 size={18} /></button>
+                      <button onClick={() => handleFinalClose(t)} className="hover:text-[#8458B3] transition-colors" title="Close Trade"><CheckCircle2 size={18} /></button>
                     )}
-                    <button onClick={() => deleteTrade(t.id)} className="hover:text-slate-900 transition" title="Delete"><Trash2 size={18} /></button>
+                    <button onClick={() => deleteTrade(t.id)} className="hover:text-[#8458B3] transition-colors" title="Delete"><Trash2 size={18} /></button>
                   </div>
                 </td>
               </tr>
