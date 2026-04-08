@@ -35,12 +35,14 @@ export const calculateMetrics = (trades, globalR = 1250) => {
   };
 };
 
+// Add this at the bottom of src/utils/math.js
 export const calculateDays = (entryDate, exitDate) => {
-  if (!entryDate) return 0;
-  const start = new Date(entryDate);
-  const end = exitDate ? new Date(exitDate) : new Date();
-  const diff = Math.abs(end - start);
-  return Math.ceil(diff / (1000 * 60 * 60 * 24));
+  if (!exitDate) {
+    const diffTime = Math.abs(new Date() - entryDate);
+    return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  }
+  const diffTime = Math.abs(new Date(exitDate) - entryDate);
+  return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 };
 
 export const calculateLiveR = (trade, cmp) => {
@@ -73,3 +75,4 @@ export const calculatePositionsMetrics = (trades, globalR = 1250) => {
   const realisedAllTime = closed.reduce((s, t) => s + (t.rMultiple * (t.riskAmount || globalR)), 0);
   return { exposure, openRiskMoney, openRiskR: openRiskMoney / globalR, unrealisedMoney, realisedAllTime };
 };
+

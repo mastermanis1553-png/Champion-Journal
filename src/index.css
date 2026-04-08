@@ -1,24 +1,39 @@
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
 @import "tailwindcss";
 
 body {
-  background-color: #f4f7f9;
-  color: #0f172a;
-  font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
-  
-  /* ULTRA SHARP FONT RENDERING */
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-rendering: optimizeLegibility;
+  background-color: #050B14; /* Deep premium dark */
+  color: #e2e8f0;
+  font-family: 'Inter', system-ui, sans-serif;
+  margin: 0;
+}
+
+/* Premium Sharp Grids & Tables */
+.pro-table th {
+  background-color: #0B1320;
+  color: #64748b;
+  font-weight: 900;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-bottom: 1px solid #1e293b; /* Sharp Grid Line */
+  border-right: 1px solid #1e293b;
+  padding: 16px;
+}
+
+.pro-table td {
+  border-bottom: 1px solid #1e293b; /* Sharp Grid Line */
+  border-right: 1px solid #1e293b;
+  padding: 16px;
   font-size: 14px;
+  font-weight: 600;
+  color: #cbd5e1;
 }
 
-::-webkit-scrollbar { width: 6px; height: 6px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
-
-input[type=number]::-webkit-inner-spin-button, 
-input[type=number]::-webkit-outer-spin-button { 
-  -webkit-appearance: none; 
-  margin: 0; 
+/* Make numbers align perfectly like an Excel sheet */
+.tabular-data {
+  font-variant-numeric: tabular-nums;
 }
+
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: #050B14; }
+::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 10px; }

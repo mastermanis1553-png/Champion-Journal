@@ -1,7 +1,8 @@
 import { initializeApp } from "firebase/app";
-import { getAuth } from "firebase/auth";
+import { getAuth, GoogleAuthProvider } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 
+// Apni Firebase config yahan dalna jo pehle thi
 const firebaseConfig = {
   apiKey: "AIzaSyCYNSLrTEAZz1lcqlKS5rSlHtCoZXj1W6I",
   authDomain: "jornal-74e5f.firebaseapp.com",
@@ -14,3 +15,4 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 export const db = getFirestore(app);
+export const googleProvider = new GoogleAuthProvider(); // Google Auth added
