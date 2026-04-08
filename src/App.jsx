@@ -11,8 +11,8 @@ import Settings from './pages/Settings';
 import Help from './pages/Help';
 
 // --- AUTH IMPORTS ---
-import Login from './components/Auth/Login';
 import Signup from './components/Auth/Signup'; // YAHAN SIGNUP IMPORT KIYA HAI
+import Login from './components/Auth/Login';
 import { useAuth } from './context/AuthContext';
 
 // --- PROTECTED ROUTE LOGIC ---
