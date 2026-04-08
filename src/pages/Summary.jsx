@@ -8,20 +8,24 @@ export default function Summary() {
   const groups = groupTrades(trades, tab);
   const keys = Object.keys(groups).sort().reverse();
 
-  const Row = ({ label, func, color = "text-slate-300", isR = false, isP = false }) => (
+  const Row = ({ label, func, color = "text-slate-300", isR = false, isP = false, isMoney = false, bg = "bg-[#0B1320]" }) => (
     <tr>
-      <td className="p-4 font-bold text-slate-400 bg-slate-900 border border-slate-700 text-[11px] uppercase tracking-wider">{label}</td>
+      <td className={`p-3 font-bold text-slate-400 border border-slate-700 text-[11px] ${bg}`}>{label}</td>
       {keys.map(k => {
         const m = calculateMetrics(groups[k], settings?.rValue || 1250);
         const val = func(m, groups[k]);
         return (
-          <td key={k} className={`p-4 text-center border border-slate-700 bg-slate-800 text-sm font-bold ${color}`}>
-            {isP ? `${(val * 100).toFixed(1)}%` : isR ? val.toFixed(2) : val}
+          <td key={k} className={`p-3 text-center border border-slate-700 text-sm font-black ${bg} ${color}`}>
+            {isP ? `${(val * 100).toFixed(0)}%` : 
+             isMoney ? `₹${Math.floor(val).toLocaleString()}` : 
+             isR ? val.toFixed(2) : val}
           </td>
         );
       })}
     </tr>
   );
+
+  const Spacer = () => <tr><td colSpan={keys.length + 1} className="h-4 bg-[#050B14]"></td></tr>;
 
   return (
     <div className="animate-in fade-in duration-500">
@@ -29,29 +33,45 @@ export default function Summary() {
         <h1 className="text-2xl font-black text-slate-100 uppercase">Performance <span className="text-blue-500">Matrix</span></h1>
         <div className="bg-slate-800 border border-slate-700 p-1 rounded-xl flex gap-1">
           {['Monthly', 'Quarterly', 'Yearly'].map(t => (
-            <button key={t} onClick={() => setTab(t)} className={`px-4 py-2 rounded-lg text-xs font-bold transition-all ${tab === t ? 'bg-slate-700 text-blue-400' : 'text-slate-400 hover:text-slate-200'}`}>{t}</button>
+            <button key={t} onClick={() => setTab(t)} className={`px-4 py-2 rounded-lg text-xs font-bold transition-all ${tab === t ? 'bg-blue-600 text-white' : 'text-slate-400 hover:text-slate-200'}`}>{t}</button>
           ))}
         </div>
       </div>
 
       <div className="overflow-x-auto rounded-xl border border-slate-700">
-        <table className="w-full text-left border-collapse">
+        <table className="w-full text-left border-collapse whitespace-nowrap">
           <thead>
             <tr>
-              <th className="p-4 bg-slate-900 border border-slate-700 text-[10px] font-black text-slate-500 uppercase tracking-widest">Metrics (R Based)</th>
+              <th className="p-4 bg-slate-900 border border-slate-700 text-[10px] font-black text-slate-500 uppercase tracking-widest">Metrics View (R Based)</th>
               {keys.map(k => <th key={k} className="p-4 text-center bg-slate-900 border border-slate-700 text-xs font-black text-slate-300">{k}</th>)}
             </tr>
           </thead>
           <tbody>
+            <Row label="Trades Entered" func={(m, g) => g.length} />
+            <Row label="Open Till Date" func={(m) => `[${m.open}]`} color="text-slate-400" />
+            <Spacer />
             <Row label="Trades Closed" func={(m) => m.total} />
+            <Row label="Breakeven" func={(m) => `[${m.be}]`} color="text-blue-400" />
+            <Row label="Winners + Losers" func={(m) => m.winners + m.losers} />
             <Row label="Winners" func={(m) => m.winners} color="text-emerald-400" />
             <Row label="Losers" func={(m) => m.losers} color="text-rose-400" />
-            <Row label="Win Rate" func={(m) => m.winRate} isP color="text-blue-400" />
-            <Row label="Avg Gain (Winners)" func={(m) => m.avgRGain} isR color="text-emerald-400" />
-            <Row label="Avg Loss (Losers)" func={(m) => m.avgRLoss} isR color="text-rose-400" />
-            <Row label="ARR" func={(m) => m.arr} isR color="text-indigo-400" />
-            <Row label="Expectancy (R)" func={(m) => m.expectancy} isR color="text-blue-400" />
+            <Row label="Win Rate" func={(m) => m.winRate} isP color="text-slate-100" />
+            <Spacer />
+            <Row label="Avg Loss (Losers)" func={(m) => m.avgLossMoney} isMoney color="text-rose-400" bg="bg-blue-900/10" />
+            <Row label="Avg Gain (Winners)" func={(m) => m.avgGainMoney} isMoney color="text-emerald-400" bg="bg-blue-900/10" />
+            <Row label="Avg Loss (BE)" func={(m) => m.avgBeMoney} isMoney color="text-blue-400" bg="bg-blue-900/10" />
+            <Spacer />
+            <Row label="Avg R Loss (Losers)" func={(m) => m.avgRLoss} isR color="text-rose-400" />
+            <Row label="Avg R Gain (Winners)" func={(m) => m.avgRGain} isR color="text-emerald-400" />
+            <Row label="ARR" func={(m) => m.arr} isR color="text-slate-100" />
+            <Row label="Avg R Loss (BE)" func={(m) => m.avgRBe} isR color="text-blue-400" />
+            <Spacer />
+            <Row label="Trade Expectancy (in R)" func={(m) => m.expectancy} isR color="text-emerald-400" />
+            <Row label="Trades Closed" func={(m) => m.total} />
             <Row label="Total R Gained" func={(m) => m.totalR} isR color="text-emerald-500" />
+            <Spacer />
+            <Row label="Avg Risk (R)" func={() => settings?.rValue || 1250} isMoney color="text-slate-300" />
+            <Row label="Total Profit (By Close Date)" func={(m) => m.totalProfit} isMoney color="text-emerald-400" />
           </tbody>
         </table>
       </div>
