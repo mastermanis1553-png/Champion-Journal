@@ -8,15 +8,16 @@ export default function Summary() {
   const groups = groupTrades(trades, tab);
   const keys = Object.keys(groups).sort().reverse();
 
-  const Row = ({ label, func, color = "text-slate-300", isR = false, isP = false, isMoney = false, bg = "bg-[#0B1320]" }) => (
+  // FIX: Fonts made bigger and brighter (text-slate-200, text-xs, text-sm)
+  const Row = ({ label, func, color = "text-slate-200", isR = false, isP = false, isMoney = false, bg = "bg-slate-800/50" }) => (
     <tr>
-      <td className={`p-3 font-bold text-slate-400 border border-slate-700 text-[11px] ${bg}`}>{label}</td>
+      <td className={`p-4 font-black text-slate-300 border border-slate-700 text-xs uppercase tracking-wider ${bg}`}>{label}</td>
       {keys.map(k => {
         const m = calculateMetrics(groups[k], settings?.rValue || 1250);
-        const val = func(m, groups[k]);
+        const val = func(m, groups[k]) || 0;
         return (
-          <td key={k} className={`p-3 text-center border border-slate-700 text-sm font-black ${bg} ${color}`}>
-            {isP ? `${(val * 100).toFixed(0)}%` : 
+          <td key={k} className={`p-4 text-center border border-slate-700 text-sm font-black ${bg} ${color}`}>
+            {isP ? `${(val * 100).toFixed(1)}%` : 
              isMoney ? `₹${Math.floor(val).toLocaleString()}` : 
              isR ? val.toFixed(2) : val}
           </td>
@@ -33,17 +34,17 @@ export default function Summary() {
         <h1 className="text-2xl font-black text-slate-100 uppercase">Performance <span className="text-blue-500">Matrix</span></h1>
         <div className="bg-slate-800 border border-slate-700 p-1 rounded-xl flex gap-1">
           {['Monthly', 'Quarterly', 'Yearly'].map(t => (
-            <button key={t} onClick={() => setTab(t)} className={`px-4 py-2 rounded-lg text-xs font-bold transition-all ${tab === t ? 'bg-blue-600 text-white' : 'text-slate-400 hover:text-slate-200'}`}>{t}</button>
+            <button key={t} onClick={() => setTab(t)} className={`px-5 py-2.5 rounded-lg text-sm font-bold transition-all ${tab === t ? 'bg-blue-600 text-white shadow-md' : 'text-slate-400 hover:text-slate-100'}`}>{t}</button>
           ))}
         </div>
       </div>
 
-      <div className="overflow-x-auto rounded-xl border border-slate-700">
+      <div className="overflow-x-auto rounded-xl border border-slate-700 shadow-xl">
         <table className="w-full text-left border-collapse whitespace-nowrap">
           <thead>
             <tr>
-              <th className="p-4 bg-slate-900 border border-slate-700 text-[10px] font-black text-slate-500 uppercase tracking-widest">Metrics View (R Based)</th>
-              {keys.map(k => <th key={k} className="p-4 text-center bg-slate-900 border border-slate-700 text-xs font-black text-slate-300">{k}</th>)}
+              <th className="p-4 bg-slate-900 border border-slate-700 text-xs font-black text-blue-400 uppercase tracking-widest">Metrics View (R Based)</th>
+              {keys.map(k => <th key={k} className="p-4 text-center bg-slate-900 border border-slate-700 text-sm font-black text-slate-100">{k}</th>)}
             </tr>
           </thead>
           <tbody>
@@ -55,15 +56,15 @@ export default function Summary() {
             <Row label="Winners + Losers" func={(m) => m.winners + m.losers} />
             <Row label="Winners" func={(m) => m.winners} color="text-emerald-400" />
             <Row label="Losers" func={(m) => m.losers} color="text-rose-400" />
-            <Row label="Win Rate" func={(m) => m.winRate} isP color="text-slate-100" />
+            <Row label="Win Rate" func={(m) => m.winRate} isP color="text-white" />
             <Spacer />
-            <Row label="Avg Loss (Losers)" func={(m) => m.avgLossMoney} isMoney color="text-rose-400" bg="bg-blue-900/10" />
-            <Row label="Avg Gain (Winners)" func={(m) => m.avgGainMoney} isMoney color="text-emerald-400" bg="bg-blue-900/10" />
-            <Row label="Avg Loss (BE)" func={(m) => m.avgBeMoney} isMoney color="text-blue-400" bg="bg-blue-900/10" />
+            <Row label="Avg Loss (Losers)" func={(m) => m.avgLossMoney} isMoney color="text-rose-400" bg="bg-blue-950/20" />
+            <Row label="Avg Gain (Winners)" func={(m) => m.avgGainMoney} isMoney color="text-emerald-400" bg="bg-blue-950/20" />
+            <Row label="Avg Loss (BE)" func={(m) => m.avgBeMoney} isMoney color="text-blue-400" bg="bg-blue-950/20" />
             <Spacer />
             <Row label="Avg R Loss (Losers)" func={(m) => m.avgRLoss} isR color="text-rose-400" />
             <Row label="Avg R Gain (Winners)" func={(m) => m.avgRGain} isR color="text-emerald-400" />
-            <Row label="ARR" func={(m) => m.arr} isR color="text-slate-100" />
+            <Row label="ARR" func={(m) => m.arr} isR color="text-white" />
             <Row label="Avg R Loss (BE)" func={(m) => m.avgRBe} isR color="text-blue-400" />
             <Spacer />
             <Row label="Trade Expectancy (in R)" func={(m) => m.expectancy} isR color="text-emerald-400" />

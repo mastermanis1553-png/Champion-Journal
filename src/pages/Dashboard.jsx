@@ -25,8 +25,12 @@ export default function Dashboard() {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <MetricCard title="Win Rate" value={`${(m.winRate * 100).toFixed(1)}%`} sub="System Accuracy" />
         <MetricCard title="Expectancy" value={`${m.expectancy.toFixed(2)}R`} sub="Avg Edge Per Trade" color="text-blue-400" />
-        <MetricCard title="Intensity" value={`${m.intensity.toFixed(2)}R`} sub="Cumulative Power" color="text-emerald-400" />
-        <MetricCard title="Net P&L" value={`₹${Math.floor(m.netPnl).toLocaleString()}`} sub="Total Monetary Gain" color="text-emerald-400" />
+        
+        {/* FIX: Intensity in ₹ */}
+        <MetricCard title="Intensity" value={`₹${Math.floor(m.intensity || 0).toLocaleString()}`} sub="Cumulative Power" color="text-emerald-400" />
+        
+        {/* FIX: Net P&L in ₹ */}
+        <MetricCard title="Net P&L" value={`₹${Math.floor(m.netPnl || 0).toLocaleString()}`} sub="Total Monetary Gain" color="text-emerald-400" />
       </div>
 
       <div className="bg-slate-800 border border-slate-700 p-6 rounded-2xl text-center shadow-sm">

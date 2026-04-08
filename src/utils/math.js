@@ -1,4 +1,5 @@
 export const calculateMetrics = (trades, globalR = 1250) => {
+  const validR = parseFloat(globalR) || 1250;
   const closed = trades.filter(t => t.status !== 'Open');
   const open = trades.filter(t => t.status === 'Open');
   
@@ -10,35 +11,39 @@ export const calculateMetrics = (trades, globalR = 1250) => {
   const winRate = total > 0 ? (winners.length / total) : 0;
   const lossRate = total > 0 ? (losers.length / total) : 0;
 
-  const avgRGain = winners.length > 0 ? winners.reduce((s, t) => s + t.rMultiple, 0) / winners.length : 0;
-  const avgRLoss = losers.length > 0 ? Math.abs(losers.reduce((s, t) => s + t.rMultiple, 0) / losers.length) : 0;
-  const avgRBe = be.length > 0 ? be.reduce((s, t) => s + t.rMultiple, 0) / be.length : -0.01; // Default slightly negative for BE costs
+  const avgRGain = winners.length > 0 ? winners.reduce((s, t) => s + (parseFloat(t.rMultiple)||0), 0) / winners.length : 0;
+  const avgRLoss = losers.length > 0 ? Math.abs(losers.reduce((s, t) => s + (parseFloat(t.rMultiple)||0), 0) / losers.length) : 0;
+  const avgRBe = be.length > 0 ? be.reduce((s, t) => s + (parseFloat(t.rMultiple)||0), 0) / be.length : -0.01;
 
   const arr = avgRLoss > 0 ? avgRGain / avgRLoss : 0;
   
   // Formulas specified by you
   const expectancy = (winRate * avgRGain) - (lossRate * avgRLoss);
-  const intensity = expectancy * total * globalR;
-  const totalR = closed.reduce((s, t) => s + t.rMultiple, 0);
+  
+  // FIX: Intensity in RUPEES
+  const intensity = expectancy * total * validR;
+  
+  const totalR = closed.reduce((s, t) => s + (parseFloat(t.rMultiple)||0), 0);
+
+  // FIX: NET PNL in RUPEES (Ye missing tha pehle)
+  const netPnl = totalR * validR;
 
   // Money based averages for Summary
-  const avgGainMoney = avgRGain * globalR;
-  const avgLossMoney = avgRLoss * globalR;
-  const avgBeMoney = avgRBe * globalR;
-  
-  // Profit calculations
-  const totalProfit = totalR * globalR;
+  const avgGainMoney = avgRGain * validR;
+  const avgLossMoney = avgRLoss * validR;
+  const avgBeMoney = avgRBe * validR;
+  const totalProfit = netPnl; // Alias for summary
 
   const tor = open.reduce((s, t) => {
     const slDist = Math.abs(t.entry - t.sl);
     const currentRisk = slDist * t.quantity;
-    return s + (currentRisk / (t.riskAmount || globalR));
+    return s + (currentRisk / (parseFloat(t.riskAmount) || validR));
   }, 0);
 
   return {
     total, winners: winners.length, losers: losers.length, be: be.length, open: open.length,
-    winRate, avgRGain, avgRLoss, avgRBe, arr, expectancy, totalR, tor, intensity,
-    avgGainMoney, avgLossMoney, avgBeMoney, totalProfit
+    winRate, avgRGain, avgRLoss, avgRBe, arr, expectancy, totalR, tor, 
+    intensity, netPnl, avgGainMoney, avgLossMoney, avgBeMoney, totalProfit
   };
 };
 

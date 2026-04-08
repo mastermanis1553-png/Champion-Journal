@@ -19,10 +19,10 @@ import { useAuth } from './context/AuthContext';
 // Ye check karta hai ki user logged in hai ya nahi. Nahi hai toh Login pe bhej dega.
 const ProtectedRoute = ({ children }) => {
   const { user, loading } = useAuth();
-  
+
   // Jab tak Firebase check kar raha hai tab tak kuch mat dikhao (prevents flicker)
-  if (loading) return null; 
-  
+  if (loading) return null;
+
   return user ? children : <Navigate to="/login" replace />;
 };
 
@@ -37,7 +37,7 @@ export default function App() {
       <Route path="/" element={<ProtectedRoute><Layout /></ProtectedRoute>}>
         {/* Jaise hi koi / par aayega, use auto-redirect karke /trades par bhej denge */}
         <Route index element={<Navigate to="trades" replace />} />
-        
+
         {/* Tere saare internal pages */}
         <Route path="trades" element={<Trades />} />
         <Route path="positions" element={<Positions />} />
