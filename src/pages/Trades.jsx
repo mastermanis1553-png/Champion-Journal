@@ -1,16 +1,19 @@
 import React, { useState } from 'react';
 import TradeLogs from '../components/TradeLogs';
 import { Search, Filter } from 'lucide-react';
+import { useTrades } from '../context/TradeContext';
 
 export default function Trades({ isDashboard, preProcessedData }) {
+  const { trades } = useTrades(); // ✅ fallback source
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('All Trades');
   const [currentPage, setCurrentPage] = useState(1);
 
   const tradesPerPage = 30;
 
-  // Pagination logic
-  const filteredTrades = preProcessedData || [];
+  // ✅ FIX: fallback to trades if preProcessedData not available
+  const filteredTrades = (preProcessedData && preProcessedData.length > 0) ? preProcessedData : trades;
+
   const totalPages = Math.ceil(filteredTrades.length / tradesPerPage);
 
   const startIndex = (currentPage - 1) * tradesPerPage;
@@ -66,7 +69,6 @@ export default function Trades({ isDashboard, preProcessedData }) {
           </div>
         </div>
 
-        {/* Table */}
         <TradeLogs
           preProcessedData={paginatedTrades}
           searchTerm={searchTerm}
@@ -75,7 +77,6 @@ export default function Trades({ isDashboard, preProcessedData }) {
           showPositionSize={true}
         />
 
-        {/* Pagination */}
         <div className="flex justify-between items-center p-4 border-t border-[#e5eaf5] bg-[#f8f9fc]">
           <p className="text-sm text-[#a28089] font-medium">
             Page {currentPage} of {totalPages || 1}
