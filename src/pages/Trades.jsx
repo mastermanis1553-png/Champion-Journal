@@ -43,7 +43,7 @@ export default function Trades() {
         
         {/* FILTER BAR */}
         <div className="p-6 bg-[#f8fafc] border-b-2 border-[#d0bdf4] flex gap-4 items-center justify-between">
-          <h2 className="text-sm font-black text-[#8458B3] uppercase tracking-widest">Filter Results</h2>
+          <h2 className="text-sm font-black text-[#8458B3] uppercase tracking-widest">TRADE LOGS</h2>
           <div className="flex gap-2 items-center">
             <Filter size={16} className="text-[#a28089]"/>
             <select 
