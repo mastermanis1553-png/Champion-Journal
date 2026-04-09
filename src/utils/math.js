@@ -6,31 +6,39 @@ export const getISTDate = (timestamp) => {
   return isNaN(date.getTime()) ? new Date() : new Date(date.toLocaleString('en-US', { timeZone: 'Asia/Kolkata' }));
 };
 
+// YAHAN PNL AUR R-MULTIPLE 100% FIX HUA HAI
 export const processTrade = (t, globalR = 1250) => {
-  // SAFER PARSING: Prevents NaN crashes entirely
-  const entry = parseFloat(t.entry) || 0;
-  const exit = parseFloat(t.exitPrice || t.cmp || t.entry) || 0;
-  const sl = parseFloat(t.initialSl || t.sl) || 0;
-  const qty = parseFloat(t.quantity) || 0;
-  const fees = parseFloat(t.fees) || 0; 
+  const entry = Number(t.entry) || 0;
+  const exit = Number(t.exitPrice || t.cmp || t.entry) || 0;
+  const sl = Number(t.initialSl || t.sl) || 0;
+  const qty = Number(t.quantity) || 0;
+  const fees = Number(t.fees) || 0;
   const isShort = t.type === 'SHORT';
 
   const riskDist = Math.abs(entry - sl);
-  const riskAmount = (riskDist * qty) || parseFloat(t.riskAmount) || parseFloat(globalR) || 1250;
+  const riskAmount = (riskDist * qty) || Number(t.riskAmount) || Number(globalR) || 1250;
 
+  // PnL Logic depending on LONG or SHORT
   let rewardDist = isShort ? (entry - exit) : (exit - entry);
-  let rMultiple = riskDist > 0 ? rewardDist / riskDist : 0;
+  let rMultiple = riskDist > 0 ? (rewardDist / riskDist) : 0;
 
   let grossPnl = rewardDist * qty;
   let netPnl = grossPnl - fees;
 
-  return { ...t, riskDist, riskAmount, rMultiple, netPnl, grossPnl, isShort, dateObj: getISTDate(t.date) };
+  return { 
+    ...t, 
+    symbol: t.symbol || 'UNKNOWN', 
+    type: t.type || 'LONG',
+    riskDist, riskAmount, rMultiple, netPnl, grossPnl, isShort, 
+    dateObj: getISTDate(t.date), entry, sl, qty, fees, exit
+  };
 };
 
 export const calculateMetrics = (rawTrades, globalR = 1250) => {
   if (!rawTrades || rawTrades.length === 0) return defaultMetrics();
 
-  const validR = parseFloat(globalR) || 1250;
+  const validR = Number(globalR) || 1250;
+  // Sabse pehle saare trades ko process karke safe banate hain
   const trades = rawTrades.map(t => processTrade(t, validR)).sort((a, b) => b.dateObj - a.dateObj);
   
   const closed = trades.filter(t => t.status !== 'Open');
@@ -52,6 +60,7 @@ export const calculateMetrics = (rawTrades, globalR = 1250) => {
   const expectancy = (winRate * avgRGain) - (lossRate * avgRLoss);
   
   const intensity = expectancy * total * validR;
+  // Total Net PNL sum of properly calculated individual PnLs
   const totalNetPnl = closed.reduce((s, t) => s + (t.netPnl || 0), 0);
   const totalR = closed.reduce((s, t) => s + (t.rMultiple || 0), 0);
 
@@ -59,11 +68,7 @@ export const calculateMetrics = (rawTrades, globalR = 1250) => {
   const avgLossMoney = avgRLoss * validR;
   const avgBeMoney = avgRBe * validR;
 
-  const tor = open.reduce((s, t) => {
-    const slDist = Math.abs((parseFloat(t.entry)||0) - (parseFloat(t.sl)||0));
-    const currentRisk = slDist * (parseFloat(t.quantity)||0);
-    return s + (currentRisk / validR);
-  }, 0);
+  const tor = open.reduce((s, t) => s + ((t.riskDist * t.qty) / validR), 0);
 
   return {
     processedTrades: trades, total, winners: winners.length, losers: losers.length, be: be.length, open: open.length,
@@ -78,23 +83,10 @@ const defaultMetrics = () => ({
   intensity: 0, netPnl: 0, avgGainMoney: 0, avgLossMoney: 0, avgBeMoney: 0, totalProfit: 0
 });
 
-export const calculatePositionsMetrics = (trades) => {
-  const open = trades.filter(t => t.status === 'Open');
-  const totalExposure = open.reduce((s, t) => s + ((parseFloat(t.entry)||0) * (parseFloat(t.quantity)||0)), 0);
-  const totalOpenRisk = open.reduce((s, t) => s + (Math.abs((parseFloat(t.entry)||0) - (parseFloat(t.sl)||0)) * (parseFloat(t.quantity)||0)), 0);
-  const totalUnrealized = open.reduce((s, t) => {
-    const entry = parseFloat(t.entry)||0;
-    const cmp = parseFloat(t.cmp) || entry;
-    const qty = parseFloat(t.quantity)||0;
-    return s + (t.type === 'SHORT' ? (entry - cmp) * qty : (cmp - entry) * qty);
-  }, 0);
-  return { totalExposure, totalOpenRisk, totalUnrealized };
-};
-
 export const calculateLiveR = (trade, cmp) => {
-  const entry = parseFloat(trade.entry)||0;
-  const currentPrice = parseFloat(cmp)||entry;
-  const initialSl = parseFloat(trade.initialSl)||0;
+  const entry = Number(trade.entry) || 0;
+  const currentPrice = Number(cmp) || entry;
+  const initialSl = Number(trade.initialSl || trade.sl) || 0;
   const slDistance = Math.abs(entry - initialSl);
   if (slDistance === 0) return 0;
   return trade.type === 'SHORT' ? (entry - currentPrice) / slDistance : (currentPrice - entry) / slDistance;
@@ -102,10 +94,10 @@ export const calculateLiveR = (trade, cmp) => {
 
 export const groupTrades = (trades, type) => {
   const groups = {};
-  trades.forEach(t => {
-    if(!t.date) return; // Prevent crash on missing dates
-    const d = t.date?.seconds ? new Date(t.date.seconds * 1000) : new Date(t.date);
-    if(isNaN(d.getTime())) return; // Prevent crash on invalid dates
+  trades.forEach(rawT => {
+    const t = processTrade(rawT);
+    const d = t.dateObj;
+    if(isNaN(d.getTime())) return;
     
     let key = type === 'Monthly' ? d.toLocaleString('en-IN', { month: 'short', year: 'numeric' }) 
             : type === 'Yearly' ? d.getFullYear().toString() 
