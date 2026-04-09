@@ -56,6 +56,7 @@ export default function Layout() {
           
           {/* Navigation */}
           <nav className="flex space-x-1 ml-8">
+            <NavItem to="Dashboard" label="Dasboard" />
             <NavItem to="trades" label="Trades" />
             <NavItem to="positions" label="Positions" />
             <NavItem to="summary" label="Matrix" />
