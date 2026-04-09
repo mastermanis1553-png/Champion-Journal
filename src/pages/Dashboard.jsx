@@ -1,7 +1,6 @@
 import React from 'react';
 import { useTrades } from '../context/TradeContext';
 import { calculateMetrics } from '../utils/math';
-import MatrixTable from './MatrixTable'; // Matrix ko import kar liya
 
 export default function Dashboard() {
   const { trades, settings } = useTrades();
