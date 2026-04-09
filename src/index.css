@@ -1,3 +1,5 @@
+/* ================= INDEX.CSS (RESPONSIVE IMPROVED) ================= */
+
 @import "tailwindcss";
 
 :root {
@@ -6,30 +8,96 @@
   --med-purple: #d0bdf4;
   --purple-pain: #8458B3;
   --heavy-purple: #a28089;
-  --dark-slate: #494D5F; /* For readable text */
+  --dark-slate: #494D5F;
+}
+
+/* GLOBAL RESET + RESPONSIVE BASE */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  width: 100%;
+  overflow-x: hidden;
 }
 
 body {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
   background-color: var(--bg-freeze);
   color: var(--dark-slate);
   font-family: 'Inter', system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
+  font-size: 14px;
 }
 
-/* Custom Soft Scrollbar */
+/* RESPONSIVE FONT SCALING */
+@media (min-width: 640px) {
+  body {
+    font-size: 15px;
+  }
+}
+
+@media (min-width: 1024px) {
+  body {
+    font-size: 16px;
+  }
+}
+
+/* MEDIA ELEMENTS FIX */
+img,
+video,
+canvas,
+svg {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* SCROLLBAR */
 ::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--med-purple); border-radius: 10px; }
 
-/* Soft UI Table */
+/* TABLE RESPONSIVENESS */
+.soft-table {
+  width: 100%;
+  overflow-x: auto;
+  display: block;
+}
+
+.soft-table table {
+  width: 100%;
+  min-width: 600px;
+  border-collapse: collapse;
+}
+
 .soft-table th {
   background-color: #ffffff;
   color: var(--heavy-purple);
   font-weight: 600;
   border-bottom: 2px solid var(--bg-freeze);
+  font-size: 12px;
+  padding: 10px;
 }
+
 .soft-table td {
   background-color: #ffffff;
   border-bottom: 1px solid var(--bg-freeze);
   color: var(--dark-slate);
+  font-size: 13px;
+  padding: 10px;
+}
+
+/* RESPONSIVE TABLE TEXT */
+@media (min-width: 768px) {
+  .soft-table th {
+    font-size: 13px;
+  }
+  .soft-table td {
+    font-size: 14px;
+  }
 }
