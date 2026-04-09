@@ -30,24 +30,26 @@ export default function TradeLogs({ preProcessedData, searchTerm = '', filterSta
   };
 
   return (
-    <div className="overflow-x-auto">
-      <table className="w-full text-left soft-table whitespace-nowrap">
+    <div className="w-full max-w-full overflow-x-auto">
+      <table className="w-full text-left soft-table whitespace-nowrap min-w-[900px] md:min-w-full">
+        
         <thead>
-          <tr className="text-[10px] font-bold text-[#a28089] uppercase tracking-widest bg-white">
-            <th className="p-4">Date</th>
-            {showExitDate && <th className="p-4">Exit Date</th>}
-            <th className="p-4">Type</th>
-            <th className="p-4">Symbol</th>
-            <th className="p-4">Entry</th>
-            {showPositionSize && <th className="p-4">Position Size</th>}
-            <th className="p-4">SL / CMP</th>
-            <th className="p-4">Status</th>
-            <th className="p-4">R-Earned</th>
-            <th className="p-4">Net PnL</th>
-            <th className="p-4">Days</th>
-            <th className="p-4 text-center">Actions</th>
+          <tr className="text-[9px] sm:text-[10px] font-bold text-[#a28089] uppercase tracking-widest bg-white">
+            <th className="p-2 sm:p-3 md:p-4">Date</th>
+            {showExitDate && <th className="p-2 sm:p-3 md:p-4">Exit Date</th>}
+            <th className="p-2 sm:p-3 md:p-4">Type</th>
+            <th className="p-2 sm:p-3 md:p-4">Symbol</th>
+            <th className="p-2 sm:p-3 md:p-4">Entry</th>
+            {showPositionSize && <th className="p-2 sm:p-3 md:p-4">Position Size</th>}
+            <th className="p-2 sm:p-3 md:p-4">SL / CMP</th>
+            <th className="p-2 sm:p-3 md:p-4">Status</th>
+            <th className="p-2 sm:p-3 md:p-4">R-Earned</th>
+            <th className="p-2 sm:p-3 md:p-4">Net PnL</th>
+            <th className="p-2 sm:p-3 md:p-4">Days</th>
+            <th className="p-2 sm:p-3 md:p-4 text-center">Actions</th>
           </tr>
         </thead>
+
         <tbody className="divide-y divide-[#e5eaf5]">
           {displayTrades.map((t) => {
             const liveR = t.status === 'Open' ? calculateLiveR(t, t.cmp) : t.rMultiple;
@@ -64,45 +66,54 @@ export default function TradeLogs({ preProcessedData, searchTerm = '', filterSta
 
             return (
               <tr key={t.id} className="hover:bg-[#f8f9fc] transition">
-                <td className="p-4 text-xs text-[#a28089] font-medium">
+                
+                <td className="p-2 sm:p-3 md:p-4 text-[10px] sm:text-xs text-[#a28089] font-medium">
                   {(t.dateObj && !isNaN(t.dateObj.getTime())) ? t.dateObj.toLocaleDateString('en-GB') : 'Invalid'}
                 </td>
 
                 {showExitDate && (
-                  <td className="p-4 text-xs text-[#a28089] font-medium">
+                  <td className="p-2 sm:p-3 md:p-4 text-[10px] sm:text-xs text-[#a28089] font-medium">
                     {t.exitDate ? new Date(t.exitDate).toLocaleDateString('en-GB') : '-'}
                   </td>
                 )}
 
-                <td className="p-4">
-                  <span className={`text-[10px] px-2 py-1 rounded font-bold ${t.type === 'SHORT' ? 'bg-rose-100 text-rose-600' : 'bg-emerald-100 text-emerald-600'}`}>
+                <td className="p-2 sm:p-3 md:p-4">
+                  <span className={`text-[9px] sm:text-[10px] px-2 py-1 rounded font-bold ${
+                    t.type === 'SHORT' ? 'bg-rose-100 text-rose-600' : 'bg-emerald-100 text-emerald-600'
+                  }`}>
                     {t.type}
                   </span>
                 </td>
 
-                <td className="p-4 font-bold text-[#8458B3]">{t.symbol}</td>
+                <td className="p-2 sm:p-3 md:p-4 font-bold text-[#8458B3] text-xs sm:text-sm">
+                  {t.symbol}
+                </td>
 
-                <td className="p-4 font-semibold text-[#494D5F]">₹{t.entry}</td>
+                <td className="p-2 sm:p-3 md:p-4 font-semibold text-[#494D5F] text-xs sm:text-sm">
+                  ₹{t.entry}
+                </td>
 
                 {showPositionSize && (
-                  <td className="p-4 font-semibold text-[#494D5F]">
+                  <td className="p-2 sm:p-3 md:p-4 font-semibold text-[#494D5F] text-xs sm:text-sm">
                     ₹{Math.floor(positionSize).toLocaleString()}
                   </td>
                 )}
 
-                <td className="p-4">
-                  <div className="flex flex-col">
-                    <span className={`text-[10px] font-bold ${t.isRiskFree ? 'text-[#a0d2eb]' : 'text-rose-400'}`}>
+                <td className="p-2 sm:p-3 md:p-4">
+                  <div className="flex flex-col leading-tight">
+                    <span className={`text-[9px] sm:text-[10px] font-bold ${
+                      t.isRiskFree ? 'text-[#a0d2eb]' : 'text-rose-400'
+                    }`}>
                       SL: {t.sl}
                     </span>
-                    <span className="text-[10px] font-semibold text-[#a28089]">
+                    <span className="text-[9px] sm:text-[10px] font-semibold text-[#a28089]">
                       CMP: {t.cmp || t.entry}
                     </span>
                   </div>
                 </td>
 
-                <td className="p-4">
-                  <span className={`px-2 py-1 rounded text-[10px] font-bold uppercase ${
+                <td className="p-2 sm:p-3 md:p-4">
+                  <span className={`px-2 py-1 rounded text-[9px] sm:text-[10px] font-bold uppercase ${
                     t.status === 'Win' ? 'bg-emerald-100 text-emerald-600' :
                     t.status === 'Loss' ? 'bg-rose-100 text-rose-600' :
                     t.status === 'BE' ? 'bg-[#e5eaf5] text-[#8458B3]' :
@@ -112,30 +123,43 @@ export default function TradeLogs({ preProcessedData, searchTerm = '', filterSta
                   </span>
                 </td>
 
-                <td className={`p-4 font-bold ${liveR >= 0 ? 'text-emerald-500' : 'text-rose-500'}`}>
-                  {liveR > 0 ? '+' : ''}{(liveR||0).toFixed(2)}R
+                <td className={`p-2 sm:p-3 md:p-4 font-bold text-xs sm:text-sm ${
+                  liveR >= 0 ? 'text-emerald-500' : 'text-rose-500'
+                }`}>
+                  {liveR > 0 ? '+' : ''}{(liveR || 0).toFixed(2)}R
                 </td>
 
-                <td className={`p-4 font-bold ${pnl >= 0 ? 'text-emerald-500' : 'text-rose-500'}`}>
-                  ₹{Math.floor(pnl||0).toLocaleString()}
+                <td className={`p-2 sm:p-3 md:p-4 font-bold text-xs sm:text-sm ${
+                  pnl >= 0 ? 'text-emerald-500' : 'text-rose-500'
+                }`}>
+                  ₹{Math.floor(pnl || 0).toLocaleString()}
                 </td>
 
-                <td className="p-4 text-xs text-[#a28089] font-medium">{daysHeld}</td>
+                <td className="p-2 sm:p-3 md:p-4 text-[10px] sm:text-xs text-[#a28089] font-medium">
+                  {daysHeld}
+                </td>
 
-                <td className="p-4">
-                  <div className="flex justify-center gap-2">
+                <td className="p-2 sm:p-3 md:p-4">
+                  <div className="flex justify-center gap-1 sm:gap-2">
                     {t.status === 'Open' && (
                       <>
-                        <button onClick={() => setEditingTrade(t)} className="p-1.5 hover:bg-[#e5eaf5] text-[#8458B3] rounded transition">
-                          <Edit3 size={16}/>
+                        <button 
+                          onClick={() => setEditingTrade(t)} 
+                          className="p-1.5 sm:p-2 hover:bg-[#e5eaf5] text-[#8458B3] rounded transition"
+                        >
+                          <Edit3 size={14}/>
                         </button>
-                        <button onClick={() => handleFinalClose(t)} className="p-1.5 hover:bg-emerald-100 text-emerald-600 rounded transition">
-                          <CheckCircle2 size={16}/>
+                        <button 
+                          onClick={() => handleFinalClose(t)} 
+                          className="p-1.5 sm:p-2 hover:bg-emerald-100 text-emerald-600 rounded transition"
+                        >
+                          <CheckCircle2 size={14}/>
                         </button>
                       </>
                     )}
                   </div>
                 </td>
+
               </tr>
             );
           })}
