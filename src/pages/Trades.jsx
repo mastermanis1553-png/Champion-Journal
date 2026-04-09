@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useTrades } from '../context/TradeContext';
-import { calculateDays, calculateLiveR } from '../utils/math';
+import { calculateDays, getTradeMetrics } from '../utils/math';
 import EditTradeModal from '../components/EditTradeModal';
 import { Edit3, CheckCircle2, Trash2, Filter } from 'lucide-react';
 
@@ -12,14 +12,19 @@ export default function Trades() {
   const handleCloseTrade = async (trade) => {
     const exit = prompt(`Exit Price for ${trade.symbol}:`, trade.cmp || trade.entry);
     if (!exit) return;
-    const r = calculateLiveR(trade, exit);
+
+    const exitPrice = parseFloat(exit);
+    const metrics = getTradeMetrics({ ...trade, cmp: exitPrice });
+
     let status = 'BE';
-    if (r > 0.1) status = 'Win'; else if (r < -0.1) status = 'Loss';
-    
-    await updateTrade(trade.id, { 
-      exitPrice: parseFloat(exit), 
-      exitDate: new Date().toISOString(), 
-      rMultiple: r, status, cmp: parseFloat(exit) 
+    if (metrics && metrics.r > 0.1) status = 'Win';
+    if (metrics && metrics.r < -0.1) status = 'Loss';
+
+    await updateTrade(trade.id, {
+      exitPrice,
+      exitDate: new Date().toISOString(),
+      cmp: exitPrice,
+      status
     });
   };
 
@@ -35,7 +40,7 @@ export default function Trades() {
         <h1 className="text-4xl font-black text-[#8458B3] uppercase tracking-tight" style={{ fontStyle: 'normal' }}>
           Trade <span className="text-[#a0d2eb]">History</span>
         </h1>
-        <p className="text-[#a28089] text-sm mt-3 font-medium">Complete log of all executed positions</p>
+        <p className="text-[#a28089] text-sm mt-3 font-medium">Complete log of all executed positions with real-time metrics</p>
       </div>
 
       {/* TABLE CONTAINER */}
@@ -43,9 +48,9 @@ export default function Trades() {
         
         {/* FILTER BAR */}
         <div className="p-6 bg-[#f8fafc] border-b-2 border-[#d0bdf4] flex gap-4 items-center justify-between">
-          <h2 className="text-sm font-black text-[#8458B3] uppercase tracking-widest">TRADE LOGS</h2>
+          <h2 className="text-sm font-black text-[#8458B3] uppercase tracking-widest">Filter Results</h2>
           <div className="flex gap-2 items-center">
-            <Filter size={16} className="text-[#a28089]"/>
+            <Filter size={16} className="text-[#a28089]" />
             <select 
               value={filter} 
               onChange={(e) => setFilter(e.target.value)}
@@ -69,47 +74,47 @@ export default function Trades() {
                 <th className="py-4 px-4">Symbol</th>
                 <th className="py-4 px-4">Entry Date</th>
                 <th className="py-4 px-4">Exit Date</th>
-                <th className="py-4 px-4">Size / Qty</th>
-                <th className="py-4 px-4">Entry</th>
-                <th className="py-4 px-4">SL / CMP</th>
+                <th className="py-4 px-4">Entry / CMP</th>
+                <th className="py-4 px-4">SL / Qty</th>
                 <th className="py-4 px-4">Status</th>
                 <th className="py-4 px-4">R-Earned</th>
-                <th className="py-4 px-4">Net Profit</th>
+                <th className="py-4 px-4">Net P&L</th>
                 <th className="py-4 px-4">Days</th>
                 <th className="py-4 px-4">Actions</th>
               </tr>
             </thead>
             <tbody className="text-sm font-bold text-[#1a1a2e] divide-y divide-[#e5eaf5]">
               {filteredTrades.map((t, i) => {
-                const rpt = parseFloat(t.riskAmount) || parseFloat(settings?.rValue) || 1250;
-                const liveR = t.status === 'Open' ? calculateLiveR(t, t.cmp || t.entry) : t.rMultiple;
-                const netPnl = liveR * rpt;
-                const exitStr = t.exitDate ? new Date(t.exitDate).toLocaleDateString('en-GB', {day:'2-digit', month:'short'}) : '-';
+                const metrics = getTradeMetrics(t);
+                if (!metrics) return null;
+
+                const exitStr = t.exitDate 
+                  ? new Date(t.exitDate).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })
+                  : '-';
+                const entryStr = new Date(t.date.seconds * 1000).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' });
 
                 return (
                   <tr key={t.id} className="hover:bg-[#f8fafc] transition-colors group">
                     <td className="py-4 px-4 text-[#a28089] text-xs">{filteredTrades.length - i}</td>
                     <td className="py-4 px-4 text-[#8458B3] font-black tracking-tight">{t.symbol}</td>
-                    <td className="py-4 px-4 text-[#a28089] text-xs">{new Date(t.date.seconds * 1000).toLocaleDateString('en-GB', {day:'2-digit', month:'short'})}</td>
+                    <td className="py-4 px-4 text-[#a28089] text-xs">{entryStr}</td>
                     <td className="py-4 px-4 text-[#a28089] text-xs">{exitStr}</td>
                     
-                    <td className="py-4 px-4">
+                    <td className="py-4 px-4 text-[#1a1a2e]">
                       <div className="flex flex-col items-center">
-                        <span className="text-[#1a1a2e]">₹{(t.quantity * t.entry).toLocaleString()}</span>
-                        <span className="text-xs text-[#a28089] mt-0.5">{t.quantity} Qty</span>
+                        <span>₹{t.entry}</span>
+                        <span className="text-xs text-[#a28089]">CMP: ₹{t.cmp || t.entry}</span>
                       </div>
                     </td>
                     
-                    <td className="py-4 px-4 text-[#1a1a2e]">₹{t.entry}</td>
-                    
-                    <td className="py-4 px-4">
-                      <div className="flex flex-col text-xs items-center">
-                        <span className={t.isRiskFree ? 'text-emerald-600' : 'text-rose-600'}>SL: {t.sl}</span>
-                        <span className="text-[#a28089] mt-1">CMP: {t.cmp || t.entry}</span>
+                    <td className="py-4 px-4 text-[#1a1a2e]">
+                      <div className="flex flex-col items-center">
+                        <span className={t.isRiskFree ? 'text-emerald-600 font-black' : 'text-rose-600 font-black'}>SL: ₹{t.sl}</span>
+                        <span className="text-xs text-[#a28089] mt-1">{t.quantity} Qty</span>
                       </div>
                     </td>
 
-                    <td className="py-4 px-4 align-middle">
+                    <td className="py-4 px-4">
                       <span className={`px-3 py-1 rounded-lg text-xs font-black uppercase border-2 ${
                         t.status === 'Win' ? 'bg-emerald-100 text-emerald-700 border-emerald-300' : 
                         t.status === 'Loss' ? 'bg-rose-100 text-rose-700 border-rose-300' : 
@@ -118,8 +123,14 @@ export default function Trades() {
                       }`}>{t.status}</span>
                     </td>
 
-                    <td className={`py-4 px-4 font-black text-base ${liveR >= 0 ? 'text-emerald-600' : 'text-rose-600'}`}>{liveR > 0 ? '+' : ''}{liveR.toFixed(2)}R</td>
-                    <td className={`py-4 px-4 font-black ${netPnl >= 0 ? 'text-emerald-600' : 'text-rose-600'}`}>₹{Math.floor(netPnl).toLocaleString()}</td>
+                    <td className={`py-4 px-4 font-black text-base ${metrics.r >= 0 ? 'text-emerald-600' : 'text-rose-600'}`}>
+                      {metrics.r > 0 ? '+' : ''}{metrics.r.toFixed(2)}R
+                    </td>
+                    
+                    <td className={`py-4 px-4 font-black ${metrics.pnl >= 0 ? 'text-emerald-600' : 'text-rose-600'}`}>
+                      ₹{Math.floor(metrics.pnl).toLocaleString()}
+                    </td>
+                    
                     <td className="py-4 px-4 text-[#a28089] text-xs">{calculateDays(new Date(t.date.seconds * 1000), t.exitDate)}</td>
                     
                     <td className="py-4 px-4">
