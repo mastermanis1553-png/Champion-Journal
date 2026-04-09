@@ -1,20 +1,20 @@
 @import "tailwindcss";
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
 
 /* ============================================
    DESIGN TOKENS
    ============================================ */
 
 :root {
-  --primary: #8458B3;
-  --secondary: #a0d2eb;
+  --primary: #7C5CFF;
+  --secondary: #5DADE2;
   --background: #e5eaf5;
   --accent: #d0bdf4;
   --muted: #a28089;
-  --text-primary: #8458B3;
-  --text-secondary: #a0d2eb;
-  --text-body: #1a1a2e;
-  --text-subtle: #a28089;
+  --text-primary: #1E1E2F;
+  --text-secondary: #6B7280;
+  --text-muted: #9CA3AF;
+  --border: #E5E7EB;
 }
 
 * {
@@ -23,9 +23,9 @@
 
 body {
   background: linear-gradient(135deg, #e5eaf5 0%, #f0f2f8 100%);
-  color: #1a1a2e;
+  color: #1E1E2F;
   font-family: 'Inter', system-ui, sans-serif;
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 400;
   line-height: 1.6;
   letter-spacing: -0.3px;
@@ -35,152 +35,138 @@ body {
 }
 
 /* ============================================
-   HEADING SYSTEM - NO ITALICS
+   HEADING SYSTEM
    ============================================ */
 
 h1, h2, h3, h4, h5, h6 {
   font-family: 'Poppins', system-ui, sans-serif;
-  font-style: normal;
   margin: 0;
   padding: 0;
   line-height: 1.3;
   letter-spacing: -0.5px;
+  font-style: normal;
 }
 
-/* H1 - Display Heading (Primary Color) */
 h1 {
-  font-size: 3.5rem;
-  font-weight: 900;
-  letter-spacing: -1px;
-  line-height: 1.1;
-  color: #8458B3;
+  font-size: 3rem;
+  font-weight: 600;
+  color: #7C5CFF;
   text-transform: uppercase;
 }
 
-/* H2 - Major Heading (Primary Color) */
 h2 {
-  font-size: 2.5rem;
-  font-weight: 800;
-  letter-spacing: -0.7px;
-  line-height: 1.2;
-  color: #8458B3;
+  font-size: 2rem;
+  font-weight: 600;
+  color: #7C5CFF;
   text-transform: uppercase;
 }
 
 h2 span {
-  color: #a0d2eb;
-  font-weight: 900;
-}
-
-/* H3 - Section Heading (Primary Color) */
-h3 {
-  font-size: 1.75rem;
-  font-weight: 700;
-  letter-spacing: -0.4px;
-  color: #8458B3;
-}
-
-/* H4 - Subsection (Body Color) */
-h4 {
-  font-size: 1.3rem;
-  font-weight: 700;
-  letter-spacing: -0.3px;
-  color: #1a1a2e;
-}
-
-/* H5 - Small Heading (Body Color) */
-h5 {
-  font-size: 1.1rem;
+  color: #5DADE2;
   font-weight: 600;
-  letter-spacing: -0.2px;
-  color: #1a1a2e;
 }
 
-/* H6 - Extra Small (Body Color) */
-h6 {
+h3 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #1E1E2F;
+}
+
+h4 {
+  font-size: 1.2rem;
+  font-weight: 500;
+  color: #1E1E2F;
+}
+
+h5 {
   font-size: 1rem;
   font-weight: 600;
-  color: #1a1a2e;
+  color: #1E1E2F;
+}
+
+h6 {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #1E1E2F;
+}
+
+p {
+  font-size: 0.95rem;
+  font-weight: 400;
+  color: #6B7280;
+  margin: 0;
 }
 
 /* ============================================
-   TEXT UTILITY CLASSES
+   TEXT UTILITIES
    ============================================ */
 
 .text-primary {
-  color: #8458B3;
-  font-weight: 600;
-  font-style: normal;
+  color: #7C5CFF;
+  font-weight: 500;
 }
 
 .text-secondary {
-  color: #a0d2eb;
-  font-weight: 600;
-  font-style: normal;
+  color: #5DADE2;
+  font-weight: 500;
 }
 
 .text-muted {
-  color: #a28089;
-  font-weight: 500;
-  font-style: normal;
+  color: #9CA3AF;
+  font-weight: 400;
 }
 
 .text-body {
-  color: #1a1a2e;
+  color: #1E1E2F;
   font-weight: 400;
-  font-style: normal;
 }
 
 /* ============================================
-   FORM & INPUT TYPOGRAPHY
+   FORM & INPUT
    ============================================ */
 
 label {
   font-family: 'Poppins', system-ui, sans-serif;
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   font-weight: 600;
   letter-spacing: 0.8px;
   text-transform: uppercase;
-  color: #8458B3;
+  color: #7C5CFF;
   line-height: 1.3;
-  font-style: normal;
 }
 
 input,
 textarea,
 select {
   font-family: 'Inter', system-ui, sans-serif;
-  font-size: 1rem;
-  font-weight: 500;
+  font-size: 0.95rem;
+  font-weight: 400;
   letter-spacing: -0.2px;
-  color: #1a1a2e;
-  font-style: normal;
+  color: #1E1E2F;
 }
 
 input::placeholder,
 textarea::placeholder {
-  color: #a28089;
+  color: #9CA3AF;
   font-weight: 400;
-  font-style: normal;
 }
 
 /* ============================================
-   BUTTON TYPOGRAPHY
+   BUTTON
    ============================================ */
 
 button,
 .btn {
   font-family: 'Poppins', system-ui, sans-serif;
-  font-size: 0.95rem;
-  font-weight: 700;
+  font-size: 0.9rem;
+  font-weight: 600;
   letter-spacing: 0.5px;
   text-transform: uppercase;
-  font-style: normal;
   transition: all 0.2s ease;
 }
 
 /* ============================================
-   TABLE TYPOGRAPHY
+   TABLE
    ============================================ */
 
 table {
@@ -189,20 +175,23 @@ table {
 
 thead th {
   font-family: 'Poppins', system-ui, sans-serif;
-  font-size: 0.8rem;
-  font-weight: 700;
+  font-size: 0.75rem;
+  font-weight: 600;
   letter-spacing: 0.8px;
   text-transform: uppercase;
-  color: #8458B3;
-  font-style: normal;
+  color: #7C5CFF;
 }
 
 tbody td {
   font-family: 'Inter', system-ui, sans-serif;
-  font-size: 0.95rem;
-  font-weight: 500;
-  color: #1a1a2e;
-  font-style: normal;
+  font-size: 0.9rem;
+  font-weight: 400;
+  color: #1E1E2F;
+}
+
+tbody td strong {
+  font-weight: 600;
+  color: #1E1E2F;
 }
 
 /* ============================================
@@ -219,40 +208,21 @@ tbody td {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: linear-gradient(180deg, #8458B3, #a0d2eb);
+  background: linear-gradient(180deg, #7C5CFF, #5DADE2);
   border-radius: 10px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(180deg, #a0d2eb, #d0bdf4);
+  background: linear-gradient(180deg, #5DADE2, #7C5CFF);
 }
 
 /* ============================================
-   RESPONSIVE TYPOGRAPHY
+   RESPONSIVE
    ============================================ */
 
 @media (max-width: 768px) {
   h1 {
-    font-size: 2.5rem;
-    letter-spacing: -0.7px;
-  }
-
-  h2 {
-    font-size: 1.875rem;
-  }
-
-  h3 {
-    font-size: 1.375rem;
-  }
-
-  input, textarea, select {
-    font-size: 16px;
-  }
-}
-
-@media (max-width: 480px) {
-  h1 {
-    font-size: 1.875rem;
+    font-size: 2rem;
   }
 
   h2 {
@@ -263,7 +233,21 @@ tbody td {
     font-size: 1.2rem;
   }
 
-  h4 {
-    font-size: 1.1rem;
+  input, textarea, select {
+    font-size: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  h1 {
+    font-size: 1.5rem;
+  }
+
+  h2 {
+    font-size: 1.2rem;
+  }
+
+  h3 {
+    font-size: 1rem;
   }
 }
