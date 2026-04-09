@@ -1,253 +1,35 @@
 @import "tailwindcss";
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
-
-/* ============================================
-   DESIGN TOKENS
-   ============================================ */
 
 :root {
-  --primary: #7C5CFF;
-  --secondary: #5DADE2;
-  --background: #e5eaf5;
-  --accent: #d0bdf4;
-  --muted: #a28089;
-  --text-primary: #1E1E2F;
-  --text-secondary: #6B7280;
-  --text-muted: #9CA3AF;
-  --border: #E5E7EB;
-}
-
-* {
-  font-family: 'Inter', system-ui, sans-serif;
+  --bg-freeze: #e5eaf5;
+  --ice-cold: #a0d2eb;
+  --med-purple: #d0bdf4;
+  --purple-pain: #8458B3;
+  --heavy-purple: #a28089;
+  --dark-slate: #494D5F; /* For readable text */
 }
 
 body {
-  background: linear-gradient(135deg, #e5eaf5 0%, #f0f2f8 100%);
-  color: #1E1E2F;
+  background-color: var(--bg-freeze);
+  color: var(--dark-slate);
   font-family: 'Inter', system-ui, sans-serif;
-  font-size: 14px;
-  font-weight: 400;
-  line-height: 1.6;
-  letter-spacing: -0.3px;
-  margin: 0;
   -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
 }
 
-/* ============================================
-   HEADING SYSTEM
-   ============================================ */
+/* Custom Soft Scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--med-purple); border-radius: 10px; }
 
-h1, h2, h3, h4, h5, h6 {
-  font-family: 'Poppins', system-ui, sans-serif;
-  margin: 0;
-  padding: 0;
-  line-height: 1.3;
-  letter-spacing: -0.5px;
-  font-style: normal;
-}
-
-h1 {
-  font-size: 3rem;
+/* Soft UI Table */
+.soft-table th {
+  background-color: #ffffff;
+  color: var(--heavy-purple);
   font-weight: 600;
-  color: #7C5CFF;
-  text-transform: uppercase;
+  border-bottom: 2px solid var(--bg-freeze);
 }
-
-h2 {
-  font-size: 2rem;
-  font-weight: 600;
-  color: #7C5CFF;
-  text-transform: uppercase;
-}
-
-h2 span {
-  color: #5DADE2;
-  font-weight: 600;
-}
-
-h3 {
-  font-size: 1.5rem;
-  font-weight: 600;
-  color: #1E1E2F;
-}
-
-h4 {
-  font-size: 1.2rem;
-  font-weight: 500;
-  color: #1E1E2F;
-}
-
-h5 {
-  font-size: 1rem;
-  font-weight: 600;
-  color: #1E1E2F;
-}
-
-h6 {
-  font-size: 0.95rem;
-  font-weight: 600;
-  color: #1E1E2F;
-}
-
-p {
-  font-size: 0.95rem;
-  font-weight: 400;
-  color: #6B7280;
-  margin: 0;
-}
-
-/* ============================================
-   TEXT UTILITIES
-   ============================================ */
-
-.text-primary {
-  color: #7C5CFF;
-  font-weight: 500;
-}
-
-.text-secondary {
-  color: #5DADE2;
-  font-weight: 500;
-}
-
-.text-muted {
-  color: #9CA3AF;
-  font-weight: 400;
-}
-
-.text-body {
-  color: #1E1E2F;
-  font-weight: 400;
-}
-
-/* ============================================
-   FORM & INPUT
-   ============================================ */
-
-label {
-  font-family: 'Poppins', system-ui, sans-serif;
-  font-size: 0.75rem;
-  font-weight: 600;
-  letter-spacing: 0.8px;
-  text-transform: uppercase;
-  color: #7C5CFF;
-  line-height: 1.3;
-}
-
-input,
-textarea,
-select {
-  font-family: 'Inter', system-ui, sans-serif;
-  font-size: 0.95rem;
-  font-weight: 400;
-  letter-spacing: -0.2px;
-  color: #1E1E2F;
-}
-
-input::placeholder,
-textarea::placeholder {
-  color: #9CA3AF;
-  font-weight: 400;
-}
-
-/* ============================================
-   BUTTON
-   ============================================ */
-
-button,
-.btn {
-  font-family: 'Poppins', system-ui, sans-serif;
-  font-size: 0.9rem;
-  font-weight: 600;
-  letter-spacing: 0.5px;
-  text-transform: uppercase;
-  transition: all 0.2s ease;
-}
-
-/* ============================================
-   TABLE
-   ============================================ */
-
-table {
-  font-family: 'Inter', system-ui, sans-serif;
-}
-
-thead th {
-  font-family: 'Poppins', system-ui, sans-serif;
-  font-size: 0.75rem;
-  font-weight: 600;
-  letter-spacing: 0.8px;
-  text-transform: uppercase;
-  color: #7C5CFF;
-}
-
-tbody td {
-  font-family: 'Inter', system-ui, sans-serif;
-  font-size: 0.9rem;
-  font-weight: 400;
-  color: #1E1E2F;
-}
-
-tbody td strong {
-  font-weight: 600;
-  color: #1E1E2F;
-}
-
-/* ============================================
-   SCROLLBAR
-   ============================================ */
-
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-
-::-webkit-scrollbar-track {
-  background: #e5eaf5;
-}
-
-::-webkit-scrollbar-thumb {
-  background: linear-gradient(180deg, #7C5CFF, #5DADE2);
-  border-radius: 10px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(180deg, #5DADE2, #7C5CFF);
-}
-
-/* ============================================
-   RESPONSIVE
-   ============================================ */
-
-@media (max-width: 768px) {
-  h1 {
-    font-size: 2rem;
-  }
-
-  h2 {
-    font-size: 1.5rem;
-  }
-
-  h3 {
-    font-size: 1.2rem;
-  }
-
-  input, textarea, select {
-    font-size: 16px;
-  }
-}
-
-@media (max-width: 480px) {
-  h1 {
-    font-size: 1.5rem;
-  }
-
-  h2 {
-    font-size: 1.2rem;
-  }
-
-  h3 {
-    font-size: 1rem;
-  }
+.soft-table td {
+  background-color: #ffffff;
+  border-bottom: 1px solid var(--bg-freeze);
+  color: var(--dark-slate);
 }

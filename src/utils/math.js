@@ -1,387 +1,78 @@
-// ============================================
-// 🔥 CORE CALCULATION ENGINE (SINGLE SOURCE OF TRUTH)
-// ============================================
+export const R_VALUE = 1250;
 
-/**
- * Get real-time trade metrics
- * ALWAYS calculate dynamically - never use stored values
- * 
- * Handles risk-free trades (entry === sl):
- * - risk = 0
- * - r = 0
- * - pnl = (price - entry) * quantity
- * 
- * @param {Object} trade - Trade object
- * @returns {Object} { risk (₹), r (R multiple), pnl (₹) } - ALWAYS returns valid object
- */
-export const getTradeMetrics = (trade) => {
-  // Parse values safely
-  const entry = parseFloat(trade.entry);
-  const sl = parseFloat(trade.sl);
-  const quantity = parseFloat(trade.quantity);
-  
-  // Get current price (CMP for open, exit for closed)
-  const currentPrice = parseFloat(trade.status === 'Open' 
-    ? (trade.cmp || trade.entry)
-    : (trade.exitPrice || trade.exit || trade.cmp || trade.entry)
-  );
-
-  // Validation - ONLY reject if entry, sl, or quantity are truly missing
-  if (!Number.isFinite(entry) || !Number.isFinite(sl) || !Number.isFinite(quantity) || quantity <= 0) {
-    return null;
-  }
-
-  // Price movement
-  const priceMove = currentPrice - entry;
-
-  // 🔥 RISK-FREE TRADE HANDLING: entry === sl
-  if (entry === sl) {
-    return {
-      risk: 0,              // No risk
-      r: 0,                 // No R earned/lost
-      pnl: priceMove * quantity  // P&L based on price movement
-    };
-  }
-
-  // NORMAL TRADE: entry !== sl
-  // Calculate risk per share
-  const riskPerShare = Math.abs(entry - sl);
-  
-  // Total risk in rupees
-  const totalRiskInRupees = riskPerShare * quantity;
-
-  // R-Multiple (how many risk units earned/lost)
-  const rMultiple = priceMove / riskPerShare;
-
-  // Profit/Loss in rupees
-  const profitLoss = priceMove * quantity;
-
-  return {
-    risk: totalRiskInRupees,        // Total risk in ₹
-    r: rMultiple,                    // R earned/lost
-    pnl: profitLoss                  // P&L in ₹
-  };
+// Date Normalizer (Asia/Kolkata)
+export const getISTDate = (timestamp) => {
+  if (!timestamp) return new Date();
+  const date = timestamp?.seconds ? new Date(timestamp.seconds * 1000) : new Date(timestamp);
+  return new Date(date.toLocaleString('en-US', { timeZone: 'Asia/Kolkata' }));
 };
 
-// ============================================
-// 📊 DASHBOARD METRICS (CLOSED TRADES ONLY)
-// ============================================
+// Core Trade Processor (Fixes LONG/SHORT, PnL, R-Multiple, Fees)
+export const processTrade = (t, globalR = 1250) => {
+  const entry = parseFloat(t.entry);
+  const exit = parseFloat(t.exitPrice || t.cmp || t.entry);
+  const sl = parseFloat(t.initialSl || t.sl);
+  const qty = parseFloat(t.quantity);
+  const fees = parseFloat(t.fees || 0);
+  const isShort = t.type === 'SHORT'; // Check if trade is short
 
-/**
- * Calculate all dashboard metrics
- * Based on CLOSED trades only
- * Includes real-time open trade metrics in net profit
- * 
- * ⚠️ CRITICAL: Do NOT filter out null metrics - only null means truly invalid data
- */
-export const calculateMetrics = (trades) => {
-  // Separate closed and open trades
-  const closedTrades = trades.filter(t => t.status !== 'Open');
-  const openTrades = trades.filter(t => t.status === 'Open');
+  const riskDist = Math.abs(entry - sl);
+  const riskAmount = riskDist * qty || parseFloat(t.riskAmount) || globalR;
 
-  // ============================================
-  // CLOSED TRADES ANALYSIS
-  // ============================================
+  // Exact R-Multiple Formula
+  let rewardDist = isShort ? (entry - exit) : (exit - entry);
+  let rMultiple = riskDist > 0 ? rewardDist / riskDist : 0;
+
+  // Exact PnL Formula
+  let grossPnl = rewardDist * qty;
+  let netPnl = grossPnl - fees;
+
+  return { ...t, riskDist, riskAmount, rMultiple, netPnl, grossPnl, isShort, dateObj: getISTDate(t.date) };
+};
+
+// Global Metrics Calculator
+export const calculateMetrics = (rawTrades, globalR = 1250) => {
+  // 1. Process & Sort Trades (Latest First)
+  const trades = rawTrades.map(t => processTrade(t, globalR)).sort((a, b) => b.dateObj - a.dateObj);
   
-  const enrichedClosed = closedTrades
-    .map(t => {
-      const metrics = getTradeMetrics(t);
-      return metrics ? { ...t, ...metrics } : null;
-    })
-    .filter(Boolean);
+  const closed = trades.filter(t => t.status !== 'Open');
+  const open = trades.filter(t => t.status === 'Open');
+  const total = closed.length;
 
-  const totalClosed = enrichedClosed.length;
+  const winners = closed.filter(t => t.rMultiple > 0.1);
+  const losers = closed.filter(t => t.rMultiple < -0.1);
+  const be = closed.filter(t => t.rMultiple >= -0.1 && t.rMultiple <= 0.1);
 
-  // Separate winners, losers, breakeven (including r=0 risk-free)
-  const winners = enrichedClosed.filter(t => t.r > 0.1);
-  const losers = enrichedClosed.filter(t => t.r < -0.1);
-  const breakEven = enrichedClosed.filter(t => Math.abs(t.r) <= 0.1);
+  const winRate = total > 0 ? (winners.length / total) : 0;
+  const lossRate = total > 0 ? (losers.length / total) : 0;
 
-  // Win rate (closed trades only)
-  const winRate = totalClosed > 0 ? winners.length / totalClosed : 0;
-  const lossRate = totalClosed > 0 ? losers.length / totalClosed : 0;
-  const beRate = totalClosed > 0 ? breakEven.length / totalClosed : 0;
+  const avgRGain = winners.length > 0 ? winners.reduce((s, t) => s + t.rMultiple, 0) / winners.length : 0;
+  const avgRLoss = losers.length > 0 ? Math.abs(losers.reduce((s, t) => s + t.rMultiple, 0) / losers.length) : 0;
 
-  // Average R per trade
-  const avgRGain = winners.length > 0
-    ? winners.reduce((sum, t) => sum + t.r, 0) / winners.length
-    : 0;
-
-  const avgRLoss = losers.length > 0
-    ? Math.abs(losers.reduce((sum, t) => sum + t.r, 0) / losers.length)
-    : 0;
-
-  const avgRBe = breakEven.length > 0
-    ? breakEven.reduce((sum, t) => sum + t.r, 0) / breakEven.length
-    : 0;
-
-  // Risk-Reward Ratio
-  const rrRatio = avgRLoss > 0 ? avgRGain / avgRLoss : 0;
-
-  // Expectancy (R-based)
+  const arr = avgRLoss > 0 ? avgRGain / avgRLoss : 0;
   const expectancy = (winRate * avgRGain) - (lossRate * avgRLoss);
+  
+  // Total PnL (Deducting fees automatically due to processTrade)
+  const totalNetPnl = closed.reduce((s, t) => s + t.netPnl, 0);
+  const intensity = expectancy * total * globalR;
 
-  // Total R from closed trades
-  const totalRFromClosed = enrichedClosed.reduce((sum, t) => sum + t.r, 0);
-
-  // 🔥 INTENSITY (R-BASED ONLY)
-  // Formula: Expectancy × Number of Closed Trades
-  // Result is in R, NOT in rupees
-  const intensity = expectancy * totalClosed;
-
-  // Average Money per trade
-  const avgMoneyGain = winners.length > 0
-    ? winners.reduce((sum, t) => sum + t.pnl, 0) / winners.length
-    : 0;
-
-  const avgMoneyLoss = losers.length > 0
-    ? Math.abs(losers.reduce((sum, t) => sum + t.pnl, 0) / losers.length)
-    : 0;
-
-  const avgMoneyBe = breakEven.length > 0
-    ? breakEven.reduce((sum, t) => sum + t.pnl, 0) / breakEven.length
-    : 0;
-
-  // Total P&L from closed trades
-  const closedNetPnl = enrichedClosed.reduce((sum, t) => sum + t.pnl, 0);
-
-  // ============================================
-  // OPEN TRADES ANALYSIS (REAL-TIME)
-  // ============================================
-
-  const enrichedOpen = openTrades
-    .map(t => {
-      const metrics = getTradeMetrics(t);
-      return metrics ? { ...t, ...metrics } : null;
-    })
-    .filter(Boolean);
-
-  // Total unrealized P&L from open trades (INCLUDING risk-free)
-  const unrealizedPnl = enrichedOpen.reduce((sum, t) => sum + t.pnl, 0);
-
-  // 🔥 TOTAL OPEN RISK (TOR)
-  // Formula: Sum of (|entry - sl| × quantity) for all open trades
-  // Risk-free trades contribute 0 to TOR
-  const torInRupees = enrichedOpen.reduce((sum, t) => sum + t.risk, 0);
-
-  // Total unrealized R from open trades (risk-free trades = 0R)
-  const totalRFromOpen = enrichedOpen.reduce((sum, t) => sum + t.r, 0);
-
-  // ============================================
-  // COMBINED METRICS
-  // ============================================
-
-  // Net P&L includes both closed + unrealized open
-  const netPnl = closedNetPnl + unrealizedPnl;
-
-  // Total R includes both closed + unrealized open
-  const totalR = totalRFromClosed + totalRFromOpen;
+  const tor = open.reduce((s, t) => s + (Math.abs(t.entry - t.sl) * t.quantity) / globalR, 0);
 
   return {
-    // Closed trades count
-    total: totalClosed,
-    winners: winners.length,
-    losers: losers.length,
-    be: breakEven.length,
-    open: openTrades.length,
-
-    // Win rates (closed only)
-    winRate,
-    lossRate,
-    beRate,
-
-    // R metrics (closed only)
-    avgRGain,
-    avgRLoss,
-    avgRBe,
-    rrRatio,
-    expectancy,
-    totalRFromClosed,
-
-    // 🔥 INTENSITY (R-BASED)
-    intensity,
-
-    // Money metrics (closed only)
-    avgMoneyGain,
-    avgMoneyLoss,
-    avgMoneyBe,
-    closedNetPnl,
-
-    // Real-time metrics (includes open)
-    unrealizedPnl,
-    netPnl,           // Closed + Open P&L in ₹
-    totalR,           // Closed + Open R earned
-    totalRFromOpen,   // Open trades R only
-
-    // Risk metrics
-    torInRupees,      // Total open risk in ₹
-
-    // Deprecated (kept for backward compatibility)
-    totalProfit: netPnl,
-    avgGainMoney: avgMoneyGain,
-    avgLossMoney: avgMoneyLoss,
-    avgBeMoney: avgMoneyBe,
-    arr: rrRatio
+    processedTrades: trades, total, winners: winners.length, losers: losers.length, be: be.length, open: open.length,
+    winRate, avgRGain, avgRLoss, arr, expectancy, tor, intensity, totalNetPnl
   };
 };
 
-// ============================================
-// 💰 POSITIONS PAGE METRICS
-// ============================================
-
-/**
- * Calculate metrics for open positions only
- * All values are REAL-TIME based on current CMP
- * Includes risk-free trades with risk=0
- */
-export const calculatePositionsMetrics = (trades) => {
-  const openTrades = trades.filter(t => t.status === 'Open');
-
-  // Total capital deployed
-  const totalExposure = openTrades.reduce((sum, t) => {
-    const entry = parseFloat(t.entry);
-    const qty = parseFloat(t.quantity);
-    return sum + (entry * qty);
-  }, 0);
-
-  // Total risk in rupees (risk-free trades = 0)
-  const totalOpenRiskRupees = openTrades.reduce((sum, t) => {
-    const metrics = getTradeMetrics(t);
-    return metrics ? sum + metrics.risk : sum;
-  }, 0);
-
-  // Total unrealized P&L (real-time, includes risk-free)
-  const totalUnrealizedPnl = openTrades.reduce((sum, t) => {
-    const metrics = getTradeMetrics(t);
-    return metrics ? sum + metrics.pnl : sum;
-  }, 0);
-
-  // Total unrealized R (risk-free trades = 0R)
-  const totalUnrealizedR = openTrades.reduce((sum, t) => {
-    const metrics = getTradeMetrics(t);
-    return metrics ? sum + metrics.r : sum;
-  }, 0);
-
-  return {
-    totalExposure,            // ₹ deployed
-    totalOpenRiskRupees,      // ₹ at risk
-    totalUnrealizedPnl,       // ₹ unrealized gain/loss
-    totalUnrealizedR,         // R unrealized
-    
-    // For backward compatibility
-    totalOpenRisk: totalOpenRiskRupees,
-    totalUnrealized: totalUnrealizedPnl
-  };
-};
-
-// ============================================
-// 🎯 LIVE R CALCULATION
-// ============================================
-
-/**
- * Get live R for a single trade at current CMP
- * Returns 0 for risk-free trades (entry === sl)
- */
-export const calculateLiveR = (trade, cmp) => {
-  const entry = parseFloat(trade.entry);
-  const sl = parseFloat(trade.sl);
-  const currentPrice = parseFloat(cmp || trade.cmp || trade.entry);
-
-  if (!Number.isFinite(entry) || !Number.isFinite(sl) || !Number.isFinite(currentPrice)) {
-    return 0;
-  }
-
-  // Risk-free trade
-  if (entry === sl) {
-    return 0;
-  }
-
-  const riskPerShare = Math.abs(entry - sl);
-  return (currentPrice - entry) / riskPerShare;
-};
-
-// ============================================
-// 📅 DAYS CALCULATION
-// ============================================
-
-export const calculateDays = (entryDate, exitDate) => {
-  const start = new Date(
-    entryDate?.seconds ? entryDate.seconds * 1000 : entryDate
-  );
-  const end = exitDate 
-    ? new Date(exitDate?.seconds ? exitDate.seconds * 1000 : exitDate)
-    : new Date();
-
-  const diffTime = Math.abs(end - start);
-  return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-};
-
-// ============================================
-// 📊 GROUP TRADES BY PERIOD
-// ============================================
-
-export const groupTrades = (trades, groupType = 'Quarterly') => {
+export const groupTrades = (trades, type) => {
   const groups = {};
-
-  trades.forEach(trade => {
-    const tradeDate = trade.date?.seconds
-      ? new Date(trade.date.seconds * 1000)
-      : new Date(trade.date);
-
-    let groupKey;
-
-    if (groupType === 'Monthly') {
-      const month = tradeDate.toLocaleString('default', { month: 'short' });
-      const year = tradeDate.getFullYear();
-      groupKey = `${month} ${year}`;
-    } else if (groupType === 'Yearly') {
-      groupKey = tradeDate.getFullYear().toString();
-    } else {
-      const quarter = Math.floor(tradeDate.getMonth() / 3) + 1;
-      const year = tradeDate.getFullYear();
-      groupKey = `Q${quarter} ${year}`;
-    }
-
-    if (!groups[groupKey]) {
-      groups[groupKey] = [];
-    }
-    groups[groupKey].push(trade);
+  trades.forEach(t => {
+    const d = t.dateObj;
+    let key = type === 'Monthly' ? d.toLocaleString('en-IN', { month: 'short', year: 'numeric' }) 
+            : type === 'Yearly' ? d.getFullYear().toString() 
+            : `Q${Math.floor(d.getMonth() / 3) + 1} ${d.getFullYear()}`;
+    if (!groups[key]) groups[key] =[];
+    groups[key].push(t);
   });
-
   return groups;
-};
-
-// ============================================
-// 🔄 CONVERT TOR TO R (FOR DISPLAY)
-// ============================================
-
-export const convertTorToR = (torInRupees, baseRiskAmount) => {
-  if (!baseRiskAmount || baseRiskAmount <= 0) return 0;
-  return torInRupees / baseRiskAmount;
-};
-
-// ============================================
-// ✅ VALIDATE TRADE DATA
-// ============================================
-
-/**
- * Validate trade before creating/updating
- * Note: entry === sl is now ALLOWED (risk-free trades)
- */
-export const validateTrade = (trade) => {
-  const entry = parseFloat(trade.entry);
-  const sl = parseFloat(trade.sl);
-  const qty = parseFloat(trade.quantity);
-
-  const errors = [];
-
-  if (!Number.isFinite(entry) || entry <= 0) errors.push('Invalid entry price');
-  if (!Number.isFinite(sl) || sl <= 0) errors.push('Invalid stop loss');
-  if (!Number.isFinite(qty) || qty <= 0) errors.push('Quantity must be greater than 0');
-  // ✅ REMOVED: entry === sl check - risk-free trades are now valid
-
-  return {
-    valid: errors.length === 0,
-    errors
-  };
 };
