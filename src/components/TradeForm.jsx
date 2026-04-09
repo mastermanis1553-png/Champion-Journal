@@ -26,12 +26,13 @@ export default function TradeForm() {
     await addTrade({
       date: Timestamp.fromDate(new Date(form.date || new Date())),
       symbol: form.symbol.toUpperCase(),
-      type: form.type, // LONG or SHORT
+      type: form.type,
       entry, sl: sl, target: parseFloat(form.target) || 0, 
       quantity: customQty, fees: parseFloat(form.fees) || 0,
       initialSl: sl, riskAmount: currentR, 
       status: 'Open', rMultiple: 0, cmp: entry, exitDate: null
     });
+
     setIsOpen(false);
     setForm({ date: '', symbol: '', type: 'LONG', entry: '', sl: '', target: '', quantity: '', fees: '0' });
   };
@@ -43,6 +44,18 @@ export default function TradeForm() {
         <h2 className="text-xl font-bold text-[#8458B3] mb-6 uppercase tracking-tight">New Position</h2>
         
         <form onSubmit={handleSubmit} className="space-y-4 text-[#494D5F]">
+
+          {/* ✅ DATE FIELD ADDED */}
+          <div>
+            <label className="text-[10px] font-semibold text-[#a28089] uppercase">Date</label>
+            <input 
+              type="date"
+              className="w-full bg-[#f8f9fc] border border-[#e5eaf5] p-3 rounded-xl text-sm focus:border-[#a0d2eb] outline-none"
+              value={form.date}
+              onChange={e => setForm({ ...form, date: e.target.value })}
+            />
+          </div>
+
           <div className="grid grid-cols-3 gap-3">
              <div className="col-span-1">
               <label className="text-[10px] font-semibold text-[#a28089] uppercase">Type</label>
