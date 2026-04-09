@@ -2,22 +2,25 @@ import React, { useState } from 'react';
 import TradeLogs from '../components/TradeLogs';
 import { Search, Filter } from 'lucide-react';
 import { useTrades } from '../context/TradeContext';
+import { processTrade } from '../utils/math';
 
 export default function Trades({ isDashboard, preProcessedData }) {
-  const { trades } = useTrades(); // ✅ fallback source
+  const { trades, settings } = useTrades();
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('All Trades');
   const [currentPage, setCurrentPage] = useState(1);
 
   const tradesPerPage = 30;
 
-  // ✅ FIX: fallback to trades if preProcessedData not available
-  const filteredTrades = (preProcessedData && preProcessedData.length > 0) ? preProcessedData : trades;
+  // ✅ FIX: always processed trades
+  const baseTrades = (preProcessedData && preProcessedData.length > 0)
+    ? preProcessedData
+    : trades.map(t => processTrade(t, settings?.rValue));
 
-  const totalPages = Math.ceil(filteredTrades.length / tradesPerPage);
+  const totalPages = Math.ceil(baseTrades.length / tradesPerPage);
 
   const startIndex = (currentPage - 1) * tradesPerPage;
-  const paginatedTrades = filteredTrades.slice(startIndex, startIndex + tradesPerPage);
+  const paginatedTrades = baseTrades.slice(startIndex, startIndex + tradesPerPage);
 
   return (
     <div className="space-y-6 animate-in fade-in duration-500 text-[#494D5F]">
