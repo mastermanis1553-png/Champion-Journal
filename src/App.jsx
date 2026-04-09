@@ -1,6 +1,7 @@
 import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
-// --- COMPONENTS & PAGES IMPORTS ---
+
+// IMPORTS
 import Layout from './components/Layout';
 import Trades from './pages/Trades';
 import Positions from './pages/Positions';
@@ -8,65 +9,35 @@ import Summary from './pages/Summary';
 import Dashboard from './pages/Dashboard';
 import Settings from './pages/Settings';
 import Help from './pages/Help';
-// --- AUTH IMPORTS ---
-import Signup from './components/Auth/Signup';
+import Diary from './pages/Diary';
+
 import Login from './components/Auth/Login';
+import Signup from './components/Auth/Signup';
 import { useAuth } from './context/AuthContext';
-// ============================================
-// PROTECTED ROUTE - Checks auth + approval
-// ============================================
+
 const ProtectedRoute = ({ children }) => {
-  const { user, userApproved, loading } = useAuth();
-
+  const { user, loading } = useAuth();
   if (loading) return null;
-
-  if (user && userApproved) {
-    return children;
-  }
-
-  return <Navigate to="/" replace />;
-};
-
-// ============================================
-// PUBLIC ROUTES
-// ============================================
-const PublicRoute = ({ children }) => {
-  const { user, userApproved, loading } = useAuth();
-
-  if (loading) return null;
-
-  if (user && userApproved) {
-    return <Navigate to="/dashboard" replace />;
-  }
-
-  return children;
+  return user ? children : <Navigate to="/login" replace />;
 };
 
 export default function App() {
   return (
     <Routes>
+      <Route path="/login" element={<Login />} />
+      <Route path="/signup" element={<Signup />} />
 
-      {/* PUBLIC ROUTES */}
-      <Route path="/" element={<PublicRoute><Signup /></PublicRoute>} />
-      <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
-
-      {/* PROTECTED ROUTES */}
-      <Route path="/dashboard" element={<ProtectedRoute><Layout /></ProtectedRoute>}>
-
-        {/* ✅ FIX: Dashboard show hoga ab */}
-        <Route index element={<Dashboard />} />
-
-        {/* Internal pages */}
+      <Route path="/" element={<ProtectedRoute><Layout /></ProtectedRoute>}>
+        <Route index element={<Navigate to="dashboard" replace />} />
+        
+        <Route path="dashboard" element={<Dashboard />} />
         <Route path="trades" element={<Trades />} />
         <Route path="positions" element={<Positions />} />
         <Route path="summary" element={<Summary />} />
+        <Route path="diary" element={<Diary />} />
         <Route path="settings" element={<Settings />} />
         <Route path="help" element={<Help />} />
       </Route>
-
-      {/* Catch-all */}
-      <Route path="*" element={<Navigate to="/" replace />} />
-
     </Routes>
   );
 }

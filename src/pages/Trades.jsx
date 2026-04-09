@@ -8,7 +8,6 @@ export default function Trades({ isDashboard, preProcessedData }) {
 
   return (
     <div className="space-y-6 animate-in fade-in duration-500 text-[#494D5F]">
-      {/* Page Header (Hides if rendered inside Dashboard) */}
       {!isDashboard && (
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
           <div>
@@ -19,33 +18,24 @@ export default function Trades({ isDashboard, preProcessedData }) {
       )}
 
       <div className="bg-white border border-[#d0bdf4] rounded-2xl shadow-sm overflow-hidden">
-        
-        {/* Controls: Search & Filter */}
         <div className="p-5 border-b border-[#e5eaf5] bg-[#f8f9fc] flex flex-col sm:flex-row justify-between items-center gap-4">
           <h3 className="font-semibold text-xs uppercase tracking-widest text-[#a28089] hidden sm:block">
             Execution Logs
           </h3>
-          
           <div className="flex items-center gap-3 w-full sm:w-auto">
-            {/* Search Bar */}
             <div className="relative flex-1 sm:w-64">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-[#a28089]" size={16} />
               <input 
-                type="text" 
-                placeholder="Search symbol..." 
-                className="w-full pl-9 pr-4 py-2 bg-white border border-[#d0bdf4] rounded-xl text-sm outline-none focus:border-[#a0d2eb] text-[#494D5F] font-medium transition-colors"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+                type="text" placeholder="Search symbol..." 
+                className="w-full pl-9 pr-4 py-2 bg-white border border-[#d0bdf4] rounded-xl text-sm outline-none focus:border-[#a0d2eb] text-[#494D5F] font-medium"
+                value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
-
-            {/* Filter Dropdown */}
             <div className="relative">
               <Filter className="absolute left-3 top-1/2 -translate-y-1/2 text-[#a28089]" size={16} />
               <select 
-                className="pl-9 pr-8 py-2 bg-white border border-[#d0bdf4] rounded-xl text-sm outline-none focus:border-[#a0d2eb] text-[#8458B3] font-bold appearance-none cursor-pointer transition-colors"
-                value={filterStatus}
-                onChange={(e) => setFilterStatus(e.target.value)}
+                className="pl-9 pr-8 py-2 bg-white border border-[#d0bdf4] rounded-xl text-sm outline-none focus:border-[#a0d2eb] text-[#8458B3] font-bold appearance-none cursor-pointer"
+                value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)}
               >
                 <option value="All Trades">All Trades</option>
                 <option value="Open">Open</option>
@@ -56,14 +46,7 @@ export default function Trades({ isDashboard, preProcessedData }) {
             </div>
           </div>
         </div>
-
-        {/* Trade Logs Table Component */}
-        {/* Note: In a real app, you pass searchTerm and filterStatus to TradeLogs to actually filter data */}
-        <TradeLogs 
-          preProcessedData={preProcessedData} 
-          searchTerm={searchTerm} 
-          filterStatus={filterStatus} 
-        />
+        <TradeLogs preProcessedData={preProcessedData} searchTerm={searchTerm} filterStatus={filterStatus} />
       </div>
     </div>
   );
