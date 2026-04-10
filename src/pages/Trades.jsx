@@ -23,7 +23,7 @@ export default function Trades({ isDashboard, preProcessedData }) {
   const paginatedTrades = baseTrades.slice(startIndex, startIndex + tradesPerPage);
 
   return (
-    <div className="space-y-4 sm:space-y-6 animate-in fade-in duration-500 text-[#494D5F] w-full max-w-full">
+    <div className="space-y-4 sm:space-y-6 animate-in fade-in duration-500 text-[#494D5F] w-full max-w-full min-w-0">
       
       {!isDashboard && (
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3 sm:gap-4 w-full max-w-full">
