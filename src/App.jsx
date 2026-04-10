@@ -23,7 +23,7 @@ const ProtectedRoute = ({ children }) => {
 
 export default function App() {
   return (
-    <div className="w-full max-w-full overflow-x-hidden">
+    <div className="w-full max-w-full overflow-hidden">
       <Routes>
         <Route path="/login" element={<div className="w-full max-w-full"><Login /></div>} />
         <Route path="/signup" element={<div className="w-full max-w-full"><Signup /></div>} />

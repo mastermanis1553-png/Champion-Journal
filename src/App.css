@@ -112,8 +112,3 @@
     padding: 32px;
   }
 }
-
-/* GLOBAL FIX FOR HORIZONTAL OVERFLOW */
-* {
-  max-width: 100%;
-}
