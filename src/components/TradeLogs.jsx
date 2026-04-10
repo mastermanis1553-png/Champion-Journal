@@ -31,23 +31,23 @@ export default function TradeLogs({ preProcessedData, searchTerm = '', filterSta
   };
 
   return (
-    <div className="w-full max-w-full overflow-x-auto">
-      <table className="w-full min-w-full text-left soft-table">
+    <div className="w-full overflow-x-auto">
+      <table className="w-full text-left soft-table">
         
         <thead>
           <tr className="text-[9px] sm:text-[10px] font-bold text-[#a28089] uppercase tracking-widest bg-white">
-            <th className="p-2 sm:p-3 md:p-4 break-words">Date</th>
-            {showExitDate && <th className="p-2 sm:p-3 md:p-4 break-words">Exit Date</th>}
-            <th className="p-2 sm:p-3 md:p-4 break-words">Type</th>
-            <th className="p-2 sm:p-3 md:p-4 break-words">Symbol</th>
-            <th className="p-2 sm:p-3 md:p-4 break-words">Entry</th>
-            {showPositionSize && <th className="p-2 sm:p-3 md:p-4 break-words">Position Size</th>}
-            <th className="p-2 sm:p-3 md:p-4 break-words">SL / CMP</th>
-            <th className="p-2 sm:p-3 md:p-4 break-words">Status</th>
-            <th className="p-2 sm:p-3 md:p-4 break-words">R-Earned</th>
-            <th className="p-2 sm:p-3 md:p-4 break-words">Net PnL</th>
-            <th className="p-2 sm:p-3 md:p-4 break-words">Days</th>
-            <th className="p-2 sm:p-3 md:p-4 text-center break-words">Actions</th>
+            <th className="p-2 sm:p-3 md:p-4 whitespace-nowrap">Date</th>
+            {showExitDate && <th className="p-2 sm:p-3 md:p-4 whitespace-nowrap">Exit Date</th>}
+            <th className="p-2 sm:p-3 md:p-4 whitespace-nowrap">Type</th>
+            <th className="p-2 sm:p-3 md:p-4 whitespace-nowrap">Symbol</th>
+            <th className="p-2 sm:p-3 md:p-4 whitespace-nowrap">Entry</th>
+            {showPositionSize && <th className="p-2 sm:p-3 md:p-4 whitespace-nowrap">Position Size</th>}
+            <th className="p-2 sm:p-3 md:p-4 whitespace-nowrap">SL / CMP</th>
+            <th className="p-2 sm:p-3 md:p-4 whitespace-nowrap">Status</th>
+            <th className="p-2 sm:p-3 md:p-4 whitespace-nowrap">R-Earned</th>
+            <th className="p-2 sm:p-3 md:p-4 whitespace-nowrap">Net PnL</th>
+            <th className="p-2 sm:p-3 md:p-4 whitespace-nowrap">Days</th>
+            <th className="p-2 sm:p-3 md:p-4 text-center whitespace-nowrap">Actions</th>
           </tr>
         </thead>
 

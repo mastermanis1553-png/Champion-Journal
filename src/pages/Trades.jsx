@@ -76,7 +76,7 @@ export default function Trades({ isDashboard, preProcessedData }) {
           </div>
         </div>
 
-        <div className="w-full max-w-full overflow-x-auto">
+        <div className="w-full overflow-x-auto">
           <TradeLogs
             preProcessedData={paginatedTrades}
             searchTerm={searchTerm}

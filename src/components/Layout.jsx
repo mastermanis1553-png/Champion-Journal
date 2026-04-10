@@ -19,7 +19,7 @@ export default function Layout() {
         }
       `}
     >
-      <span className="break-words">{label}</span>
+      <span className="whitespace-nowrap">{label}</span>
     </NavLink>
   );
 
@@ -58,7 +58,7 @@ export default function Layout() {
         </div>
       </header>
 
-      <main className="relative z-10 flex-1 overflow-auto p-4 sm:p-6 md:p-8 w-full max-w-full">
+      <main className="relative z-10 flex-1 min-w-0 w-full overflow-auto p-4 sm:p-6 md:p-8 max-w-full">
         <div className="w-full max-w-full">
           <Outlet />
         </div>
