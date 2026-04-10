@@ -32,7 +32,7 @@ export default function TradeLogs({ preProcessedData, searchTerm = '', filterSta
 
   return (
     <div className="w-full max-w-full overflow-x-auto">
-      <table className="w-full text-left soft-table">
+      <table className="w-full min-w-full text-left soft-table">
         
         <thead>
           <tr className="text-[9px] sm:text-[10px] font-bold text-[#a28089] uppercase tracking-widest bg-white">

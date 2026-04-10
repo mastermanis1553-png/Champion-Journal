@@ -59,7 +59,7 @@ export default function Layout() {
       </header>
 
       <main className="relative z-10 flex-1 overflow-auto p-4 sm:p-6 md:p-8 w-full max-w-full">
-        <div className="max-w-[1400px] mx-auto w-full max-w-full">
+        <div className="w-full max-w-full">
           <Outlet />
         </div>
       </main>
