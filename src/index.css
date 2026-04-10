@@ -55,20 +55,7 @@ svg {
 .soft-table {
   width: 100%;
   max-width: 100%;
-}
-
-/* Actual table */
-.soft-table {
   border-collapse: collapse;
-  width: 100%;
-}
-
-/* Cells fix overflow */
-.soft-table th,
-.soft-table td {
-  word-break: break-word;
-  overflow-wrap: break-word;
-  white-space: normal;
 }
 
 /* Header */
@@ -79,6 +66,7 @@ svg {
   border-bottom: 2px solid var(--bg-freeze);
   font-size: 12px;
   padding: 10px;
+  white-space: nowrap;
 }
 
 /* Body */
@@ -88,12 +76,8 @@ svg {
   color: var(--dark-slate);
   font-size: 13px;
   padding: 10px;
-}
-
-/* Prevent desktop overflow */
-table {
-  width: 100%;
-  max-width: 100%;
+  word-break: break-word;
+  overflow-wrap: break-word;
 }
 
 /* RESPONSIVE TEXT */
