@@ -79,7 +79,7 @@ export default function TradeLogs({ preProcessedData, searchTerm = '', filterSta
                 )}
 
                 <td className="p-2 sm:p-3 md:p-4 break-words">
-                  <span className={`text-[9px] sm:text-[10px] px-2 py-1 rounded font-bold break-words ${
+                  <span className={`text-[9px] sm:text-[10px] px-2 py-1 rounded font-bold ${
                     t.type === 'SHORT' ? 'bg-rose-100 text-rose-600' : 'bg-emerald-100 text-emerald-600'
                   }`}>
                     {t.type}
@@ -102,19 +102,19 @@ export default function TradeLogs({ preProcessedData, searchTerm = '', filterSta
 
                 <td className="p-2 sm:p-3 md:p-4 break-words">
                   <div className="flex flex-col leading-tight">
-                    <span className={`text-[9px] sm:text-[10px] font-bold break-words ${
+                    <span className={`text-[9px] sm:text-[10px] font-bold ${
                       t.isRiskFree ? 'text-[#a0d2eb]' : 'text-rose-400'
                     }`}>
                       SL: {t.sl}
                     </span>
-                    <span className="text-[9px] sm:text-[10px] font-semibold text-[#a28089] break-words">
+                    <span className="text-[9px] sm:text-[10px] font-semibold text-[#a28089]">
                       CMP: {t.cmp || t.entry}
                     </span>
                   </div>
                 </td>
 
                 <td className="p-2 sm:p-3 md:p-4 break-words">
-                  <span className={`px-2 py-1 rounded text-[9px] sm:text-[10px] font-bold uppercase break-words ${
+                  <span className={`px-2 py-1 rounded text-[9px] sm:text-[10px] font-bold uppercase ${
                     t.status === 'Win' ? 'bg-emerald-100 text-emerald-600' :
                     t.status === 'Loss' ? 'bg-rose-100 text-rose-600' :
                     t.status === 'BE' ? 'bg-[#e5eaf5] text-[#8458B3]' :
