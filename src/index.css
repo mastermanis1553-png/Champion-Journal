@@ -1,4 +1,4 @@
-/* ================= INDEX.CSS (RESPONSIVE IMPROVED) ================= */
+/* ================= INDEX.CSS (RESPONSIVE FIXED TABLE) ================= */
 
 @import "tailwindcss";
 
@@ -11,7 +11,7 @@
   --dark-slate: #494D5F;
 }
 
-/* GLOBAL RESET + RESPONSIVE BASE */
+/* GLOBAL RESET */
 *,
 *::before,
 *::after {
@@ -34,20 +34,7 @@ body {
   font-size: 14px;
 }
 
-/* RESPONSIVE FONT SCALING */
-@media (min-width: 640px) {
-  body {
-    font-size: 15px;
-  }
-}
-
-@media (min-width: 1024px) {
-  body {
-    font-size: 16px;
-  }
-}
-
-/* MEDIA ELEMENTS FIX */
+/* MEDIA FIX */
 img,
 video,
 canvas,
@@ -62,19 +49,29 @@ svg {
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--med-purple); border-radius: 10px; }
 
-/* TABLE RESPONSIVENESS */
+/* ================= TABLE FIX ================= */
+
+/* Wrapper only handles scroll */
 .soft-table {
   width: 100%;
-  overflow-x: auto;
-  display: block;
+  max-width: 100%;
 }
 
-.soft-table table {
-  width: 100%;
-  min-width: 600px;
+/* Actual table */
+.soft-table {
   border-collapse: collapse;
+  width: 100%;
 }
 
+/* Cells fix overflow */
+.soft-table th,
+.soft-table td {
+  word-break: break-word;
+  overflow-wrap: break-word;
+  white-space: normal;
+}
+
+/* Header */
 .soft-table th {
   background-color: #ffffff;
   color: var(--heavy-purple);
@@ -84,6 +81,7 @@ svg {
   padding: 10px;
 }
 
+/* Body */
 .soft-table td {
   background-color: #ffffff;
   border-bottom: 1px solid var(--bg-freeze);
@@ -92,7 +90,13 @@ svg {
   padding: 10px;
 }
 
-/* RESPONSIVE TABLE TEXT */
+/* Prevent desktop overflow */
+table {
+  width: 100%;
+  max-width: 100%;
+}
+
+/* RESPONSIVE TEXT */
 @media (min-width: 768px) {
   .soft-table th {
     font-size: 13px;

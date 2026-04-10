@@ -23,21 +23,29 @@ const ProtectedRoute = ({ children }) => {
 
 export default function App() {
   return (
-    <Routes>
-      <Route path="/login" element={<Login />} />
-      <Route path="/signup" element={<Signup />} />
+    <div className="w-full max-w-full overflow-x-hidden">
+      <Routes>
+        <Route path="/login" element={<div className="w-full max-w-full"><Login /></div>} />
+        <Route path="/signup" element={<div className="w-full max-w-full"><Signup /></div>} />
 
-      <Route path="/" element={<ProtectedRoute><Layout /></ProtectedRoute>}>
-        <Route index element={<Navigate to="dashboard" replace />} />
-        
-        <Route path="dashboard" element={<Dashboard />} />
-        <Route path="trades" element={<Trades />} />
-        <Route path="positions" element={<Positions />} />
-        <Route path="summary" element={<Summary />} />
-        <Route path="diary" element={<Diary />} />
-        <Route path="settings" element={<Settings />} />
-        <Route path="help" element={<Help />} />
-      </Route>
-    </Routes>
+        <Route path="/" element={
+          <ProtectedRoute>
+            <div className="w-full max-w-full">
+              <Layout />
+            </div>
+          </ProtectedRoute>
+        }>
+          <Route index element={<Navigate to="dashboard" replace />} />
+          
+          <Route path="dashboard" element={<div className="w-full max-w-full"><Dashboard /></div>} />
+          <Route path="trades" element={<div className="w-full max-w-full"><Trades /></div>} />
+          <Route path="positions" element={<div className="w-full max-w-full"><Positions /></div>} />
+          <Route path="summary" element={<div className="w-full max-w-full"><Summary /></div>} />
+          <Route path="diary" element={<div className="w-full max-w-full"><Diary /></div>} />
+          <Route path="settings" element={<div className="w-full max-w-full"><Settings /></div>} />
+          <Route path="help" element={<div className="w-full max-w-full"><Help /></div>} />
+        </Route>
+      </Routes>
+    </div>
   );
 }
