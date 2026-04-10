@@ -1,3 +1,4 @@
+// TradeForm.jsx
 import React, { useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useTrades } from '../context/TradeContext';
@@ -38,64 +39,63 @@ export default function TradeForm() {
   };
 
   const modal = isOpen && (
-    <div className="fixed inset-0 bg-[#494D5F]/80 backdrop-blur-sm flex items-center justify-center z-[9999] p-4">
-      <div className="bg-white border border-[#d0bdf4] p-8 rounded-3xl w-full max-w-md shadow-2xl relative">
+    <div className="fixed inset-0 bg-[#494D5F]/80 backdrop-blur-sm flex items-center justify-center z-[9999] p-4 w-full max-w-full overflow-y-auto">
+      <div className="bg-white border border-[#d0bdf4] p-8 rounded-3xl w-full max-w-md shadow-2xl relative max-w-full">
         <button onClick={() => setIsOpen(false)} className="absolute top-6 right-6 text-[#a28089] hover:text-[#8458B3]"><X size={20} /></button>
-        <h2 className="text-xl font-bold text-[#8458B3] mb-6 uppercase tracking-tight">New Position</h2>
+        <h2 className="text-xl font-bold text-[#8458B3] mb-6 uppercase tracking-tight break-words">New Position</h2>
         
-        <form onSubmit={handleSubmit} className="space-y-4 text-[#494D5F]">
+        <form onSubmit={handleSubmit} className="space-y-4 text-[#494D5F] w-full max-w-full">
 
-          {/* ✅ DATE FIELD ADDED */}
           <div>
             <label className="text-[10px] font-semibold text-[#a28089] uppercase">Date</label>
             <input 
               type="date"
-              className="w-full bg-[#f8f9fc] border border-[#e5eaf5] p-3 rounded-xl text-sm focus:border-[#a0d2eb] outline-none"
+              className="w-full bg-[#f8f9fc] border border-[#e5eaf5] p-3 rounded-xl text-sm focus:border-[#a0d2eb] outline-none max-w-full" 
               value={form.date}
               onChange={e => setForm({ ...form, date: e.target.value })}
             />
           </div>
 
-          <div className="grid grid-cols-3 gap-3">
+          <div className="grid grid-cols-3 gap-3 w-full max-w-full">
              <div className="col-span-1">
               <label className="text-[10px] font-semibold text-[#a28089] uppercase">Type</label>
-              <select className="w-full bg-[#e5eaf5] border-none p-3 rounded-xl text-sm font-bold text-[#8458B3] outline-none" value={form.type} onChange={e => setForm({...form, type: e.target.value})}>
+              <select className="w-full bg-[#e5eaf5] border-none p-3 rounded-xl text-sm font-bold text-[#8458B3] outline-none max-w-full" value={form.type} onChange={e => setForm({...form, type: e.target.value})}>
                 <option value="LONG">LONG</option>
                 <option value="SHORT">SHORT</option>
               </select>
             </div>
             <div className="col-span-2">
               <label className="text-[10px] font-semibold text-[#a28089] uppercase">Symbol</label>
-              <input type="text" required className="w-full bg-[#f8f9fc] border border-[#e5eaf5] p-3 rounded-xl text-sm uppercase focus:border-[#a0d2eb] outline-none" value={form.symbol} onChange={e => setForm({...form, symbol: e.target.value})} />
+              <input type="text" required className="w-full bg-[#f8f9fc] border border-[#e5eaf5] p-3 rounded-xl text-sm uppercase focus:border-[#a0d2eb] outline-none break-words max-w-full" value={form.symbol} onChange={e => setForm({...form, symbol: e.target.value})} />
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 gap-4 w-full max-w-full">
             <div>
               <label className="text-[10px] font-semibold text-[#a28089] uppercase">Entry Price</label>
-              <input type="number" step="any" required className="w-full bg-[#f8f9fc] border border-[#e5eaf5] p-3 rounded-xl text-sm focus:border-[#a0d2eb] outline-none" value={form.entry} onChange={e => setForm({...form, entry: e.target.value})} />
+              <input type="number" step="any" required className="w-full bg-[#f8f9fc] border border-[#e5eaf5] p-3 rounded-xl text-sm focus:border-[#a0d2eb] outline-none max-w-full" value={form.entry} onChange={e => setForm({...form, entry: e.target.value})} />
             </div>
             <div>
               <label className="text-[10px] font-semibold text-[#a28089] uppercase">Stop Loss</label>
-              <input type="number" step="any" required className="w-full bg-[#f8f9fc] border border-[#e5eaf5] p-3 rounded-xl text-sm focus:border-[#a0d2eb] outline-none" value={form.sl} onChange={e => setForm({...form, sl: e.target.value})} />
+              <input type="number" step="any" required className="w-full bg-[#f8f9fc] border border-[#e5eaf5] p-3 rounded-xl text-sm focus:border-[#a0d2eb] outline-none max-w-full" value={form.sl} onChange={e => setForm({...form, sl: e.target.value})} />
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 gap-4 w-full max-w-full">
             <div>
               <label className="text-[10px] font-semibold text-[#a28089] uppercase">Target Price</label>
-              <input type="number" step="any" className="w-full bg-[#f8f9fc] border border-[#e5eaf5] p-3 rounded-xl text-sm focus:border-[#a0d2eb] outline-none" value={form.target} onChange={e => setForm({...form, target: e.target.value})} />
+              <input type="number" step="any" className="w-full bg-[#f8f9fc] border border-[#e5eaf5] p-3 rounded-xl text-sm focus:border-[#a0d2eb] outline-none max-w-full" value={form.target} onChange={e => setForm({...form, target: e.target.value})} />
             </div>
             <div>
               <div className="flex justify-between items-end mb-1">
                 <label className="text-[10px] font-semibold text-[#8458B3] uppercase">Qty</label>
                 {idealQty > 0 && <button type="button" onClick={applyIdealQty} className="text-[9px] font-bold bg-[#d0bdf4] text-[#8458B3] px-2 py-0.5 rounded">Use: {idealQty}</button>}
               </div>
-              <input type="number" step="any" required className="w-full bg-[#e5eaf5] border border-[#d0bdf4] p-3 rounded-xl text-[#8458B3] font-bold text-sm outline-none" value={form.quantity} onChange={e => setForm({...form, quantity: e.target.value})} />
+              <input type="number" step="any" required className="w-full bg-[#e5eaf5] border border-[#d0bdf4] p-3 rounded-xl text-[#8458B3] font-bold text-sm outline-none max-w-full" value={form.quantity} onChange={e => setForm({...form, quantity: e.target.value})} />
             </div>
           </div>
 
-          <button type="submit" className="w-full bg-[#8458B3] hover:opacity-90 text-white font-bold py-4 rounded-xl mt-4 transition-opacity uppercase text-sm tracking-widest shadow-md">
+          <button type="submit" className="w-full bg-[#8458B3] hover:opacity-90 text-white font-bold py-4 rounded-xl mt-4 transition-opacity uppercase text-sm tracking-widest shadow-md max-w-full">
             Execute Order
           </button>
         </form>

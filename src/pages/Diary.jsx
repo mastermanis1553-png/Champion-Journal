@@ -1,3 +1,4 @@
+// Diary.jsx
 import React, { useState } from 'react';
 import { Calendar } from 'lucide-react';
 import MistakeForm from '../components/MistakeForm';
@@ -17,85 +18,80 @@ export default function Diary() {
   const freqMap = mistakes.reduce((acc, m) => { acc[m.type] = (acc[m.type] || 0) + 1; return acc; }, {});
   const mostFrequent = Object.keys(freqMap).sort((a,b) => freqMap[b] - freqMap[a])[0] || 'None';
 
-  // ✅ NEW: form se data add hoga
   const handleAddMistake = (newMistake) => {
     setMistakes([newMistake, ...mistakes]);
   };
 
   return (
-    <div className="space-y-6 animate-in fade-in duration-500 text-[#494D5F]">
-      <div>
-        <h1 className="text-2xl font-bold text-[#8458B3]">
+    <div className="space-y-6 animate-in fade-in duration-500 text-[#494D5F] w-full max-w-full">
+      <div className="w-full max-w-full">
+        <h1 className="text-2xl font-bold text-[#8458B3] break-words">
           TRADING <span className="text-[#a28089]">DIARY</span>
         </h1>
-        <p className="text-sm font-medium text-[#a28089]">
+        <p className="text-sm font-medium text-[#a28089] break-words">
           Track your mistakes and improve monthly.
         </p>
       </div>
 
-      {/* Analytics */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="bg-white border border-[#d0bdf4] p-5 rounded-2xl shadow-sm">
-          <p className="text-xs font-semibold text-[#a28089] uppercase">Total Mistakes</p>
-          <h2 className="text-3xl font-bold text-[#8458B3] mt-1">{total}</h2>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 w-full max-w-full">
+        <div className="bg-white border border-[#d0bdf4] p-5 rounded-2xl shadow-sm w-full max-w-full">
+          <p className="text-xs font-semibold text-[#a28089] uppercase break-words">Total Mistakes</p>
+          <h2 className="text-3xl font-bold text-[#8458B3] mt-1 break-words">{total}</h2>
         </div>
 
-        <div className="bg-white border border-[#d0bdf4] p-5 rounded-2xl shadow-sm">
-          <p className="text-xs font-semibold text-[#a28089] uppercase">Serious Mistakes</p>
-          <h2 className="text-3xl font-bold text-rose-500 mt-1">{highSev}</h2>
+        <div className="bg-white border border-[#d0bdf4] p-5 rounded-2xl shadow-sm w-full max-w-full">
+          <p className="text-xs font-semibold text-[#a28089] uppercase break-words">Serious Mistakes</p>
+          <h2 className="text-3xl font-bold text-rose-500 mt-1 break-words">{highSev}</h2>
         </div>
 
-        <div className="bg-white border border-[#d0bdf4] p-5 rounded-2xl shadow-sm">
-          <p className="text-xs font-semibold text-[#a28089] uppercase">Most Repeated</p>
-          <h2 className="text-xl font-semibold text-[#494D5F] mt-2">{mostFrequent}</h2>
+        <div className="bg-white border border-[#d0bdf4] p-5 rounded-2xl shadow-sm w-full max-w-full">
+          <p className="text-xs font-semibold text-[#a28089] uppercase break-words">Most Repeated</p>
+          <h2 className="text-xl font-semibold text-[#494D5F] mt-2 break-words">{mostFrequent}</h2>
         </div>
       </div>
 
-      {/* Table */}
-      <div className="bg-white border border-[#d0bdf4] rounded-2xl shadow-sm overflow-hidden">
-        <div className="p-4 border-b border-[#e5eaf5] flex justify-between items-center">
-          <h3 className="font-semibold text-[#8458B3]">Mistake Logs</h3>
-
-          {/* ✅ OLD BUTTON REMOVE → NEW COMPONENT */}
+      <div className="bg-white border border-[#d0bdf4] rounded-2xl shadow-sm overflow-hidden w-full max-w-full">
+        <div className="p-4 border-b border-[#e5eaf5] flex justify-between items-center w-full max-w-full">
+          <h3 className="font-semibold text-[#8458B3] break-words">Mistake Logs</h3>
           <MistakeForm onAdd={handleAddMistake} />
         </div>
 
-        <div className="overflow-x-auto">
-          <table className="w-full text-left whitespace-nowrap soft-table">
+        <div className="overflow-x-auto w-full max-w-full">
+          <table className="w-full text-left soft-table">
             <thead>
               <tr className="text-xs uppercase tracking-wide">
-                <th className="p-4">No.</th>
-                <th className="p-4">Date</th>
-                <th className="p-4">Mistake</th>
-                <th className="p-4">Details</th>
-                <th className="p-4">Setup</th>
-                <th className="p-4">Severity</th>
+                <th className="p-4 break-words">No.</th>
+                <th className="p-4 break-words">Date</th>
+                <th className="p-4 break-words">Mistake</th>
+                <th className="p-4 break-words">Details</th>
+                <th className="p-4 break-words">Setup</th>
+                <th className="p-4 break-words">Severity</th>
               </tr>
             </thead>
 
             <tbody className="text-sm font-medium">
               {mistakes.map((m, i) => (
                 <tr key={m.id} className="hover:bg-[#f8f9fc] transition">
-                  <td className="p-4">{i + 1}</td>
+                  <td className="p-4 break-words">{i + 1}</td>
 
-                  <td className="p-4 flex items-center gap-2">
+                  <td className="p-4 flex items-center gap-2 break-words">
                     <Calendar size={14} className="text-[#a0d2eb]"/> {m.date}
                   </td>
 
-                  <td className="p-4 text-[#8458B3]">{m.type}</td>
+                  <td className="p-4 text-[#8458B3] break-words">{m.type}</td>
 
-                  <td className="p-4 text-[#a28089] whitespace-normal min-w-[250px]">
+                  <td className="p-4 text-[#a28089] break-words">
                     {m.desc}
                   </td>
 
-                  <td className="p-4">
-                    <span className="bg-[#e5eaf5] text-[#8458B3] px-2 py-1 rounded text-xs">
+                  <td className="p-4 break-words">
+                    <span className="bg-[#e5eaf5] text-[#8458B3] px-2 py-1 rounded text-xs break-words">
                       {m.tag}
                     </span>
                   </td>
 
-                  <td className="p-4">
-                    <span className={`px-2 py-1 rounded text-xs ${
+                  <td className="p-4 break-words">
+                    <span className={`px-2 py-1 rounded text-xs break-words ${
                       m.severity === 'High' ? 'bg-rose-100 text-rose-600' :
                       m.severity === 'Medium' ? 'bg-orange-100 text-orange-600' :
                       'bg-emerald-100 text-emerald-600'

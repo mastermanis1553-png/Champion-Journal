@@ -1,3 +1,4 @@
+// Trades.jsx
 import React, { useState } from 'react';
 import TradeLogs from '../components/TradeLogs';
 import { Search, Filter } from 'lucide-react';
@@ -25,22 +26,21 @@ export default function Trades({ isDashboard, preProcessedData }) {
     <div className="space-y-4 sm:space-y-6 animate-in fade-in duration-500 text-[#494D5F] w-full max-w-full overflow-x-hidden">
       
       {!isDashboard && (
-        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3 sm:gap-4">
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3 sm:gap-4 w-full max-w-full">
           <div>
-            <h1 className="text-xl sm:text-2xl font-bold text-[#8458B3] uppercase tracking-tight">
+            <h1 className="text-xl sm:text-2xl font-bold text-[#8458B3] uppercase tracking-tight break-words">
               Trade <span className="text-[#a28089]">History</span>
             </h1>
-            <p className="text-xs sm:text-sm font-medium text-[#a28089] mt-1">
+            <p className="text-xs sm:text-sm font-medium text-[#a28089] mt-1 break-words">
               Detailed log of all your executions and historical data.
             </p>
           </div>
         </div>
       )}
 
-      <div className="bg-white border border-[#d0bdf4] rounded-xl sm:rounded-2xl shadow-sm overflow-hidden w-full">
+      <div className="bg-white border border-[#d0bdf4] rounded-xl sm:rounded-2xl shadow-sm overflow-hidden w-full max-w-full">
         
-        {/* HEADER */}
-        <div className="p-3 sm:p-4 md:p-5 border-b border-[#e5eaf5] bg-[#f8f9fc] flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 sm:gap-4">
+        <div className="p-3 sm:p-4 md:p-5 border-b border-[#e5eaf5] bg-[#f8f9fc] flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 sm:gap-4 w-full max-w-full">
           
           <h3 className="font-semibold text-[10px] sm:text-xs uppercase tracking-widest text-[#a28089] hidden sm:block">
             Execution Logs
@@ -48,23 +48,21 @@ export default function Trades({ isDashboard, preProcessedData }) {
 
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 w-full sm:w-auto">
             
-            {/* SEARCH */}
-            <div className="relative w-full sm:w-56 md:w-64">
+            <div className="relative w-full sm:w-56 md:w-64 max-w-full">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-[#a28089]" size={14} />
               <input
                 type="text"
                 placeholder="Search symbol..."
-                className="w-full pl-8 sm:pl-9 pr-3 sm:pr-4 py-2 bg-white border border-[#d0bdf4] rounded-lg sm:rounded-xl text-xs sm:text-sm outline-none focus:border-[#a0d2eb] text-[#494D5F] font-medium"
+                className="w-full pl-8 sm:pl-9 pr-3 sm:pr-4 py-2 bg-white border border-[#d0bdf4] rounded-lg sm:rounded-xl text-xs sm:text-sm outline-none focus:border-[#a0d2eb] text-[#494D5F] font-medium max-w-full"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
 
-            {/* FILTER */}
-            <div className="relative w-full sm:w-auto">
+            <div className="relative w-full sm:w-auto max-w-full">
               <Filter className="absolute left-3 top-1/2 -translate-y-1/2 text-[#a28089]" size={14} />
               <select
-                className="w-full sm:w-auto pl-8 sm:pl-9 pr-6 sm:pr-8 py-2 bg-white border border-[#d0bdf4] rounded-lg sm:rounded-xl text-xs sm:text-sm outline-none focus:border-[#a0d2eb] text-[#8458B3] font-bold appearance-none cursor-pointer"
+                className="w-full sm:w-auto pl-8 sm:pl-9 pr-6 sm:pr-8 py-2 bg-white border border-[#d0bdf4] rounded-lg sm:rounded-xl text-xs sm:text-sm outline-none focus:border-[#a0d2eb] text-[#8458B3] font-bold appearance-none cursor-pointer max-w-full"
                 value={filterStatus}
                 onChange={(e) => setFilterStatus(e.target.value)}
               >
@@ -78,8 +76,7 @@ export default function Trades({ isDashboard, preProcessedData }) {
           </div>
         </div>
 
-        {/* TABLE / LOGS */}
-        <div className="w-full overflow-x-auto">
+        <div className="w-full max-w-full overflow-x-auto">
           <TradeLogs
             preProcessedData={paginatedTrades}
             searchTerm={searchTerm}
@@ -89,10 +86,9 @@ export default function Trades({ isDashboard, preProcessedData }) {
           />
         </div>
 
-        {/* PAGINATION */}
-        <div className="flex flex-col sm:flex-row justify-between items-center gap-2 sm:gap-3 p-3 sm:p-4 border-t border-[#e5eaf5] bg-[#f8f9fc]">
+        <div className="flex flex-col sm:flex-row justify-between items-center gap-2 sm:gap-3 p-3 sm:p-4 border-t border-[#e5eaf5] bg-[#f8f9fc] w-full max-w-full">
           
-          <p className="text-xs sm:text-sm text-[#a28089] font-medium text-center sm:text-left">
+          <p className="text-xs sm:text-sm text-[#a28089] font-medium text-center sm:text-left break-words">
             Page {currentPage} of {totalPages || 1}
           </p>
 

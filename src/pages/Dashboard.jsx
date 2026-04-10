@@ -1,32 +1,31 @@
+// Dashboard.jsx
 import React from 'react';
 import { useTrades } from '../context/TradeContext';
 import { calculateMetrics } from '../utils/math';
 
 export default function Dashboard() {
   const { trades, settings } = useTrades();
-  // Using the new unified single source of truth
   const m = calculateMetrics(trades, settings?.rValue || 1250);
 
-  // NaN fix: Agar m.totalNetPnl NaN hai toh 0 dikhayega
   const safeNetPnl = isNaN(m.totalNetPnl) ? 0 : m.totalNetPnl;
 
   const MetricCard = ({ title, value, sub, color="text-[#8458B3]", bg="bg-white" }) => (
-    <div className={`${bg} border border-[#d0bdf4] p-6 rounded-2xl shadow-sm`}>
-      <p className="text-[10px] font-semibold text-[#a28089] uppercase tracking-widest mb-1">{title}</p>
-      <h2 className={`text-3xl font-bold ${color}`}>{value}</h2>
-      <p className="text-[10px] font-medium text-[#a28089] mt-2">{sub}</p>
+    <div className={`${bg} border border-[#d0bdf4] p-6 rounded-2xl shadow-sm w-full max-w-full`}>
+      <p className="text-[10px] font-semibold text-[#a28089] uppercase tracking-widest mb-1 break-words">{title}</p>
+      <h2 className={`text-3xl font-bold ${color} break-words`}>{value}</h2>
+      <p className="text-[10px] font-medium text-[#a28089] mt-2 break-words">{sub}</p>
     </div>
   );
 
   return (
-    <div className="space-y-6 animate-in fade-in duration-500">
-      <div>
-        <h1 className="text-2xl font-bold text-[#494D5F]">
+    <div className="space-y-6 animate-in fade-in duration-500 w-full max-w-full">
+      <div className="w-full max-w-full">
+        <h1 className="text-2xl font-bold text-[#494D5F] break-words">
           TRADING <span className="text-[#8458B3]">TERMINAL</span>
         </h1>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 w-full max-w-full">
         <MetricCard
           title="Win Rate"
           value={`${(m.winRate * 100).toFixed(1)}%`}
@@ -52,12 +51,12 @@ export default function Dashboard() {
         />
       </div>
 
-      <div className="bg-[#ffffff] border border-[#d0bdf4] p-5 rounded-2xl text-center shadow-sm">
-        <p className="text-xs font-semibold text-[#a28089] uppercase tracking-widest">
+      <div className="bg-[#ffffff] border border-[#d0bdf4] p-5 rounded-2xl text-center shadow-sm w-full max-w-full">
+        <p className="text-xs font-semibold text-[#a28089] uppercase tracking-widest break-words">
           Total Open Risk (TOR)
         </p>
         <h2
-          className={`text-3xl font-bold mt-1 ${
+          className={`text-3xl font-bold mt-1 break-words ${
             m.tor > 3 ? 'text-rose-500' : 'text-[#8458B3]'
           }`}
         >

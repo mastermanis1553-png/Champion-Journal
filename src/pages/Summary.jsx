@@ -1,3 +1,4 @@
+// Summary.jsx
 import React, { useState } from 'react';
 import { useTrades } from '../context/TradeContext';
 import { groupTrades, calculateMetrics } from '../utils/math';
@@ -10,12 +11,14 @@ export default function Summary() {
 
   const Row = ({ label, func, color = "text-[#494D5F]", isR = false, isP = false, isMoney = false, bg = "bg-white" }) => (
     <tr>
-      <td className={`p-4 font-semibold text-[#a28089] border border-[#e5eaf5] text-xs uppercase tracking-wider ${bg}`}>{label}</td>
+      <td className={`p-4 font-semibold text-[#a28089] border border-[#e5eaf5] text-xs uppercase tracking-wider ${bg} break-words`}>
+        {label}
+      </td>
       {keys.map(k => {
         const m = calculateMetrics(groups[k], settings?.rValue || 1250);
         const val = func(m, groups[k]) || 0;
         return (
-          <td key={k} className={`p-4 text-center border border-[#e5eaf5] text-sm font-bold ${bg} ${color}`}>
+          <td key={k} className={`p-4 text-center border border-[#e5eaf5] text-sm font-bold ${bg} ${color} break-words`}>
             {isP ? `${(val * 100).toFixed(1)}%` : 
              isMoney ? `₹${Math.floor(val).toLocaleString()}` : 
              isR ? val.toFixed(2) : val}
@@ -28,22 +31,32 @@ export default function Summary() {
   const Spacer = () => <tr><td colSpan={keys.length + 1} className="h-4 bg-[#e5eaf5]"></td></tr>;
 
   return (
-    <div className="animate-in fade-in duration-500">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold text-[#8458B3] uppercase tracking-tight">Performance <span className="text-[#a28089]">Matrix</span></h1>
-        <div className="bg-white border border-[#d0bdf4] p-1 rounded-xl flex gap-1 shadow-sm">
+    <div className="animate-in fade-in duration-500 w-full max-w-full">
+      <div className="flex justify-between items-center mb-6 flex-wrap gap-3 w-full max-w-full">
+        <h1 className="text-2xl font-bold text-[#8458B3] uppercase tracking-tight break-words">
+          Performance <span className="text-[#a28089]">Matrix</span>
+        </h1>
+        <div className="bg-white border border-[#d0bdf4] p-1 rounded-xl flex gap-1 shadow-sm flex-wrap">
           {['Monthly', 'Quarterly', 'Yearly'].map(t => (
-            <button key={t} onClick={() => setTab(t)} className={`px-5 py-2.5 rounded-lg text-sm font-semibold transition-all ${tab === t ? 'bg-[#8458B3] text-white shadow-sm' : 'text-[#a28089] hover:text-[#8458B3]'}`}>{t}</button>
+            <button key={t} onClick={() => setTab(t)} className={`px-5 py-2.5 rounded-lg text-sm font-semibold transition-all ${tab === t ? 'bg-[#8458B3] text-white shadow-sm' : 'text-[#a28089] hover:text-[#8458B3]'}`}>
+              {t}
+            </button>
           ))}
         </div>
       </div>
 
-      <div className="overflow-x-auto rounded-2xl border border-[#d0bdf4] shadow-sm bg-white">
-        <table className="w-full text-left border-collapse whitespace-nowrap">
+      <div className="overflow-x-auto rounded-2xl border border-[#d0bdf4] shadow-sm bg-white w-full max-w-full">
+        <table className="w-full text-left border-collapse">
           <thead>
             <tr>
-              <th className="p-4 bg-[#f8f9fc] border border-[#e5eaf5] text-xs font-bold text-[#8458B3] uppercase tracking-widest">Metrics View (R Based)</th>
-              {keys.map(k => <th key={k} className="p-4 text-center bg-[#f8f9fc] border border-[#e5eaf5] text-sm font-bold text-[#494D5F]">{k}</th>)}
+              <th className="p-4 bg-[#f8f9fc] border border-[#e5eaf5] text-xs font-bold text-[#8458B3] uppercase tracking-widest break-words">
+                Metrics View (R Based)
+              </th>
+              {keys.map(k => (
+                <th key={k} className="p-4 text-center bg-[#f8f9fc] border border-[#e5eaf5] text-sm font-bold text-[#494D5F] break-words">
+                  {k}
+                </th>
+              ))}
             </tr>
           </thead>
           <tbody>
