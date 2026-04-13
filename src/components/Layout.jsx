@@ -1,10 +1,23 @@
 // Layout.jsx
 import React from 'react';
-import { Outlet, NavLink } from 'react-router-dom';
+import { Outlet, NavLink, useNavigate } from 'react-router-dom';
 import TradeForm from './TradeForm';
 import { LogOut, Activity } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
 
 export default function Layout() {
+  const { logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      navigate('/login');
+    } catch (error) {
+      console.error("Logout failed:", error);
+    }
+  };
+
   const NavItem = ({ to, label }) => (
     <NavLink 
       to={to} 
@@ -52,7 +65,11 @@ export default function Layout() {
           <div className="scale-90 sm:scale-95 md:scale-100 max-w-full">
             <TradeForm />
           </div>
-          <button className="text-[#a28089] hover:text-rose-500 p-2 transition">
+          <button 
+            onClick={handleLogout}
+            className="text-[#a28089] hover:text-rose-500 p-2 transition"
+            title="Logout"
+          >
             <LogOut size={18}/>
           </button>
         </div>
