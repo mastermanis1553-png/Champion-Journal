@@ -18,75 +18,70 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  useEffect(() => {
+  // Error Message Helper (Moved outside to be clean)
+  const getErrorMessage = (code) => {
+    const errorMap = {
+      'auth/email-already-in-use': 'Email already registered. Please login.',
+      'auth/invalid-email': 'Invalid email address.',
+      'auth/weak-password': 'Password must be at least 6 characters.',
+      'auth/user-not-found': 'No account found.',
+      'auth/wrong-password': 'Incorrect password.',
+      'auth/too-many-requests': 'Too many attempts. Try later.',
+    };
+    return errorMap[code] || 'An authentication error occurred.';
+  };
 
-    const checkRedirect = async () => {
+  useEffect(() => {
+    // 1. Check for Redirect Result (Google Login)
+    const handleRedirect = async () => {
       try {
-        const result = await getRedirectResult(auth);
-        if (result) {
-          console.log("Redirect login success");
-        }
+        await getRedirectResult(auth);
       } catch (err) {
-        console.error("Redirect error:", err);
+        console.error("Redirect Error:", err);
         setError(err.message);
       }
     };
+    handleRedirect();
 
-    checkRedirect();
-
+    // 2. Auth State Listener
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
+      setLoading(true);
       try {
         if (currentUser) {
           const userDocRef = doc(db, 'users', currentUser.uid);
-          const userDocSnap = await getDoc(userDocRef);
+          let userDocSnap = await getDoc(userDocRef);
 
-          console.log("USER:", currentUser);
-          console.log("DATA:", userDocSnap.data());
-
-          // ✅ FIX 1: agar doc exist nahi karta
+          // Agar Firestore mein entry nahi hai (Pehli baar login)
           if (!userDocSnap.exists()) {
-            await setDoc(userDocRef, {
+            const newUserData = {
               email: currentUser.email,
               uid: currentUser.uid,
-              approved: false,
+              approved: false, // Default: Not approved
               createdAt: serverTimestamp(),
               lastLogin: serverTimestamp(),
               displayName: currentUser.displayName || '',
               photoURL: currentUser.photoURL || null,
-              authMethod: 'google'
-            });
-
-            setUser(null);
-            setUserApproved(false);
-            setError('Account created! Please wait for admin approval.');
-            await signOut(auth);
-            return;
+              authMethod: currentUser.providerData[0]?.providerId || 'email'
+            };
+            await setDoc(userDocRef, newUserData);
+            
+            // Re-fetch to be sure
+            userDocSnap = await getDoc(userDocRef);
           }
 
           const userData = userDocSnap.data();
-
-          // ✅ FIX 2: agar approved field missing hai
-          if (userData.approved === undefined) {
-            await setDoc(userDocRef, { approved: false }, { merge: true });
-
-            setUser(null);
-            setUserApproved(false);
-            setError('Your account is not approved yet. Please wait for admin approval.');
-            await signOut(auth);
-            return;
-          }
 
           if (userData.approved === true) {
             setUser(currentUser);
             setUserApproved(true);
             setError(null);
           } else {
-            setUser(null);
+            // ✅ DO NOT SignOut here. Just set states.
+            // UI will check userApproved and block access.
+            setUser(currentUser); 
             setUserApproved(false);
-            setError('Your account is not approved yet. Please wait for admin approval.');
-            await signOut(auth);
+            setError('Account Pending Approval. Please contact admin.');
           }
-
         } else {
           setUser(null);
           setUserApproved(false);
@@ -94,9 +89,7 @@ export const AuthProvider = ({ children }) => {
         }
       } catch (err) {
         console.error('Auth state error:', err);
-        setError(err.message);
-        setUser(null);
-        setUserApproved(false);
+        setError('Database connection error.');
       } finally {
         setLoading(false);
       }
@@ -105,130 +98,36 @@ export const AuthProvider = ({ children }) => {
     return unsubscribe;
   }, []);
 
+  // Email Signup
   const signupWithEmail = async (email, password) => {
     try {
       setError(null);
-
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-      const firebaseUser = userCredential.user;
-
-      const userDocRef = doc(db, 'users', firebaseUser.uid);
-      await setDoc(userDocRef, {
-        email: firebaseUser.email,
-        uid: firebaseUser.uid,
-        approved: false,
-        createdAt: serverTimestamp(),
-        lastLogin: serverTimestamp(),
-        displayName: '',
-        photoURL: null,
-        authMethod: 'email'
-      });
-
-      await signOut(auth);
-      setUser(null);
-      setUserApproved(false);
-
-      return {
-        success: true,
-        message: 'Account created! Please wait for admin approval to access the dashboard.'
-      };
+      const res = await createUserWithEmailAndPassword(auth, email, password);
+      // Firestore entry logic handled by onAuthStateChanged listener above
+      return { success: true };
     } catch (err) {
-      const errorMessage = getErrorMessage(err.code);
-      setError(errorMessage);
-      throw new Error(errorMessage);
+      const msg = getErrorMessage(err.code);
+      setError(msg);
+      throw new Error(msg);
     }
   };
 
+  // Email Login
   const loginWithEmail = async (email, password) => {
     try {
       setError(null);
-
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      const firebaseUser = userCredential.user;
-
-      const userDocRef = doc(db, 'users', firebaseUser.uid);
-      const userDocSnap = await getDoc(userDocRef);
-
-      if (!userDocSnap.exists()) {
-        await setDoc(userDocRef, {
-          email: firebaseUser.email,
-          uid: firebaseUser.uid,
-          approved: false,
-          createdAt: serverTimestamp(),
-          lastLogin: serverTimestamp(),
-          displayName: '',
-          photoURL: null,
-          authMethod: 'email'
-        });
-        await signOut(auth);
-        throw new Error('Your account is not approved yet. Please wait for admin approval.');
-      }
-
-      const userData = userDocSnap.data();
-
-      if (userData.approved !== true) {
-        await signOut(auth);
-        setUser(null);
-        setUserApproved(false);
-        throw new Error('Your account is not approved yet. Please wait for admin approval.');
-      }
-
-      await setDoc(userDocRef, { lastLogin: serverTimestamp() }, { merge: true });
-
-      setUser(firebaseUser);
-      setUserApproved(true);
-      setError(null);
-
+      await signInWithEmailAndPassword(auth, email, password);
       return { success: true };
     } catch (err) {
-      const errorMessage = getErrorMessage(err.code) || err.message;
-      setError(errorMessage);
-      setUser(null);
-      setUserApproved(false);
-      throw new Error(errorMessage);
+      const msg = getErrorMessage(err.code);
+      setError(msg);
+      throw new Error(msg);
     }
   };
 
-  const loginWithGoogle = async () => {
-    try {
-      setError(null);
+  const loginWithGoogle = () => signInWithRedirect(auth, googleProvider);
 
-      await signInWithRedirect(auth, googleProvider);
-
-    } catch (err) {
-      const errorMessage = err.message;
-      setError(errorMessage);
-      setUser(null);
-      setUserApproved(false);
-      throw new Error(errorMessage);
-    }
-  };
-
-  const logout = async () => {
-    try {
-      await signOut(auth);
-      setUser(null);
-      setUserApproved(false);
-      setError(null);
-    } catch (err) {
-      console.error('Logout error:', err);
-      setError(err.message);
-    }
-  };
-
-  const getErrorMessage = (code) => {
-    const errorMap = {
-      'auth/email-already-in-use': 'Email already registered. Please login or use a different email.',
-      'auth/invalid-email': 'Invalid email address.',
-      'auth/weak-password': 'Password must be at least 6 characters.',
-      'auth/user-not-found': 'No account found with this email.',
-      'auth/wrong-password': 'Incorrect password.',
-      'auth/too-many-requests': 'Too many login attempts. Please try again later.',
-      'auth/operation-not-allowed': 'This authentication method is not enabled.',
-      'auth/account-exists-with-different-credential': 'An account with this email already exists.'
-    };
-    return errorMap[code] || 'An authentication error occurred.';
-  };
+  const logout = () => signOut(auth);
 
   const value = {
     user,
@@ -248,10 +147,4 @@ export const AuthProvider = ({ children }) => {
   );
 };
 
-export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error('useAuth must be used within AuthProvider');
-  }
-  return context;
-};
+export const useAuth = () => useContext(AuthContext);
