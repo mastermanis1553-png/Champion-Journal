@@ -1,22 +1,20 @@
-import React, { useState, useEffect } from 'react'; // ✅ useEffect add kiya
+import React, { useState, useEffect } from 'react'; 
 import { useAuth } from '../../context/AuthContext';
 import { useNavigate, Link } from 'react-router-dom';
 import { Activity } from 'lucide-react';
 
 export default function Signup() {
   const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const[password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
   
-  // ✅ FIX: 'user' ko extract kiya context se
   const { signupWithEmail, loginWithGoogle, user } = useAuth(); 
   const navigate = useNavigate();
 
-  // ✅ FIX: Ye code check karega ki agar user Google se wapas aa gaya hai aur login ho gaya hai, toh seedha andar bhejo
   useEffect(() => {
     if (user) {
-      navigate('/trades');
+      navigate('/dashboard');
     }
   }, [user, navigate]);
 
@@ -30,8 +28,6 @@ export default function Signup() {
 
     try {
       await signupWithEmail(email, password);
-      // ✅ Signup success ke baad ka navigation
-      // (Agar error na aaye aur state update ho, toh upar wala useEffect bhi handle kar lega)
     } catch (err) {
       setError(err.message || "Failed to create an account.");
     }
@@ -41,9 +37,9 @@ export default function Signup() {
     setError('');
     try {
       await loginWithGoogle();
-      // Google Auth ke baad ye line reload ki wajah se run nahi hoti, isliye useEffect handle karega
+      navigate('/dashboard'); // ✅ Explicit redirect on success
     } catch (err) {
-      setError("Google Auth Failed or Unauthorized.");
+      setError(err.message || "Google Auth Failed or Unauthorized.");
     }
   };
 
@@ -111,7 +107,6 @@ export default function Signup() {
             <span className="bg-white px-4 text-[10px] font-bold text-[#a28089] uppercase tracking-widest relative z-10">Or Sign Up With</span>
           </div>
 
-          {/* ✅ FIX: button type="button" kiya taaki ye form submit na kar de galti se */}
           <button type="button" onClick={handleGoogleAuth} className="w-full mt-6 bg-white border border-[#d0bdf4] hover:bg-[#f8f9fc] text-[#494D5F] font-bold py-3.5 rounded-xl shadow-sm transition-colors flex items-center justify-center gap-3 text-sm">
             <svg className="w-5 h-5" viewBox="0 0 24 24">
               <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />

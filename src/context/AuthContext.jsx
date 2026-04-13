@@ -13,11 +13,10 @@ const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  const[userApproved, setUserApproved] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const [userApproved, setUserApproved] = useState(false);
+  const[loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Error Message Helper (Moved outside to be clean)
   const getErrorMessage = (code) => {
     const errorMap = {
       'auth/email-already-in-use': 'Email already registered. Please login.',
@@ -26,12 +25,12 @@ export const AuthProvider = ({ children }) => {
       'auth/user-not-found': 'No account found.',
       'auth/wrong-password': 'Incorrect password.',
       'auth/too-many-requests': 'Too many attempts. Try later.',
+      'auth/popup-closed-by-user': 'Google sign in was cancelled.'
     };
     return errorMap[code] || 'An authentication error occurred.';
   };
 
   useEffect(() => {
-    // Auth State Listener
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       setLoading(true);
       try {
@@ -39,12 +38,11 @@ export const AuthProvider = ({ children }) => {
           const userDocRef = doc(db, 'users', currentUser.uid);
           let userDocSnap = await getDoc(userDocRef);
 
-          // Agar Firestore mein entry nahi hai (Pehli baar login)
           if (!userDocSnap.exists()) {
             const newUserData = {
               email: currentUser.email,
               uid: currentUser.uid,
-              approved: false, // Default: Not approved
+              approved: false,
               createdAt: serverTimestamp(),
               lastLogin: serverTimestamp(),
               displayName: currentUser.displayName || '',
@@ -52,8 +50,6 @@ export const AuthProvider = ({ children }) => {
               authMethod: currentUser.providerData[0]?.providerId || 'email'
             };
             await setDoc(userDocRef, newUserData);
-            
-            // Re-fetch to be sure
             userDocSnap = await getDoc(userDocRef);
           }
 
@@ -64,8 +60,6 @@ export const AuthProvider = ({ children }) => {
             setUserApproved(true);
             setError(null);
           } else {
-            // ✅ DO NOT SignOut here. Just set states.
-            // UI will check userApproved and block access.
             setUser(currentUser); 
             setUserApproved(false);
             setError('Account Pending Approval. Please contact admin.');
@@ -84,4 +78,61 @@ export const AuthProvider = ({ children }) => {
     });
 
     return unsubscribe;
-  },
+  },[]);
+
+  const signupWithEmail = async (email, password) => {
+    try {
+      setError(null);
+      await createUserWithEmailAndPassword(auth, email, password);
+      return { success: true };
+    } catch (err) {
+      const msg = getErrorMessage(err.code);
+      setError(msg);
+      throw new Error(msg);
+    }
+  };
+
+  const loginWithEmail = async (email, password) => {
+    try {
+      setError(null);
+      await signInWithEmailAndPassword(auth, email, password);
+      return { success: true };
+    } catch (err) {
+      const msg = getErrorMessage(err.code);
+      setError(msg);
+      throw new Error(msg);
+    }
+  };
+
+  const loginWithGoogle = async () => {
+    try {
+      setError(null);
+      await signInWithPopup(auth, googleProvider);
+    } catch (err) {
+      const msg = getErrorMessage(err.code);
+      setError(msg);
+      throw new Error(msg);
+    }
+  };
+
+  const logout = () => signOut(auth);
+
+  const value = {
+    user,
+    userApproved,
+    loading,
+    error,
+    signupWithEmail,
+    loginWithEmail,
+    loginWithGoogle,
+    logout
+  };
+
+  return (
+    <AuthContext.Provider value={value}>
+      {!loading && children}
+    </AuthContext.Provider>
+  );
+};
+
+export const useAuth = () => useContext(AuthContext);

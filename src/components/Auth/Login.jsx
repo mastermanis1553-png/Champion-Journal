@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'; // ✅ useEffect add kiya
+import React, { useState, useEffect } from 'react'; 
 import { useAuth } from '../../context/AuthContext';
 import { useNavigate, Link } from 'react-router-dom';
 import { Activity } from 'lucide-react';
@@ -8,14 +8,12 @@ export default function Login() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   
-  // ✅ FIX: 'user' ko extract kiya context se
   const { loginWithEmail, loginWithGoogle, user } = useAuth(); 
   const navigate = useNavigate();
 
-  // ✅ FIX: Ye code check karega ki agar user already login hai, toh seedha andar bhejo
   useEffect(() => {
     if (user) {
-      navigate('/trades');
+      navigate('/dashboard');
     }
   }, [user, navigate]);
 
@@ -24,7 +22,6 @@ export default function Login() {
     setError('');
     try {
       await loginWithEmail(email, password);
-      // yahan ka navigate ab zaruri nahi kyunki useEffect sambhal lega, but rehne de sakte hain
     } catch (err) { 
       setError(err.message || "Invalid Credentials or Unauthorized."); 
     }
@@ -34,19 +31,16 @@ export default function Login() {
     setError('');
     try {
       await loginWithGoogle();
-      // Google Auth ke baad ye line kabhi run nahi hoti page reload ki wajah se. 
-      // Isiliye upar wala useEffect kaam aayega.
+      navigate('/dashboard'); // ✅ Explicit redirect on success
     } catch (err) {
-      setError("Google Auth Failed or Unauthorized.");
+      setError(err.message || "Google Auth Failed or Unauthorized.");
     }
   };
 
-  // ... (Baaki poora UI ka code same rahega, usme koi change nahi)
   return (
     <div className="min-h-screen bg-[#e5eaf5] flex flex-col items-center justify-center p-6 font-sans">
       <div className="w-full max-w-md space-y-8">
         
-        {/* Brand Header */}
         <div className="text-center flex flex-col items-center">
           <div className="inline-flex p-4 bg-white rounded-2xl border border-[#d0bdf4] mb-4 shadow-sm">
             <Activity className="text-[#a0d2eb]" size={32} />
@@ -55,7 +49,6 @@ export default function Login() {
           <p className="text-[#a28089] text-sm font-medium mt-2">Sign in to access your institutional dashboard.</p>
         </div>
 
-        {/* Form Card */}
         <div className="bg-white border border-[#d0bdf4] p-8 rounded-[2rem] shadow-sm">
           {error && (
             <div className="bg-rose-50 border border-rose-200 text-rose-600 text-xs font-bold p-3 rounded-xl mb-6 text-center uppercase tracking-widest">
