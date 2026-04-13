@@ -17,14 +17,10 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // ============================================
-  // MAIN AUTH STATE LISTENER
-  // ============================================
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       try {
         if (currentUser) {
-          // User is logged in - check approval status
           const userDocRef = doc(db, 'users', currentUser.uid);
           const userDocSnap = await getDoc(userDocRef);
 
@@ -35,20 +31,17 @@ export const AuthProvider = ({ children }) => {
               setUserApproved(true);
               setError(null);
             } else {
-              // User exists but not approved
               setUser(null);
               setUserApproved(false);
               setError('Your account is not approved yet. Please wait for admin approval.');
               await signOut(auth);
             }
           } else {
-            // User doc doesn't exist - sign them out
             setUser(null);
             setUserApproved(false);
             await signOut(auth);
           }
         } else {
-          // No user logged in
           setUser(null);
           setUserApproved(false);
           setError(null);
@@ -66,18 +59,13 @@ export const AuthProvider = ({ children }) => {
     return unsubscribe;
   }, []);
 
-  // ============================================
-  // SIGNUP WITH EMAIL & PASSWORD
-  // ============================================
   const signupWithEmail = async (email, password) => {
     try {
       setError(null);
 
-      // Create Firebase Auth user
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const firebaseUser = userCredential.user;
 
-      // Create Firestore user document with approval: false
       const userDocRef = doc(db, 'users', firebaseUser.uid);
       await setDoc(userDocRef, {
         email: firebaseUser.email,
@@ -90,7 +78,6 @@ export const AuthProvider = ({ children }) => {
         authMethod: 'email'
       });
 
-      // Don't auto-login - user needs approval first
       await signOut(auth);
       setUser(null);
       setUserApproved(false);
@@ -106,23 +93,17 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  // ============================================
-  // LOGIN WITH EMAIL & PASSWORD
-  // ============================================
   const loginWithEmail = async (email, password) => {
     try {
       setError(null);
 
-      // Sign in with Firebase Auth
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       const firebaseUser = userCredential.user;
 
-      // Check approval status in Firestore
       const userDocRef = doc(db, 'users', firebaseUser.uid);
       const userDocSnap = await getDoc(userDocRef);
 
       if (!userDocSnap.exists()) {
-        // User doc doesn't exist - create it (shouldn't happen but safety measure)
         await setDoc(userDocRef, {
           email: firebaseUser.email,
           uid: firebaseUser.uid,
@@ -146,10 +127,8 @@ export const AuthProvider = ({ children }) => {
         throw new Error('Your account is not approved yet. Please wait for admin approval.');
       }
 
-      // Update last login timestamp
       await setDoc(userDocRef, { lastLogin: serverTimestamp() }, { merge: true });
 
-      // User is approved - set state
       setUser(firebaseUser);
       setUserApproved(true);
       setError(null);
@@ -164,23 +143,17 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  // ============================================
-  // LOGIN WITH GOOGLE
-  // ============================================
   const loginWithGoogle = async () => {
     try {
       setError(null);
 
-      // Sign in with Google
       const result = await signInWithPopup(auth, googleProvider);
       const firebaseUser = result.user;
 
-      // Check if user doc exists in Firestore
       const userDocRef = doc(db, 'users', firebaseUser.uid);
       const userDocSnap = await getDoc(userDocRef);
 
       if (!userDocSnap.exists()) {
-        // First time Google login - create user doc with approved: false
         await setDoc(userDocRef, {
           email: firebaseUser.email,
           uid: firebaseUser.uid,
@@ -191,21 +164,23 @@ export const AuthProvider = ({ children }) => {
           photoURL: firebaseUser.photoURL || null,
           authMethod: 'google'
         });
-        await signOut(auth);
+
+        setUser(null);
+        setUserApproved(false);
+
         throw new Error('Account created! Please wait for admin approval to access the dashboard.');
       }
 
       const userData = userDocSnap.data();
 
       if (userData.approved !== true) {
-        await signOut(auth);
+        setUser(null);
+        setUserApproved(false);
         throw new Error('Your account is not approved yet. Please wait for admin approval.');
       }
 
-      // Update last login timestamp
       await setDoc(userDocRef, { lastLogin: serverTimestamp() }, { merge: true });
 
-      // User is approved
       setUser(firebaseUser);
       setUserApproved(true);
       setError(null);
@@ -220,9 +195,6 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  // ============================================
-  // LOGOUT
-  // ============================================
   const logout = async () => {
     try {
       await signOut(auth);
@@ -235,9 +207,6 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  // ============================================
-  // HELPER: Firebase error messages
-  // ============================================
   const getErrorMessage = (code) => {
     const errorMap = {
       'auth/email-already-in-use': 'Email already registered. Please login or use a different email.',
