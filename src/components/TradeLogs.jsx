@@ -31,27 +31,27 @@ export default function TradeLogs({ preProcessedData, searchTerm = '', filterSta
   };
 
   return (
-    <div className="w-full overflow-x-auto">
-      <table className="w-full text-left soft-table">
+    <div className="w-full overflow-x-auto border border-[#d0bdf4] rounded-lg">
+      <table className="w-full text-left border-collapse bg-white">
         
         <thead>
-          <tr className="text-[9px] sm:text-[10px] font-bold text-[#a28089] uppercase tracking-widest bg-white">
-            <th className="p-2 sm:p-3 md:p-4 whitespace-nowrap">Date</th>
-            {showExitDate && <th className="p-2 sm:p-3 md:p-4 whitespace-nowrap">Exit Date</th>}
-            <th className="p-2 sm:p-3 md:p-4 whitespace-nowrap">Type</th>
-            <th className="p-2 sm:p-3 md:p-4 whitespace-nowrap">Symbol</th>
-            <th className="p-2 sm:p-3 md:p-4 whitespace-nowrap">Entry</th>
-            {showPositionSize && <th className="p-2 sm:p-3 md:p-4 whitespace-nowrap">Position Size</th>}
-            <th className="p-2 sm:p-3 md:p-4 whitespace-nowrap">SL / CMP</th>
-            <th className="p-2 sm:p-3 md:p-4 whitespace-nowrap">Status</th>
-            <th className="p-2 sm:p-3 md:p-4 whitespace-nowrap">R-Earned</th>
-            <th className="p-2 sm:p-3 md:p-4 whitespace-nowrap">Net PnL</th>
-            <th className="p-2 sm:p-3 md:p-4 whitespace-nowrap">Days</th>
-            <th className="p-2 sm:p-3 md:p-4 text-center whitespace-nowrap">Actions</th>
+          <tr className="text-[9px] sm:text-[10px] font-bold text-[#a28089] uppercase tracking-widest bg-[#f8f9fc]">
+            <th className="px-2 py-3 sm:px-3 border border-[#e5eaf5] whitespace-nowrap">Date</th>
+            {showExitDate && <th className="px-2 py-3 sm:px-3 border border-[#e5eaf5] whitespace-nowrap">Exit Date</th>}
+            <th className="px-2 py-3 sm:px-3 border border-[#e5eaf5] text-center whitespace-nowrap">Type</th>
+            <th className="px-2 py-3 sm:px-3 border border-[#e5eaf5] whitespace-nowrap">Symbol</th>
+            <th className="px-2 py-3 sm:px-3 border border-[#e5eaf5] text-right whitespace-nowrap">Entry</th>
+            {showPositionSize && <th className="px-2 py-3 sm:px-3 border border-[#e5eaf5] text-right whitespace-nowrap">Position Size</th>}
+            <th className="px-2 py-3 sm:px-3 border border-[#e5eaf5] whitespace-nowrap">SL / CMP</th>
+            <th className="px-2 py-3 sm:px-3 border border-[#e5eaf5] text-center whitespace-nowrap">Status</th>
+            <th className="px-2 py-3 sm:px-3 border border-[#e5eaf5] text-right whitespace-nowrap">R-Earned</th>
+            <th className="px-2 py-3 sm:px-3 border border-[#e5eaf5] text-right whitespace-nowrap">Net PnL</th>
+            <th className="px-2 py-3 sm:px-3 border border-[#e5eaf5] text-right whitespace-nowrap">Days</th>
+            <th className="px-2 py-3 sm:px-3 border border-[#e5eaf5] text-center whitespace-nowrap">Actions</th>
           </tr>
         </thead>
 
-        <tbody className="divide-y divide-[#e5eaf5]">
+        <tbody className="divide-y-0">
           {displayTrades.map((t) => {
             const liveR = t.status === 'Open' ? calculateLiveR(t, t.cmp) : t.rMultiple;
             
@@ -68,39 +68,39 @@ export default function TradeLogs({ preProcessedData, searchTerm = '', filterSta
             return (
               <tr key={t.id} className="hover:bg-[#f8f9fc] transition">
                 
-                <td className="p-2 sm:p-3 md:p-4 text-[10px] sm:text-xs text-[#a28089] font-medium break-words">
+                <td className="px-2 py-2 sm:px-3 border border-[#e5eaf5] text-[10px] sm:text-xs text-[#a28089] font-medium whitespace-nowrap">
                   {(t.dateObj && !isNaN(t.dateObj.getTime())) ? t.dateObj.toLocaleDateString('en-GB') : 'Invalid'}
                 </td>
 
                 {showExitDate && (
-                  <td className="p-2 sm:p-3 md:p-4 text-[10px] sm:text-xs text-[#a28089] font-medium break-words">
+                  <td className="px-2 py-2 sm:px-3 border border-[#e5eaf5] text-[10px] sm:text-xs text-[#a28089] font-medium whitespace-nowrap">
                     {t.exitDate ? new Date(t.exitDate).toLocaleDateString('en-GB') : '-'}
                   </td>
                 )}
 
-                <td className="p-2 sm:p-3 md:p-4 break-words">
-                  <span className={`text-[9px] sm:text-[10px] px-2 py-1 rounded font-bold ${
+                <td className="px-2 py-2 sm:px-3 border border-[#e5eaf5] text-center whitespace-nowrap">
+                  <span className={`text-[9px] sm:text-[10px] px-2 py-0.5 rounded font-bold inline-block ${
                     t.type === 'SHORT' ? 'bg-rose-100 text-rose-600' : 'bg-emerald-100 text-emerald-600'
                   }`}>
                     {t.type}
                   </span>
                 </td>
 
-                <td className="p-2 sm:p-3 md:p-4 font-bold text-[#8458B3] text-xs sm:text-sm break-words">
+                <td className="px-2 py-2 sm:px-3 border border-[#e5eaf5] font-bold text-[#8458B3] text-xs sm:text-sm whitespace-nowrap">
                   {t.symbol}
                 </td>
 
-                <td className="p-2 sm:p-3 md:p-4 font-semibold text-[#494D5F] text-xs sm:text-sm break-words">
+                <td className="px-2 py-2 sm:px-3 border border-[#e5eaf5] text-right font-semibold text-[#494D5F] text-xs sm:text-sm whitespace-nowrap">
                   ₹{t.entry}
                 </td>
 
                 {showPositionSize && (
-                  <td className="p-2 sm:p-3 md:p-4 font-semibold text-[#494D5F] text-xs sm:text-sm break-words">
+                  <td className="px-2 py-2 sm:px-3 border border-[#e5eaf5] text-right font-semibold text-[#494D5F] text-xs sm:text-sm whitespace-nowrap">
                     ₹{Math.floor(positionSize).toLocaleString()}
                   </td>
                 )}
 
-                <td className="p-2 sm:p-3 md:p-4 break-words">
+                <td className="px-2 py-2 sm:px-3 border border-[#e5eaf5] whitespace-nowrap">
                   <div className="flex flex-col leading-tight">
                     <span className={`text-[9px] sm:text-[10px] font-bold ${
                       t.isRiskFree ? 'text-[#a0d2eb]' : 'text-rose-400'
@@ -113,8 +113,8 @@ export default function TradeLogs({ preProcessedData, searchTerm = '', filterSta
                   </div>
                 </td>
 
-                <td className="p-2 sm:p-3 md:p-4 break-words">
-                  <span className={`px-2 py-1 rounded text-[9px] sm:text-[10px] font-bold uppercase ${
+                <td className="px-2 py-2 sm:px-3 border border-[#e5eaf5] text-center whitespace-nowrap">
+                  <span className={`px-2 py-0.5 rounded text-[9px] sm:text-[10px] font-bold uppercase inline-block ${
                     t.status === 'Win' ? 'bg-emerald-100 text-emerald-600' :
                     t.status === 'Loss' ? 'bg-rose-100 text-rose-600' :
                     t.status === 'BE' ? 'bg-[#e5eaf5] text-[#8458B3]' :
@@ -124,35 +124,35 @@ export default function TradeLogs({ preProcessedData, searchTerm = '', filterSta
                   </span>
                 </td>
 
-                <td className={`p-2 sm:p-3 md:p-4 font-bold text-xs sm:text-sm break-words ${
+                <td className={`px-2 py-2 sm:px-3 border border-[#e5eaf5] text-right font-bold text-xs sm:text-sm whitespace-nowrap ${
                   liveR >= 0 ? 'text-emerald-500' : 'text-rose-500'
                 }`}>
                   {liveR > 0 ? '+' : ''}{(liveR || 0).toFixed(2)}R
                 </td>
 
-                <td className={`p-2 sm:p-3 md:p-4 font-bold text-xs sm:text-sm break-words ${
+                <td className={`px-2 py-2 sm:px-3 border border-[#e5eaf5] text-right font-bold text-xs sm:text-sm whitespace-nowrap ${
                   pnl >= 0 ? 'text-emerald-500' : 'text-rose-500'
                 }`}>
                   ₹{Math.floor(pnl || 0).toLocaleString()}
                 </td>
 
-                <td className="p-2 sm:p-3 md:p-4 text-[10px] sm:text-xs text-[#a28089] font-medium break-words">
+                <td className="px-2 py-2 sm:px-3 border border-[#e5eaf5] text-right text-[10px] sm:text-xs text-[#a28089] font-medium whitespace-nowrap">
                   {daysHeld}
                 </td>
 
-                <td className="p-2 sm:p-3 md:p-4 break-words">
-                  <div className="flex justify-center gap-1 sm:gap-2 flex-wrap">
+                <td className="px-2 py-2 sm:px-3 border border-[#e5eaf5] text-center whitespace-nowrap">
+                  <div className="flex justify-center gap-1 sm:gap-2">
                     {t.status === 'Open' && (
                       <>
                         <button 
                           onClick={() => setEditingTrade(t)} 
-                          className="p-1.5 sm:p-2 hover:bg-[#e5eaf5] text-[#8458B3] rounded transition"
+                          className="p-1 hover:bg-[#e5eaf5] text-[#8458B3] rounded transition"
                         >
                           <Edit3 size={14}/>
                         </button>
                         <button 
                           onClick={() => handleFinalClose(t)} 
-                          className="p-1.5 sm:p-2 hover:bg-emerald-100 text-emerald-600 rounded transition"
+                          className="p-1 hover:bg-emerald-100 text-emerald-600 rounded transition"
                         >
                           <CheckCircle2 size={14}/>
                         </button>
