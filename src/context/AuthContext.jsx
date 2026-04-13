@@ -2,7 +2,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { auth, db, googleProvider } from '../utils/firebase';
 import { 
   onAuthStateChanged, 
-  signInWithPopup, // ✅ FIX: Changed from Redirect to Popup
+  signInWithPopup, 
   signInWithEmailAndPassword, 
   signOut,
   createUserWithEmailAndPassword
@@ -12,11 +12,12 @@ import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const[user, setUser] = useState(null);
-  const [userApproved, setUserApproved] = useState(false);
+  const [user, setUser] = useState(null);
+  const[userApproved, setUserApproved] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  // Error Message Helper (Moved outside to be clean)
   const getErrorMessage = (code) => {
     const errorMap = {
       'auth/email-already-in-use': 'Email already registered. Please login.',
@@ -25,7 +26,6 @@ export const AuthProvider = ({ children }) => {
       'auth/user-not-found': 'No account found.',
       'auth/wrong-password': 'Incorrect password.',
       'auth/too-many-requests': 'Too many attempts. Try later.',
-      'auth/popup-closed-by-user': 'Google login cancelled by user.'
     };
     return errorMap[code] || 'An authentication error occurred.';
   };
@@ -52,18 +52,20 @@ export const AuthProvider = ({ children }) => {
               authMethod: currentUser.providerData[0]?.providerId || 'email'
             };
             await setDoc(userDocRef, newUserData);
+            
+            // Re-fetch to be sure
             userDocSnap = await getDoc(userDocRef);
           }
 
           const userData = userDocSnap.data();
 
           if (userData.approved === true) {
-            // ✅ Update last login time successfully
-            await setDoc(userDocRef, { lastLogin: serverTimestamp() }, { merge: true });
             setUser(currentUser);
             setUserApproved(true);
             setError(null);
           } else {
+            // ✅ DO NOT SignOut here. Just set states.
+            // UI will check userApproved and block access.
             setUser(currentUser); 
             setUserApproved(false);
             setError('Account Pending Approval. Please contact admin.');
