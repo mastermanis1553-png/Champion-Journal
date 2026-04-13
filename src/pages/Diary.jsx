@@ -56,42 +56,44 @@ export default function Diary() {
           <MistakeForm onAdd={handleAddMistake} />
         </div>
 
-        <div className="overflow-x-auto w-full max-w-full">
-          <table className="w-full text-left soft-table">
-            <thead>
-              <tr className="text-xs uppercase tracking-wide">
-                <th className="p-4 break-words">No.</th>
-                <th className="p-4 break-words">Date</th>
-                <th className="p-4 break-words">Mistake</th>
-                <th className="p-4 break-words">Details</th>
-                <th className="p-4 break-words">Setup</th>
-                <th className="p-4 break-words">Severity</th>
+        <div className="overflow-x-auto w-full max-w-full bg-white">
+          <table className="w-full text-left border-collapse">
+            <thead className="bg-[#f8f9fc]">
+              <tr className="text-[10px] font-bold uppercase tracking-widest text-[#a28089]">
+                <th className="px-3 py-2.5 border border-[#e5eaf5] text-center whitespace-nowrap">No.</th>
+                <th className="px-3 py-2.5 border border-[#e5eaf5] text-left whitespace-nowrap">Date</th>
+                <th className="px-3 py-2.5 border border-[#e5eaf5] text-left whitespace-nowrap">Mistake</th>
+                <th className="px-3 py-2.5 border border-[#e5eaf5] text-left whitespace-nowrap">Details</th>
+                <th className="px-3 py-2.5 border border-[#e5eaf5] text-center whitespace-nowrap">Setup</th>
+                <th className="px-3 py-2.5 border border-[#e5eaf5] text-center whitespace-nowrap">Severity</th>
               </tr>
             </thead>
 
             <tbody className="text-sm font-medium">
               {mistakes.map((m, i) => (
-                <tr key={m.id} className="hover:bg-[#f8f9fc] transition">
-                  <td className="p-4 break-words">{i + 1}</td>
+                <tr key={m.id} className="hover:bg-[#f8f9fc] transition-colors">
+                  <td className="px-3 py-2 border border-[#e5eaf5] text-center whitespace-nowrap">{i + 1}</td>
 
-                  <td className="p-4 flex items-center gap-2 break-words">
-                    <Calendar size={14} className="text-[#a0d2eb]"/> {m.date}
+                  <td className="px-3 py-2 border border-[#e5eaf5] whitespace-nowrap">
+                    <div className="flex items-center gap-2">
+                      <Calendar size={14} className="text-[#a0d2eb]"/> {m.date}
+                    </div>
                   </td>
 
-                  <td className="p-4 text-[#8458B3] break-words">{m.type}</td>
+                  <td className="px-3 py-2 border border-[#e5eaf5] text-[#8458B3] whitespace-nowrap">{m.type}</td>
 
-                  <td className="p-4 text-[#a28089] break-words">
+                  <td className="px-3 py-2 border border-[#e5eaf5] text-[#a28089] truncate max-w-[250px]">
                     {m.desc}
                   </td>
 
-                  <td className="p-4 break-words">
-                    <span className="bg-[#e5eaf5] text-[#8458B3] px-2 py-1 rounded text-xs break-words">
+                  <td className="px-3 py-2 border border-[#e5eaf5] text-center whitespace-nowrap">
+                    <span className="bg-[#e5eaf5] text-[#8458B3] px-2 py-1 rounded text-xs">
                       {m.tag}
                     </span>
                   </td>
 
-                  <td className="p-4 break-words">
-                    <span className={`px-2 py-1 rounded text-xs break-words ${
+                  <td className="px-3 py-2 border border-[#e5eaf5] text-center whitespace-nowrap">
+                    <span className={`px-2 py-1 rounded text-xs ${
                       m.severity === 'High' ? 'bg-rose-100 text-rose-600' :
                       m.severity === 'Medium' ? 'bg-orange-100 text-orange-600' :
                       'bg-emerald-100 text-emerald-600'

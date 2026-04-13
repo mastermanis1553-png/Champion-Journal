@@ -9,7 +9,7 @@ export default function Trades({ isDashboard, preProcessedData }) {
   const { trades, settings } = useTrades();
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('All Trades');
-  const [currentPage, setCurrentPage] = useState(1);
+  const[currentPage, setCurrentPage] = useState(1);
 
   const tradesPerPage = 30;
 
@@ -76,7 +76,7 @@ export default function Trades({ isDashboard, preProcessedData }) {
           </div>
         </div>
 
-        <div className="w-full overflow-x-auto">
+        <div className="w-full overflow-x-auto bg-white">
           <TradeLogs
             preProcessedData={paginatedTrades}
             searchTerm={searchTerm}
@@ -94,7 +94,7 @@ export default function Trades({ isDashboard, preProcessedData }) {
 
           <div className="flex gap-2 w-full sm:w-auto justify-center sm:justify-end">
             <button
-              className="flex-1 sm:flex-none px-3 py-1.5 rounded-lg border border-[#d0bdf4] text-xs sm:text-sm disabled:opacity-50"
+              className="flex-1 sm:flex-none px-3 py-1.5 rounded-lg border border-[#d0bdf4] text-xs sm:text-sm bg-white disabled:opacity-50 transition-colors hover:bg-[#f8f9fc]"
               onClick={() => setCurrentPage((p) => p - 1)}
               disabled={currentPage === 1}
             >
@@ -102,7 +102,7 @@ export default function Trades({ isDashboard, preProcessedData }) {
             </button>
 
             <button
-              className="flex-1 sm:flex-none px-3 py-1.5 rounded-lg border border-[#d0bdf4] text-xs sm:text-sm disabled:opacity-50"
+              className="flex-1 sm:flex-none px-3 py-1.5 rounded-lg border border-[#d0bdf4] text-xs sm:text-sm bg-white disabled:opacity-50 transition-colors hover:bg-[#f8f9fc]"
               onClick={() => setCurrentPage((p) => p + 1)}
               disabled={currentPage === totalPages || totalPages === 0}
             >

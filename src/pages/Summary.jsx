@@ -10,15 +10,15 @@ export default function Summary() {
   const keys = Object.keys(groups).sort().reverse();
 
   const Row = ({ label, func, color = "text-[#494D5F]", isR = false, isP = false, isMoney = false, bg = "bg-white" }) => (
-    <tr>
-      <td className={`p-4 font-semibold text-[#a28089] border border-[#e5eaf5] text-xs uppercase tracking-wider ${bg} break-words`}>
+    <tr className="hover:bg-[#f8f9fc] transition-colors">
+      <td className={`px-4 py-2.5 font-semibold text-[#a28089] border border-[#e5eaf5] text-xs uppercase tracking-wider ${bg} whitespace-nowrap`}>
         {label}
       </td>
       {keys.map(k => {
         const m = calculateMetrics(groups[k], settings?.rValue || 1250);
         const val = func(m, groups[k]) || 0;
         return (
-          <td key={k} className={`p-4 text-center border border-[#e5eaf5] text-sm font-bold ${bg} ${color} break-words`}>
+          <td key={k} className={`px-4 py-2.5 text-center border border-[#e5eaf5] text-sm font-bold ${bg} ${color} whitespace-nowrap`}>
             {isP ? `${(val * 100).toFixed(1)}%` : 
              isMoney ? `₹${Math.floor(val).toLocaleString()}` : 
              isR ? val.toFixed(2) : val}
@@ -28,7 +28,11 @@ export default function Summary() {
     </tr>
   );
 
-  const Spacer = () => <tr><td colSpan={keys.length + 1} className="h-4 bg-[#e5eaf5]"></td></tr>;
+  const Spacer = () => (
+    <tr>
+      <td colSpan={keys.length + 1} className="h-3 bg-[#f8f9fc] border border-[#e5eaf5]"></td>
+    </tr>
+  );
 
   return (
     <div className="animate-in fade-in duration-500 w-full max-w-full">
@@ -46,14 +50,14 @@ export default function Summary() {
       </div>
 
       <div className="overflow-x-auto rounded-2xl border border-[#d0bdf4] shadow-sm bg-white w-full max-w-full">
-        <table className="w-full text-left border-collapse">
-          <thead>
+        <table className="w-full text-left border-collapse bg-white">
+          <thead className="bg-[#f8f9fc]">
             <tr>
-              <th className="p-4 bg-[#f8f9fc] border border-[#e5eaf5] text-xs font-bold text-[#8458B3] uppercase tracking-widest break-words">
+              <th className="px-4 py-2.5 border border-[#e5eaf5] text-[10px] font-bold text-[#8458B3] uppercase tracking-widest whitespace-nowrap">
                 Metrics View (R Based)
               </th>
               {keys.map(k => (
-                <th key={k} className="p-4 text-center bg-[#f8f9fc] border border-[#e5eaf5] text-sm font-bold text-[#494D5F] break-words">
+                <th key={k} className="px-4 py-2.5 text-center border border-[#e5eaf5] text-sm font-bold text-[#494D5F] whitespace-nowrap">
                   {k}
                 </th>
               ))}
