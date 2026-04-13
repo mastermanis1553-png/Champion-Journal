@@ -43,22 +43,22 @@ export default function Positions() {
         </div>
       </div>
 
-      <div className="bg-white border border-[#d0bdf4] rounded-2xl overflow-hidden shadow-sm w-full max-w-full">
+      <div className="bg-white border border-gray-300 shadow-sm w-full max-w-full">
         <div className="overflow-x-auto w-full max-w-full bg-white">
-          <table className="w-full border-collapse text-sm">
-            <thead className="bg-[#f8f9fc]">
-              <tr className="text-[10px] font-bold uppercase tracking-widest text-[#a28089]">
-                <th className="px-3 py-2.5 border border-[#e5eaf5] whitespace-nowrap text-center">Type</th>
-                <th className="px-3 py-2.5 border border-[#e5eaf5] whitespace-nowrap text-left">Symbol</th>
-                <th className="px-3 py-2.5 border border-[#e5eaf5] whitespace-nowrap text-right">Qty</th>
-                <th className="px-3 py-2.5 border border-[#e5eaf5] whitespace-nowrap text-right">Avg Entry</th>
-                <th className="px-3 py-2.5 border border-[#e5eaf5] whitespace-nowrap text-right">Current SL</th>
-                <th className="px-3 py-2.5 border border-[#e5eaf5] whitespace-nowrap text-right">CMP</th>
-                <th className="px-3 py-2.5 border border-[#e5eaf5] whitespace-nowrap text-right">Open Risk (R)</th>
-                <th className="px-3 py-2.5 border border-[#e5eaf5] whitespace-nowrap text-right">Unrealized P&L</th>
+          <table className="w-full border-collapse border border-gray-300 text-sm">
+            <thead className="bg-gray-50">
+              <tr className="divide-x divide-gray-300">
+                <th className="px-3 py-2 border border-gray-300 whitespace-nowrap text-center text-xs font-semibold text-[#a28089] uppercase tracking-widest">Type</th>
+                <th className="px-3 py-2 border border-gray-300 whitespace-nowrap text-center text-xs font-semibold text-[#a28089] uppercase tracking-widest">Symbol</th>
+                <th className="px-3 py-2 border border-gray-300 whitespace-nowrap text-center text-xs font-semibold text-[#a28089] uppercase tracking-widest">Qty</th>
+                <th className="px-3 py-2 border border-gray-300 whitespace-nowrap text-center text-xs font-semibold text-[#a28089] uppercase tracking-widest">Avg Entry</th>
+                <th className="px-3 py-2 border border-gray-300 whitespace-nowrap text-center text-xs font-semibold text-[#a28089] uppercase tracking-widest">Current SL</th>
+                <th className="px-3 py-2 border border-gray-300 whitespace-nowrap text-center text-xs font-semibold text-[#a28089] uppercase tracking-widest">CMP</th>
+                <th className="px-3 py-2 border border-gray-300 whitespace-nowrap text-center text-xs font-semibold text-[#a28089] uppercase tracking-widest">Open Risk (R)</th>
+                <th className="px-3 py-2 border border-gray-300 whitespace-nowrap text-center text-xs font-semibold text-[#a28089] uppercase tracking-widest">Unrealized P&L</th>
               </tr>
             </thead>
-            <tbody className="font-medium text-[#494D5F]">
+            <tbody className="divide-y divide-gray-300">
               {openTrades.map(t => {
                 const currentPrice = Number(t.cmp) || t.entry;
                 const reward = t.isShort ? (t.entry - currentPrice) : (currentPrice - t.entry);
@@ -66,19 +66,19 @@ export default function Positions() {
                 const riskR = t.riskDist > 0 ? ((t.riskDist * t.qty) / globalR) : 0;
 
                 return (
-                  <tr key={t.id} className="hover:bg-[#f8f9fc] transition-colors">
-                    <td className="px-3 py-2 border border-[#e5eaf5] text-center whitespace-nowrap">
-                      <span className={`text-[10px] px-2 py-1 rounded font-bold ${t.isShort ? 'bg-rose-100 text-rose-600' : 'bg-emerald-100 text-emerald-600'}`}>
+                  <tr key={t.id} className="hover:bg-gray-50 transition-colors divide-x divide-gray-300">
+                    <td className="px-3 py-2 border border-gray-300 text-center whitespace-nowrap">
+                      <span className={`text-[10px] px-2 py-0.5 rounded font-bold ${t.isShort ? 'bg-rose-100 text-rose-600' : 'bg-emerald-100 text-emerald-600'}`}>
                         {t.type}
                       </span>
                     </td>
-                    <td className="px-3 py-2 border border-[#e5eaf5] font-bold text-[#8458B3] text-left whitespace-nowrap">{t.symbol}</td>
-                    <td className="px-3 py-2 border border-[#e5eaf5] text-right whitespace-nowrap">{t.qty}</td>
-                    <td className="px-3 py-2 border border-[#e5eaf5] text-right whitespace-nowrap">₹{t.entry}</td>
-                    <td className={`px-3 py-2 border border-[#e5eaf5] text-right whitespace-nowrap ${t.isRiskFree ? 'text-[#a0d2eb]' : 'text-rose-400'}`}>₹{t.sl}</td>
-                    <td className="px-3 py-2 border border-[#e5eaf5] text-right whitespace-nowrap">₹{currentPrice}</td>
-                    <td className="px-3 py-2 border border-[#e5eaf5] text-rose-500 text-right whitespace-nowrap">{riskR.toFixed(2)}R</td>
-                    <td className={`px-3 py-2 border border-[#e5eaf5] font-bold text-right whitespace-nowrap ${unrealized >= 0 ? 'text-emerald-500' : 'text-rose-500'}`}>
+                    <td className="px-3 py-2 border border-gray-300 text-center font-bold text-[#8458B3] whitespace-nowrap">{t.symbol}</td>
+                    <td className="px-3 py-2 border border-gray-300 text-center whitespace-nowrap text-[#494D5F]">{t.qty}</td>
+                    <td className="px-3 py-2 border border-gray-300 text-center whitespace-nowrap text-[#494D5F]">₹{t.entry}</td>
+                    <td className={`px-3 py-2 border border-gray-300 text-center whitespace-nowrap ${t.isRiskFree ? 'text-[#a0d2eb]' : 'text-rose-400'}`}>₹{t.sl}</td>
+                    <td className="px-3 py-2 border border-gray-300 text-center whitespace-nowrap text-[#494D5F]">₹{currentPrice}</td>
+                    <td className="px-3 py-2 border border-gray-300 text-center text-rose-500 whitespace-nowrap">{riskR.toFixed(2)}R</td>
+                    <td className={`px-3 py-2 border border-gray-300 text-center font-bold whitespace-nowrap ${unrealized >= 0 ? 'text-emerald-500' : 'text-rose-500'}`}>
                       ₹{Math.floor(unrealized).toLocaleString()}
                     </td>
                   </tr>
