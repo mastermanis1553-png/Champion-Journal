@@ -31,27 +31,27 @@ export default function TradeLogs({ preProcessedData, searchTerm = '', filterSta
   };
 
   return (
-    <div className="w-full overflow-x-auto border border-[#d0bdf4] rounded-lg">
-      <table className="w-full text-left border-collapse bg-white">
+    <div className="w-full overflow-x-auto border border-gray-300">
+      <table className="w-full border-collapse bg-white divide-x divide-gray-300 divide-y divide-gray-300">
         
         <thead>
-          <tr className="text-[9px] sm:text-[10px] font-bold text-[#a28089] uppercase tracking-widest bg-[#f8f9fc]">
-            <th className="px-2 py-3 sm:px-3 border border-[#e5eaf5] whitespace-nowrap">Date</th>
-            {showExitDate && <th className="px-2 py-3 sm:px-3 border border-[#e5eaf5] whitespace-nowrap">Exit Date</th>}
-            <th className="px-2 py-3 sm:px-3 border border-[#e5eaf5] text-center whitespace-nowrap">Type</th>
-            <th className="px-2 py-3 sm:px-3 border border-[#e5eaf5] whitespace-nowrap">Symbol</th>
-            <th className="px-2 py-3 sm:px-3 border border-[#e5eaf5] text-right whitespace-nowrap">Entry</th>
-            {showPositionSize && <th className="px-2 py-3 sm:px-3 border border-[#e5eaf5] text-right whitespace-nowrap">Position Size</th>}
-            <th className="px-2 py-3 sm:px-3 border border-[#e5eaf5] whitespace-nowrap">SL / CMP</th>
-            <th className="px-2 py-3 sm:px-3 border border-[#e5eaf5] text-center whitespace-nowrap">Status</th>
-            <th className="px-2 py-3 sm:px-3 border border-[#e5eaf5] text-right whitespace-nowrap">R-Earned</th>
-            <th className="px-2 py-3 sm:px-3 border border-[#e5eaf5] text-right whitespace-nowrap">Net PnL</th>
-            <th className="px-2 py-3 sm:px-3 border border-[#e5eaf5] text-right whitespace-nowrap">Days</th>
-            <th className="px-2 py-3 sm:px-3 border border-[#e5eaf5] text-center whitespace-nowrap">Actions</th>
+          <tr className="bg-gray-50">
+            <th className="px-3 py-2 border border-gray-300 text-center text-xs font-semibold text-[#494D5F] uppercase tracking-wider whitespace-nowrap">Date</th>
+            {showExitDate && <th className="px-3 py-2 border border-gray-300 text-center text-xs font-semibold text-[#494D5F] uppercase tracking-wider whitespace-nowrap">Exit Date</th>}
+            <th className="px-3 py-2 border border-gray-300 text-center text-xs font-semibold text-[#494D5F] uppercase tracking-wider whitespace-nowrap">Type</th>
+            <th className="px-3 py-2 border border-gray-300 text-center text-xs font-semibold text-[#494D5F] uppercase tracking-wider whitespace-nowrap">Symbol</th>
+            <th className="px-3 py-2 border border-gray-300 text-center text-xs font-semibold text-[#494D5F] uppercase tracking-wider whitespace-nowrap">Entry</th>
+            {showPositionSize && <th className="px-3 py-2 border border-gray-300 text-center text-xs font-semibold text-[#494D5F] uppercase tracking-wider whitespace-nowrap">Position Size</th>}
+            <th className="px-3 py-2 border border-gray-300 text-center text-xs font-semibold text-[#494D5F] uppercase tracking-wider whitespace-nowrap">SL / CMP</th>
+            <th className="px-3 py-2 border border-gray-300 text-center text-xs font-semibold text-[#494D5F] uppercase tracking-wider whitespace-nowrap">Status</th>
+            <th className="px-3 py-2 border border-gray-300 text-center text-xs font-semibold text-[#494D5F] uppercase tracking-wider whitespace-nowrap">R-Earned</th>
+            <th className="px-3 py-2 border border-gray-300 text-center text-xs font-semibold text-[#494D5F] uppercase tracking-wider whitespace-nowrap">Net PnL</th>
+            <th className="px-3 py-2 border border-gray-300 text-center text-xs font-semibold text-[#494D5F] uppercase tracking-wider whitespace-nowrap">Days</th>
+            <th className="px-3 py-2 border border-gray-300 text-center text-xs font-semibold text-[#494D5F] uppercase tracking-wider whitespace-nowrap">Actions</th>
           </tr>
         </thead>
 
-        <tbody className="divide-y-0">
+        <tbody className="divide-y divide-gray-300">
           {displayTrades.map((t) => {
             const liveR = t.status === 'Open' ? calculateLiveR(t, t.cmp) : t.rMultiple;
             
@@ -66,55 +66,55 @@ export default function TradeLogs({ preProcessedData, searchTerm = '', filterSta
             const positionSize = (t.entry || 0) * (t.qty || 0);
 
             return (
-              <tr key={t.id} className="hover:bg-[#f8f9fc] transition">
+              <tr key={t.id} className="hover:bg-gray-50 transition-colors">
                 
-                <td className="px-2 py-2 sm:px-3 border border-[#e5eaf5] text-[10px] sm:text-xs text-[#a28089] font-medium whitespace-nowrap">
+                <td className="px-3 py-2 border border-gray-300 text-center text-sm text-[#494D5F] whitespace-nowrap">
                   {(t.dateObj && !isNaN(t.dateObj.getTime())) ? t.dateObj.toLocaleDateString('en-GB') : 'Invalid'}
                 </td>
 
                 {showExitDate && (
-                  <td className="px-2 py-2 sm:px-3 border border-[#e5eaf5] text-[10px] sm:text-xs text-[#a28089] font-medium whitespace-nowrap">
+                  <td className="px-3 py-2 border border-gray-300 text-center text-sm text-[#494D5F] whitespace-nowrap">
                     {t.exitDate ? new Date(t.exitDate).toLocaleDateString('en-GB') : '-'}
                   </td>
                 )}
 
-                <td className="px-2 py-2 sm:px-3 border border-[#e5eaf5] text-center whitespace-nowrap">
-                  <span className={`text-[9px] sm:text-[10px] px-2 py-0.5 rounded font-bold inline-block ${
+                <td className="px-3 py-2 border border-gray-300 text-center whitespace-nowrap">
+                  <span className={`text-[10px] px-2 py-0.5 rounded font-bold uppercase ${
                     t.type === 'SHORT' ? 'bg-rose-100 text-rose-600' : 'bg-emerald-100 text-emerald-600'
                   }`}>
                     {t.type}
                   </span>
                 </td>
 
-                <td className="px-2 py-2 sm:px-3 border border-[#e5eaf5] font-bold text-[#8458B3] text-xs sm:text-sm whitespace-nowrap">
+                <td className="px-3 py-2 border border-gray-300 text-center text-sm font-bold text-[#8458B3] whitespace-nowrap">
                   {t.symbol}
                 </td>
 
-                <td className="px-2 py-2 sm:px-3 border border-[#e5eaf5] text-right font-semibold text-[#494D5F] text-xs sm:text-sm whitespace-nowrap">
+                <td className="px-3 py-2 border border-gray-300 text-center text-sm font-semibold text-[#494D5F] whitespace-nowrap">
                   ₹{t.entry}
                 </td>
 
                 {showPositionSize && (
-                  <td className="px-2 py-2 sm:px-3 border border-[#e5eaf5] text-right font-semibold text-[#494D5F] text-xs sm:text-sm whitespace-nowrap">
+                  <td className="px-3 py-2 border border-gray-300 text-center text-sm font-semibold text-[#494D5F] whitespace-nowrap">
                     ₹{Math.floor(positionSize).toLocaleString()}
                   </td>
                 )}
 
-                <td className="px-2 py-2 sm:px-3 border border-[#e5eaf5] whitespace-nowrap">
-                  <div className="flex flex-col leading-tight">
-                    <span className={`text-[9px] sm:text-[10px] font-bold ${
+                <td className="px-3 py-2 border border-gray-300 text-center whitespace-nowrap">
+                  <div className="flex flex-col leading-tight items-center">
+                    <span className={`text-[10px] font-bold ${
                       t.isRiskFree ? 'text-[#a0d2eb]' : 'text-rose-400'
                     }`}>
                       SL: {t.sl}
                     </span>
-                    <span className="text-[9px] sm:text-[10px] font-semibold text-[#a28089]">
+                    <span className="text-[10px] font-semibold text-[#a28089]">
                       CMP: {t.cmp || t.entry}
                     </span>
                   </div>
                 </td>
 
-                <td className="px-2 py-2 sm:px-3 border border-[#e5eaf5] text-center whitespace-nowrap">
-                  <span className={`px-2 py-0.5 rounded text-[9px] sm:text-[10px] font-bold uppercase inline-block ${
+                <td className="px-3 py-2 border border-gray-300 text-center whitespace-nowrap">
+                  <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${
                     t.status === 'Win' ? 'bg-emerald-100 text-emerald-600' :
                     t.status === 'Loss' ? 'bg-rose-100 text-rose-600' :
                     t.status === 'BE' ? 'bg-[#e5eaf5] text-[#8458B3]' :
@@ -124,35 +124,35 @@ export default function TradeLogs({ preProcessedData, searchTerm = '', filterSta
                   </span>
                 </td>
 
-                <td className={`px-2 py-2 sm:px-3 border border-[#e5eaf5] text-right font-bold text-xs sm:text-sm whitespace-nowrap ${
+                <td className={`px-3 py-2 border border-gray-300 text-center text-sm font-bold whitespace-nowrap ${
                   liveR >= 0 ? 'text-emerald-500' : 'text-rose-500'
                 }`}>
                   {liveR > 0 ? '+' : ''}{(liveR || 0).toFixed(2)}R
                 </td>
 
-                <td className={`px-2 py-2 sm:px-3 border border-[#e5eaf5] text-right font-bold text-xs sm:text-sm whitespace-nowrap ${
+                <td className={`px-3 py-2 border border-gray-300 text-center text-sm font-bold whitespace-nowrap ${
                   pnl >= 0 ? 'text-emerald-500' : 'text-rose-500'
                 }`}>
                   ₹{Math.floor(pnl || 0).toLocaleString()}
                 </td>
 
-                <td className="px-2 py-2 sm:px-3 border border-[#e5eaf5] text-right text-[10px] sm:text-xs text-[#a28089] font-medium whitespace-nowrap">
+                <td className="px-3 py-2 border border-gray-300 text-center text-sm text-[#494D5F] whitespace-nowrap">
                   {daysHeld}
                 </td>
 
-                <td className="px-2 py-2 sm:px-3 border border-[#e5eaf5] text-center whitespace-nowrap">
-                  <div className="flex justify-center gap-1 sm:gap-2">
+                <td className="px-3 py-2 border border-gray-300 text-center whitespace-nowrap">
+                  <div className="flex justify-center gap-2">
                     {t.status === 'Open' && (
                       <>
                         <button 
                           onClick={() => setEditingTrade(t)} 
-                          className="p-1 hover:bg-[#e5eaf5] text-[#8458B3] rounded transition"
+                          className="hover:text-[#8458B3] text-[#a28089] transition-colors"
                         >
                           <Edit3 size={14}/>
                         </button>
                         <button 
                           onClick={() => handleFinalClose(t)} 
-                          className="p-1 hover:bg-emerald-100 text-emerald-600 rounded transition"
+                          className="hover:text-emerald-600 text-[#a28089] transition-colors"
                         >
                           <CheckCircle2 size={14}/>
                         </button>
