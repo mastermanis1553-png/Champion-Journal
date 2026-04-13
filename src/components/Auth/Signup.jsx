@@ -5,10 +5,11 @@ import { Activity } from 'lucide-react';
 
 export default function Signup() {
   const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const[password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
-  const { signup, loginWithGoogle } = useAuth();
+  // ✅ FIX: Changed 'signup' to 'signupWithEmail'
+  const { signupWithEmail, loginWithGoogle } = useAuth(); 
   const navigate = useNavigate();
 
   const handleSignup = async (e) => {
@@ -20,7 +21,8 @@ export default function Signup() {
     }
 
     try {
-      await signup(email, password);
+      // ✅ FIX: Changed 'signup' to 'signupWithEmail'
+      await signupWithEmail(email, password);
       navigate('/trades');
     } catch (err) {
       setError(err.message || "Failed to create an account.");

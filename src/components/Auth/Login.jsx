@@ -5,19 +5,21 @@ import { Activity } from 'lucide-react';
 
 export default function Login() {
   const [email, setEmail] = useState('');
-  const[password, setPassword] = useState('');
-  const [error, setError] = useState('');
-  const { login, loginWithGoogle } = useAuth();
+  const [password, setPassword] = useState('');
+  const[error, setError] = useState('');
+  // ✅ FIX: Changed 'login' to 'loginWithEmail'
+  const { loginWithEmail, loginWithGoogle } = useAuth(); 
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
     e.preventDefault();
     setError('');
     try {
-      await login(email, password);
+      // ✅ FIX: Changed 'login' to 'loginWithEmail'
+      await loginWithEmail(email, password);
       navigate('/trades');
     } catch (err) { 
-      setError("Invalid Credentials or Unauthorized."); 
+      setError(err.message || "Invalid Credentials or Unauthorized."); 
     }
   };
 
