@@ -2,7 +2,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { auth, db, googleProvider } from '../utils/firebase';
 import { 
   onAuthStateChanged, 
-  signInWithPopup, 
+  signInWithRedirect, 
   signInWithEmailAndPassword, 
   signOut,
   createUserWithEmailAndPassword
@@ -147,45 +147,8 @@ export const AuthProvider = ({ children }) => {
     try {
       setError(null);
 
-      const result = await signInWithPopup(auth, googleProvider);
-      const firebaseUser = result.user;
+      await signInWithRedirect(auth, googleProvider);
 
-      const userDocRef = doc(db, 'users', firebaseUser.uid);
-      const userDocSnap = await getDoc(userDocRef);
-
-      if (!userDocSnap.exists()) {
-        await setDoc(userDocRef, {
-          email: firebaseUser.email,
-          uid: firebaseUser.uid,
-          approved: false,
-          createdAt: serverTimestamp(),
-          lastLogin: serverTimestamp(),
-          displayName: firebaseUser.displayName || '',
-          photoURL: firebaseUser.photoURL || null,
-          authMethod: 'google'
-        });
-
-        setUser(null);
-        setUserApproved(false);
-
-        throw new Error('Account created! Please wait for admin approval to access the dashboard.');
-      }
-
-      const userData = userDocSnap.data();
-
-      if (userData.approved !== true) {
-        setUser(null);
-        setUserApproved(false);
-        throw new Error('Your account is not approved yet. Please wait for admin approval.');
-      }
-
-      await setDoc(userDocRef, { lastLogin: serverTimestamp() }, { merge: true });
-
-      setUser(firebaseUser);
-      setUserApproved(true);
-      setError(null);
-
-      return { success: true };
     } catch (err) {
       const errorMessage = err.message;
       setError(errorMessage);
