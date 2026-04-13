@@ -20,7 +20,6 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
 
-    // ✅ ADDED: redirect result handler
     const checkRedirect = async () => {
       try {
         const result = await getRedirectResult(auth);
@@ -34,34 +33,60 @@ export const AuthProvider = ({ children }) => {
     };
 
     checkRedirect();
-    // ✅ END
 
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       try {
         if (currentUser) {
           const userDocRef = doc(db, 'users', currentUser.uid);
           const userDocSnap = await getDoc(userDocRef);
-         console.log("USER:", currentUser);
-         console.log("DATA:", userDocSnap.data());
 
+          console.log("USER:", currentUser);
+          console.log("DATA:", userDocSnap.data());
 
-          if (userDocSnap.exists()) {
-            const userData = userDocSnap.data();
-            if (userData.approved === true) {
-              setUser(currentUser);
-              setUserApproved(true);
-              setError(null);
-            } else {
-              setUser(null);
-              setUserApproved(false);
-              setError('Your account is not approved yet. Please wait for admin approval.');
-              await signOut(auth);
-            }
+          // ✅ FIX 1: agar doc exist nahi karta
+          if (!userDocSnap.exists()) {
+            await setDoc(userDocRef, {
+              email: currentUser.email,
+              uid: currentUser.uid,
+              approved: false,
+              createdAt: serverTimestamp(),
+              lastLogin: serverTimestamp(),
+              displayName: currentUser.displayName || '',
+              photoURL: currentUser.photoURL || null,
+              authMethod: 'google'
+            });
+
+            setUser(null);
+            setUserApproved(false);
+            setError('Account created! Please wait for admin approval.');
+            await signOut(auth);
+            return;
+          }
+
+          const userData = userDocSnap.data();
+
+          // ✅ FIX 2: agar approved field missing hai
+          if (userData.approved === undefined) {
+            await setDoc(userDocRef, { approved: false }, { merge: true });
+
+            setUser(null);
+            setUserApproved(false);
+            setError('Your account is not approved yet. Please wait for admin approval.');
+            await signOut(auth);
+            return;
+          }
+
+          if (userData.approved === true) {
+            setUser(currentUser);
+            setUserApproved(true);
+            setError(null);
           } else {
             setUser(null);
             setUserApproved(false);
+            setError('Your account is not approved yet. Please wait for admin approval.');
             await signOut(auth);
           }
+
         } else {
           setUser(null);
           setUserApproved(false);
