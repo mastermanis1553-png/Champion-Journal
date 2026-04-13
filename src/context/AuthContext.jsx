@@ -5,7 +5,8 @@ import {
   signInWithRedirect, 
   signInWithEmailAndPassword, 
   signOut,
-  createUserWithEmailAndPassword
+  createUserWithEmailAndPassword,
+  getRedirectResult
 } from 'firebase/auth';
 import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
 
@@ -18,6 +19,23 @@ export const AuthProvider = ({ children }) => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
+
+    // ✅ ADDED: redirect result handler
+    const checkRedirect = async () => {
+      try {
+        const result = await getRedirectResult(auth);
+        if (result) {
+          console.log("Redirect login success");
+        }
+      } catch (err) {
+        console.error("Redirect error:", err);
+        setError(err.message);
+      }
+    };
+
+    checkRedirect();
+    // ✅ END
+
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       try {
         if (currentUser) {
