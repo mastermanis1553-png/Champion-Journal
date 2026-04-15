@@ -3,10 +3,10 @@ import React, { useState } from 'react';
 import { useTrades } from '../context/TradeContext';
 import { calculateLiveR, processTrade, calculateDays } from '../utils/math';
 import EditTradeModal from './EditTradeModal';
-import { Edit3, CheckCircle2 } from 'lucide-react';
+import { Edit3, CheckCircle2, Trash2 } from 'lucide-react';
 
 export default function TradeLogs({ preProcessedData, searchTerm = '', filterStatus = 'All Trades', showExitDate, showPositionSize }) {
-  const { trades, updateTrade, settings } = useTrades();
+  const { trades, updateTrade, settings, deleteTrade } = useTrades();
   const [editingTrade, setEditingTrade] = useState(null);
 
   const safeSearchTerm = (searchTerm || '').toLowerCase();
@@ -28,6 +28,12 @@ export default function TradeLogs({ preProcessedData, searchTerm = '', filterSta
     if (rMultiple < -0.1) status = 'Loss';
     
     await updateTrade(trade.id, { exitPrice, rMultiple, status, cmp: exitPrice, exitDate: new Date().toISOString() });
+  };
+
+  const handleDelete = async (id) => {
+    const confirmDelete = window.confirm('Are you sure you want to delete this trade?');
+    if (!confirmDelete) return;
+    await deleteTrade(id);
   };
 
   return (
@@ -150,11 +156,19 @@ export default function TradeLogs({ preProcessedData, searchTerm = '', filterSta
                         >
                           <Edit3 size={14}/>
                         </button>
+
                         <button 
                           onClick={() => handleFinalClose(t)} 
                           className="hover:text-emerald-600 text-[#a28089] transition-colors"
                         >
                           <CheckCircle2 size={14}/>
+                        </button>
+
+                        <button 
+                          onClick={() => handleDelete(t.id)} 
+                          className="hover:text-rose-600 text-[#a28089] transition-colors"
+                        >
+                          <Trash2 size={14}/>
                         </button>
                       </>
                     )}
