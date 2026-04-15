@@ -5,8 +5,15 @@ import { X, ShieldCheck } from 'lucide-react';
 export default function EditTradeModal({ trade, onClose }) {
   const { updateTrade } = useTrades();
 
-  const [date, setDate] = useState(trade.date ? trade.date.split('T')[0] : '');
-  const [exitDate, setExitDate] = useState(trade.exitDate ? trade.exitDate.split('T')[0] : '');
+  const formatDate = (d) => {
+    if (!d) return '';
+    if (typeof d === 'string') return d.split('T')[0];
+    if (d.seconds) return new Date(d.seconds * 1000).toISOString().split('T')[0];
+    return '';
+  };
+
+  const [date, setDate] = useState(formatDate(trade.date));
+  const [exitDate, setExitDate] = useState(formatDate(trade.exitDate));
   const [qty, setQty] = useState(trade.qty || '');
   const [entry, setEntry] = useState(trade.entry || '');
   const [cmp, setCmp] = useState(trade.cmp || trade.entry);
