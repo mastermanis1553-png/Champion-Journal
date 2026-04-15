@@ -148,6 +148,7 @@ export default function TradeLogs({ preProcessedData, searchTerm = '', filterSta
 
                 <td className="px-3 py-2 border border-gray-300 text-center whitespace-nowrap">
                   <div className="flex justify-center gap-2">
+                    
                     {t.status === 'Open' && (
                       <>
                         <button 
@@ -163,15 +164,16 @@ export default function TradeLogs({ preProcessedData, searchTerm = '', filterSta
                         >
                           <CheckCircle2 size={14}/>
                         </button>
-
-                        <button 
-                          onClick={() => handleDelete(t.id)} 
-                          className="hover:text-rose-600 text-[#a28089] transition-colors"
-                        >
-                          <Trash2 size={14}/>
-                        </button>
                       </>
                     )}
+
+                    <button 
+                      onClick={() => handleDelete(t.id)} 
+                      className="hover:text-rose-600 text-[#a28089] transition-colors"
+                    >
+                      <Trash2 size={14}/>
+                    </button>
+
                   </div>
                 </td>
 
