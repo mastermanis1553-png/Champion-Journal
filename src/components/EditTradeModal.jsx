@@ -4,14 +4,23 @@ import { X, ShieldCheck } from 'lucide-react';
 
 export default function EditTradeModal({ trade, onClose }) {
   const { updateTrade } = useTrades();
+
+  const [date, setDate] = useState(trade.date ? trade.date.split('T')[0] : '');
+  const [exitDate, setExitDate] = useState(trade.exitDate ? trade.exitDate.split('T')[0] : '');
+  const [qty, setQty] = useState(trade.qty || '');
+  const [entry, setEntry] = useState(trade.entry || '');
   const [cmp, setCmp] = useState(trade.cmp || trade.entry);
   const [sl, setSl] = useState(trade.sl);
 
   const handleSave = async () => {
     await updateTrade(trade.id, { 
+      date: date ? new Date(date).toISOString() : trade.date,
+      exitDate: exitDate ? new Date(exitDate).toISOString() : trade.exitDate,
+      qty: parseFloat(qty),
+      entry: parseFloat(entry),
       cmp: parseFloat(cmp), 
       sl: parseFloat(sl),
-      isRiskFree: parseFloat(sl) === trade.entry 
+      isRiskFree: parseFloat(sl) === parseFloat(entry)
     });
     onClose();
   };
@@ -37,6 +46,60 @@ export default function EditTradeModal({ trade, onClose }) {
 
         <div className="space-y-3 sm:space-y-4 w-full max-w-full">
 
+          {/* DATE */}
+          <div className="flex flex-col w-full">
+            <label className="text-[10px] sm:text-xs font-semibold text-[#a28089] uppercase mb-1">
+              Entry Date
+            </label>
+            <input 
+              type="date"
+              className="w-full bg-[#f8f9fc] border border-[#e5eaf5] p-2.5 sm:p-3 rounded-lg sm:rounded-xl focus:border-[#a0d2eb] outline-none text-[#494D5F] font-bold text-sm max-w-full"
+              value={date}
+              onChange={(e) => setDate(e.target.value)}
+            />
+          </div>
+
+          {/* EXIT DATE */}
+          <div className="flex flex-col w-full">
+            <label className="text-[10px] sm:text-xs font-semibold text-[#a28089] uppercase mb-1">
+              Exit Date
+            </label>
+            <input 
+              type="date"
+              className="w-full bg-[#f8f9fc] border border-[#e5eaf5] p-2.5 sm:p-3 rounded-lg sm:rounded-xl focus:border-[#a0d2eb] outline-none text-[#494D5F] font-bold text-sm max-w-full"
+              value={exitDate}
+              onChange={(e) => setExitDate(e.target.value)}
+            />
+          </div>
+
+          {/* QUANTITY */}
+          <div className="flex flex-col w-full">
+            <label className="text-[10px] sm:text-xs font-semibold text-[#a28089] uppercase mb-1">
+              Quantity
+            </label>
+            <input 
+              type="number"
+              className="w-full bg-[#f8f9fc] border border-[#e5eaf5] p-2.5 sm:p-3 rounded-lg sm:rounded-xl focus:border-[#a0d2eb] outline-none text-[#494D5F] font-bold text-sm max-w-full"
+              value={qty}
+              onChange={(e) => setQty(e.target.value)}
+            />
+          </div>
+
+          {/* ENTRY */}
+          <div className="flex flex-col w-full">
+            <label className="text-[10px] sm:text-xs font-semibold text-[#a28089] uppercase mb-1">
+              Entry Price
+            </label>
+            <input 
+              type="number"
+              step="any"
+              className="w-full bg-[#f8f9fc] border border-[#e5eaf5] p-2.5 sm:p-3 rounded-lg sm:rounded-xl focus:border-[#a0d2eb] outline-none text-[#494D5F] font-bold text-sm max-w-full"
+              value={entry}
+              onChange={(e) => setEntry(e.target.value)}
+            />
+          </div>
+
+          {/* CMP */}
           <div className="flex flex-col w-full">
             <label className="text-[10px] sm:text-xs font-semibold text-[#a28089] uppercase mb-1">
               Current Market Price (CMP)
@@ -50,6 +113,7 @@ export default function EditTradeModal({ trade, onClose }) {
             />
           </div>
 
+          {/* SL */}
           <div className="flex flex-col w-full">
             <label className="text-[10px] sm:text-xs font-semibold text-[#a28089] uppercase mb-1">
               Stop Loss
@@ -65,7 +129,7 @@ export default function EditTradeModal({ trade, onClose }) {
               />
 
               <button 
-                onClick={() => setSl(trade.entry)} 
+                onClick={() => setSl(entry)} 
                 title="Make Risk Free" 
                 className="w-full sm:w-auto bg-[#e5eaf5] text-[#8458B3] px-3 sm:px-4 py-2 rounded-lg sm:rounded-xl border border-[#d0bdf4] hover:bg-[#d0bdf4] flex items-center justify-center gap-2 font-bold text-xs transition max-w-full"
               >
