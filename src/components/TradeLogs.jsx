@@ -48,6 +48,7 @@ export default function TradeLogs({ preProcessedData, searchTerm = '', filterSta
             <th className="px-3 py-2 border border-gray-300 text-center text-xs font-semibold text-[#494D5F] uppercase tracking-wider whitespace-nowrap">Symbol</th>
             <th className="px-3 py-2 border border-gray-300 text-center text-xs font-semibold text-[#494D5F] uppercase tracking-wider whitespace-nowrap">Entry</th>
             {showPositionSize && <th className="px-3 py-2 border border-gray-300 text-center text-xs font-semibold text-[#494D5F] uppercase tracking-wider whitespace-nowrap">Position Size</th>}
+            <th className="px-3 py-2 border border-gray-300 text-center text-xs font-semibold text-[#494D5F] uppercase tracking-wider whitespace-nowrap">QTY</th>
             <th className="px-3 py-2 border border-gray-300 text-center text-xs font-semibold text-[#494D5F] uppercase tracking-wider whitespace-nowrap">SL / CMP</th>
             <th className="px-3 py-2 border border-gray-300 text-center text-xs font-semibold text-[#494D5F] uppercase tracking-wider whitespace-nowrap">Status</th>
             <th className="px-3 py-2 border border-gray-300 text-center text-xs font-semibold text-[#494D5F] uppercase tracking-wider whitespace-nowrap">R-Earned</th>
@@ -60,12 +61,23 @@ export default function TradeLogs({ preProcessedData, searchTerm = '', filterSta
         <tbody className="divide-y divide-gray-300">
           {displayTrades.map((t) => {
             const liveR = t.status === 'Open' ? calculateLiveR(t, t.cmp) : t.rMultiple;
-            
+
+            const remainingQty = t.remainingQty ?? t.qty;
+            const bookedQty = t.bookedQty ?? 0;
+
             let pnl = t.netPnl;
             if (t.status === 'Open') {
               const currentPrice = Number(t.cmp) || t.entry;
-              const unrealizedReward = t.isShort ? (t.entry - currentPrice) : (currentPrice - t.entry);
-              pnl = (unrealizedReward * t.qty) - t.fees;
+
+              const unrealized = t.isShort 
+                ? (t.entry - currentPrice) * remainingQty
+                : (currentPrice - t.entry) * remainingQty;
+
+              const realized = t.isShort
+                ? (t.entry - (t.cmp || t.entry)) * bookedQty
+                : ((t.cmp || t.entry) - t.entry) * bookedQty;
+
+              pnl = unrealized + realized - t.fees;
             }
 
             const daysHeld = calculateDays(t.dateObj, t.exitDate);
@@ -105,6 +117,11 @@ export default function TradeLogs({ preProcessedData, searchTerm = '', filterSta
                     ₹{Math.floor(positionSize).toLocaleString()}
                   </td>
                 )}
+
+                {/* UPDATED QTY */}
+                <td className="px-3 py-2 border border-gray-300 text-center text-sm font-semibold text-[#494D5F] whitespace-nowrap">
+                  {t.qty} → {remainingQty} | {bookedQty}
+                </td>
 
                 <td className="px-3 py-2 border border-gray-300 text-center whitespace-nowrap">
                   <div className="flex flex-col leading-tight items-center">
@@ -151,26 +168,17 @@ export default function TradeLogs({ preProcessedData, searchTerm = '', filterSta
                     
                     {t.status === 'Open' && (
                       <>
-                        <button 
-                          onClick={() => setEditingTrade(t)} 
-                          className="hover:text-[#8458B3] text-[#a28089] transition-colors"
-                        >
+                        <button onClick={() => setEditingTrade(t)} className="hover:text-[#8458B3] text-[#a28089] transition-colors">
                           <Edit3 size={14}/>
                         </button>
 
-                        <button 
-                          onClick={() => handleFinalClose(t)} 
-                          className="hover:text-emerald-600 text-[#a28089] transition-colors"
-                        >
+                        <button onClick={() => handleFinalClose(t)} className="hover:text-emerald-600 text-[#a28089] transition-colors">
                           <CheckCircle2 size={14}/>
                         </button>
                       </>
                     )}
 
-                    <button 
-                      onClick={() => handleDelete(t.id)} 
-                      className="hover:text-rose-600 text-[#a28089] transition-colors"
-                    >
+                    <button onClick={() => handleDelete(t.id)} className="hover:text-rose-600 text-[#a28089] transition-colors">
                       <Trash2 size={14}/>
                     </button>
 
