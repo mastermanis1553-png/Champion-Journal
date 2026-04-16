@@ -81,7 +81,7 @@ export default function TradeLogs({ preProcessedData, searchTerm = '', filterSta
                 ? (t.entry - currentPrice) * remainingQty
                 : (currentPrice - t.entry) * remainingQty;
 
-              // ✅ FIXED LOGIC (ONLY CHANGE)
+              // ✅ FIXED REALIZED LOGIC
               const realized = (t.partials || []).reduce((sum, p) => {
                 if (t.isShort) {
                   return sum + (t.entry - p.price) * p.qty;
@@ -104,8 +104,6 @@ export default function TradeLogs({ preProcessedData, searchTerm = '', filterSta
             return (
               <tr key={t.id} className="hover:bg-gray-50 transition-colors">
                 
-                {/* UI SAME AS BEFORE — NO CHANGE */}
-
                 <td className="px-3 py-2 border border-gray-300 text-center text-sm text-[#494D5F] whitespace-nowrap">
                   {(t.date?.seconds ? new Date(t.date.seconds * 1000) : new Date(t.date)).toLocaleDateString('en-GB')}
                 </td>
@@ -149,4 +147,67 @@ export default function TradeLogs({ preProcessedData, searchTerm = '', filterSta
                   </div>
                 </td>
 
-                {/* rest UI unchanged */}
+                <td className="px-3 py-2 border border-gray-300 text-center whitespace-nowrap">
+                  <div className="flex flex-col leading-tight items-center">
+                    <span className="text-[10px] font-bold text-rose-400">
+                      SL: {t.sl}
+                    </span>
+                    <span className="text-[10px] font-semibold text-[#a28089]">
+                      CMP: {t.cmp || t.entry}
+                    </span>
+                  </div>
+                </td>
+
+                <td className="px-3 py-2 border border-gray-300 text-center whitespace-nowrap">
+                  <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-orange-100 text-orange-500">
+                    {t.status}
+                  </span>
+                </td>
+
+                <td className="px-3 py-2 border border-gray-300 text-center text-sm font-bold">
+                  {(liveR || 0).toFixed(2)}R
+                </td>
+
+                <td className="px-3 py-2 border border-gray-300 text-center text-sm font-bold">
+                  ₹{Math.floor(pnl || 0).toLocaleString()}
+                </td>
+
+                <td className="px-3 py-2 border border-gray-300 text-center text-sm">
+                  {daysHeld}
+                </td>
+
+                <td className="px-3 py-2 border border-gray-300 text-center">
+                  <div className="flex justify-center gap-2">
+                    {t.status === 'Open' && (
+                      <>
+                        <button onClick={() => setEditingTrade(t)}>
+                          <Edit3 size={14}/>
+                        </button>
+                        <button onClick={() => handleFinalClose(t)}>
+                          <CheckCircle2 size={14}/>
+                        </button>
+                      </>
+                    )}
+                    <button onClick={() => handleDelete(t.id)}>
+                      <Trash2 size={14}/>
+                    </button>
+                  </div>
+                </td>
+
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+
+      {editingTrade && <EditTradeModal trade={editingTrade} onClose={() => setEditingTrade(null)} />}
+
+      {editingQtyTrade && (
+        <EditQtyModal 
+          trade={editingQtyTrade} 
+          onClose={() => setEditingQtyTrade(null)} 
+        />
+      )}
+    </div>
+  );
+}
