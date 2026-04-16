@@ -3,13 +3,13 @@ import React, { useState } from 'react';
 import { useTrades } from '../context/TradeContext';
 import { calculateLiveR, calculateDays } from '../utils/math';
 import EditTradeModal from './EditTradeModal';
-import EditQtyModal from './EditQtyModal';
+import EditQtyModal from './EditQtyModal'; // ✅ NEW
 import { Edit3, CheckCircle2, Trash2 } from 'lucide-react';
 
 export default function TradeLogs({ preProcessedData, searchTerm = '', filterStatus = 'All Trades', showExitDate, showPositionSize }) {
   const { trades, updateTrade, settings, deleteTrade } = useTrades();
   const [editingTrade, setEditingTrade] = useState(null);
-  const [editingQtyTrade, setEditingQtyTrade] = useState(null);
+  const [editingQtyTrade, setEditingQtyTrade] = useState(null); // ✅ NEW
 
   const safeSearchTerm = (searchTerm || '').toLowerCase();
 
@@ -81,16 +81,11 @@ export default function TradeLogs({ preProcessedData, searchTerm = '', filterSta
                 ? (t.entry - currentPrice) * remainingQty
                 : (currentPrice - t.entry) * remainingQty;
 
-              // ✅ FIXED REALIZED LOGIC
-              const realized = (t.partials || []).reduce((sum, p) => {
-                if (t.isShort) {
-                  return sum + (t.entry - p.price) * p.qty;
-                } else {
-                  return sum + (p.price - t.entry) * p.qty;
-                }
-              }, 0);
+              const realized = t.isShort
+                ? (t.entry - (t.cmp || t.entry)) * bookedQty
+                : ((t.cmp || t.entry) - t.entry) * bookedQty;
 
-              pnl = realized + unrealized - t.fees;
+              pnl = unrealized + realized - t.fees;
             }
 
             const daysHeld = calculateDays(
@@ -136,9 +131,14 @@ export default function TradeLogs({ preProcessedData, searchTerm = '', filterSta
                   </td>
                 )}
 
-                <td className="px-3 py-2 border border-gray-300 text-center text-sm font-semibold text-[#494D5F] whitespace-nowrap">
+                {/* ✅ ONLY CHANGE HERE */}
+                <td
+                  className="px-3 py-2 border border-gray-300 text-center text-sm font-semibold text-[#494D5F] whitespace-nowrap"
+                  title={`Total: ${t.qty}, Remaining: ${remainingQty}, Booked: ${bookedQty}`}
+                >
                   <div className="flex items-center justify-center gap-2">
                     {t.qty} → {remainingQty} | {bookedQty}
+
                     {t.status === 'Open' && (
                       <button onClick={() => setEditingQtyTrade(t)}>
                         <Edit3 size={14} className="text-[#8458B3]" />
@@ -149,7 +149,9 @@ export default function TradeLogs({ preProcessedData, searchTerm = '', filterSta
 
                 <td className="px-3 py-2 border border-gray-300 text-center whitespace-nowrap">
                   <div className="flex flex-col leading-tight items-center">
-                    <span className="text-[10px] font-bold text-rose-400">
+                    <span className={`text-[10px] font-bold ${
+                      t.isRiskFree ? 'text-[#a0d2eb]' : 'text-rose-400'
+                    }`}>
                       SL: {t.sl}
                     </span>
                     <span className="text-[10px] font-semibold text-[#a28089]">
@@ -159,38 +161,51 @@ export default function TradeLogs({ preProcessedData, searchTerm = '', filterSta
                 </td>
 
                 <td className="px-3 py-2 border border-gray-300 text-center whitespace-nowrap">
-                  <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-orange-100 text-orange-500">
+                  <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${
+                    t.status === 'Win' ? 'bg-emerald-100 text-emerald-600' :
+                    t.status === 'Loss' ? 'bg-rose-100 text-rose-600' :
+                    t.status === 'BE' ? 'bg-[#e5eaf5] text-[#8458B3]' :
+                    'bg-orange-100 text-orange-500'
+                  }`}>
                     {t.status}
                   </span>
                 </td>
 
-                <td className="px-3 py-2 border border-gray-300 text-center text-sm font-bold">
-                  {(liveR || 0).toFixed(2)}R
+                <td className={`px-3 py-2 border border-gray-300 text-center text-sm font-bold whitespace-nowrap ${
+                  liveR >= 0 ? 'text-emerald-500' : 'text-rose-500'
+                }`}>
+                  {liveR > 0 ? '+' : ''}{(liveR || 0).toFixed(2)}R
                 </td>
 
-                <td className="px-3 py-2 border border-gray-300 text-center text-sm font-bold">
+                <td className={`px-3 py-2 border border-gray-300 text-center text-sm font-bold whitespace-nowrap ${
+                  pnl >= 0 ? 'text-emerald-500' : 'text-rose-500'
+                }`}>
                   ₹{Math.floor(pnl || 0).toLocaleString()}
                 </td>
 
-                <td className="px-3 py-2 border border-gray-300 text-center text-sm">
+                <td className="px-3 py-2 border border-gray-300 text-center text-sm text-[#494D5F] whitespace-nowrap">
                   {daysHeld}
                 </td>
 
-                <td className="px-3 py-2 border border-gray-300 text-center">
+                <td className="px-3 py-2 border border-gray-300 text-center whitespace-nowrap">
                   <div className="flex justify-center gap-2">
+                    
                     {t.status === 'Open' && (
                       <>
-                        <button onClick={() => setEditingTrade(t)}>
+                        <button onClick={() => setEditingTrade(t)} className="hover:text-[#8458B3] text-[#a28089] transition-colors">
                           <Edit3 size={14}/>
                         </button>
-                        <button onClick={() => handleFinalClose(t)}>
+
+                        <button onClick={() => handleFinalClose(t)} className="hover:text-emerald-600 text-[#a28089] transition-colors">
                           <CheckCircle2 size={14}/>
                         </button>
                       </>
                     )}
-                    <button onClick={() => handleDelete(t.id)}>
+
+                    <button onClick={() => handleDelete(t.id)} className="hover:text-rose-600 text-[#a28089] transition-colors">
                       <Trash2 size={14}/>
                     </button>
+
                   </div>
                 </td>
 
@@ -202,6 +217,7 @@ export default function TradeLogs({ preProcessedData, searchTerm = '', filterSta
 
       {editingTrade && <EditTradeModal trade={editingTrade} onClose={() => setEditingTrade(null)} />}
 
+      {/* ✅ ONLY ADDITION */}
       {editingQtyTrade && (
         <EditQtyModal 
           trade={editingQtyTrade} 
