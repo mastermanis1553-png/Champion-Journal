@@ -6,7 +6,7 @@ export default function EditQtyModal({ trade, onClose }) {
   const { updateTrade } = useTrades();
 
   const [buyingQty, setBuyingQty] = useState(trade.qty || 0);
-  const [bookedQty, setBookedQty] = useState(trade.bookedQty || 0);
+  const [bookedQty, setBookedQty] = useState(0); // ✅ reset for new partial entry
 
   const entry = parseFloat(trade.entry || 0);
   const cmp = parseFloat(trade.cmp || trade.entry);
@@ -14,8 +14,8 @@ export default function EditQtyModal({ trade, onClose }) {
 
   // ✅ CALCULATIONS (LIVE)
   const remainingQty = useMemo(() => {
-    return buyingQty - bookedQty;
-  }, [buyingQty, bookedQty]);
+    return buyingQty - ((trade.bookedQty || 0) + bookedQty);
+  }, [buyingQty, bookedQty, trade.bookedQty]);
 
   const positionSize = useMemo(() => {
     return buyingQty * entry;
@@ -34,18 +34,26 @@ export default function EditQtyModal({ trade, onClose }) {
     return pnl / risk;
   }, [pnl, risk]);
 
-  const isInvalid = bookedQty > buyingQty;
+  const totalBooked = (trade.bookedQty || 0) + bookedQty;
+  const isInvalid = totalBooked > buyingQty;
 
   const handleSave = async () => {
-    if (isInvalid) return;
+    if (isInvalid || bookedQty <= 0) return;
+
+    // ✅ NEW PARTIAL ENTRY
+    const newPartial = {
+      qty: bookedQty,
+      price: cmp
+    };
+
+    const updatedPartials = [...(trade.partials || []), newPartial];
 
     await updateTrade(trade.id, {
       qty: buyingQty,
-      bookedQty: bookedQty,
-      remainingQty: remainingQty,
+      bookedQty: totalBooked,
+      remainingQty: buyingQty - totalBooked,
       positionSize: positionSize,
-      pnl: pnl,
-      rEarned: rEarned
+      partials: updatedPartials // ✅ MAIN FIX
     });
 
     onClose();
