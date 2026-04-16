@@ -1,24 +1,16 @@
 // TradeLogs.jsx
 import React, { useState } from 'react';
 import { useTrades } from '../context/TradeContext';
-import { calculateLiveR, calculateDays } from '../utils/math';
+import { calculateLiveR, processTrade, calculateDays } from '../utils/math';
 import EditTradeModal from './EditTradeModal';
-import EditQtyModal from './EditQtyModal'; // ✅ NEW
 import { Edit3, CheckCircle2, Trash2 } from 'lucide-react';
 
 export default function TradeLogs({ preProcessedData, searchTerm = '', filterStatus = 'All Trades', showExitDate, showPositionSize }) {
   const { trades, updateTrade, settings, deleteTrade } = useTrades();
   const [editingTrade, setEditingTrade] = useState(null);
-  const [editingQtyTrade, setEditingQtyTrade] = useState(null); // ✅ NEW
 
   const safeSearchTerm = (searchTerm || '').toLowerCase();
-
-  const displayTrades = (preProcessedData || trades)
-    .sort((a, b) => {
-      const aDate = a.date?.seconds ? new Date(a.date.seconds * 1000) : new Date(a.date);
-      const bDate = b.date?.seconds ? new Date(b.date.seconds * 1000) : new Date(b.date);
-      return bDate - aDate;
-    })
+  const displayTrades = (preProcessedData || trades.map(t => processTrade(t, settings?.rValue)).sort((a, b) => b.dateObj - a.dateObj))
     .filter(t => (t.symbol || '').toLowerCase().includes(safeSearchTerm))
     .filter(t => filterStatus === 'All Trades' ? true : t.status === filterStatus);
 
@@ -88,36 +80,48 @@ export default function TradeLogs({ preProcessedData, searchTerm = '', filterSta
               pnl = unrealized + realized - t.fees;
             }
 
-            const daysHeld = calculateDays(
-              t.date?.seconds ? new Date(t.date.seconds * 1000) : new Date(t.date),
-              t.exitDate
-            );
-
-            const effectiveQty = t.remainingQty ?? t.qty;
-            const positionSize = (t.entry || 0) * effectiveQty;
+            const daysHeld = calculateDays(t.dateObj, t.exitDate);
+            const positionSize = (t.entry || 0) * (t.qty || 0);
 
             return (
               <tr key={t.id} className="hover:bg-gray-50 transition-colors">
                 
-                {/* ALL SAME UI ABOVE */}
-
-                <td className="px-3 py-2 border border-gray-300 text-center text-sm font-semibold text-[#494D5F] whitespace-nowrap">
-                  <div className="flex items-center justify-center gap-2">
-                    
-                    {/* ✅ ONLY THIS LINE CHANGED FORMAT */}
-                    {t.qty} → {bookedQty} | {remainingQty}
-
-                    {/* ✅ EDIT BUTTON (ONLY ADDITION) */}
-                    {t.status === 'Open' && (
-                      <button onClick={() => setEditingQtyTrade(t)}>
-                        <Edit3 size={14} className="text-[#8458B3]" />
-                      </button>
-                    )}
-
-                  </div>
+                <td className="px-3 py-2 border border-gray-300 text-center text-sm text-[#494D5F] whitespace-nowrap">
+                  {(t.dateObj && !isNaN(t.dateObj.getTime())) ? t.dateObj.toLocaleDateString('en-GB') : 'Invalid'}
                 </td>
 
-                {/* BELOW EVERYTHING SAME AS BEFORE */}
+                {showExitDate && (
+                  <td className="px-3 py-2 border border-gray-300 text-center text-sm text-[#494D5F] whitespace-nowrap">
+                    {t.exitDate ? new Date(t.exitDate).toLocaleDateString('en-GB') : '-'}
+                  </td>
+                )}
+
+                <td className="px-3 py-2 border border-gray-300 text-center whitespace-nowrap">
+                  <span className={`text-[10px] px-2 py-0.5 rounded font-bold uppercase ${
+                    t.type === 'SHORT' ? 'bg-rose-100 text-rose-600' : 'bg-emerald-100 text-emerald-600'
+                  }`}>
+                    {t.type}
+                  </span>
+                </td>
+
+                <td className="px-3 py-2 border border-gray-300 text-center text-sm font-bold text-[#8458B3] whitespace-nowrap">
+                  {t.symbol}
+                </td>
+
+                <td className="px-3 py-2 border border-gray-300 text-center text-sm font-semibold text-[#494D5F] whitespace-nowrap">
+                  ₹{t.entry}
+                </td>
+
+                {showPositionSize && (
+                  <td className="px-3 py-2 border border-gray-300 text-center text-sm font-semibold text-[#494D5F] whitespace-nowrap">
+                    ₹{Math.floor(positionSize).toLocaleString()}
+                  </td>
+                )}
+
+                {/* UPDATED QTY */}
+                <td className="px-3 py-2 border border-gray-300 text-center text-sm font-semibold text-[#494D5F] whitespace-nowrap">
+                  {t.qty} → {remainingQty} | {bookedQty}
+                </td>
 
                 <td className="px-3 py-2 border border-gray-300 text-center whitespace-nowrap">
                   <div className="flex flex-col leading-tight items-center">
@@ -188,14 +192,6 @@ export default function TradeLogs({ preProcessedData, searchTerm = '', filterSta
       </table>
 
       {editingTrade && <EditTradeModal trade={editingTrade} onClose={() => setEditingTrade(null)} />}
-
-      {/* ✅ NEW ONLY */}
-      {editingQtyTrade && (
-        <EditQtyModal 
-          trade={editingQtyTrade} 
-          onClose={() => setEditingQtyTrade(null)} 
-        />
-      )}
     </div>
   );
 }
