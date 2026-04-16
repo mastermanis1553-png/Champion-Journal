@@ -14,33 +14,18 @@ export default function EditTradeModal({ trade, onClose }) {
 
   const [date, setDate] = useState(formatDate(trade.date));
   const [exitDate, setExitDate] = useState(formatDate(trade.exitDate));
-  const [qty, setQty] = useState(trade.qty || '');
   const [entry, setEntry] = useState(trade.entry || '');
   const [cmp, setCmp] = useState(trade.cmp || trade.entry);
   const [sl, setSl] = useState(trade.sl);
-  const [bookedQty, setBookedQty] = useState(trade.bookedQty || 0);
 
   const handleSave = async () => {
-    const booked = parseFloat(bookedQty) || 0;
-    const totalQty = parseFloat(qty) || 0;
-
-    if (booked > totalQty) {
-      alert('Booked quantity cannot exceed total quantity');
-      return;
-    }
-
-    const remainingQty = totalQty - booked;
-
     await updateTrade(trade.id, { 
       date: date ? new Date(date).toISOString() : trade.date,
       exitDate: exitDate ? new Date(exitDate).toISOString() : trade.exitDate,
-      qty: totalQty,
       entry: parseFloat(entry),
       cmp: parseFloat(cmp), 
-      sl: booked > 0 ? parseFloat(entry) : parseFloat(sl),
-      bookedQty: booked,
-      remainingQty: remainingQty,
-      isRiskFree: booked > 0 ? true : parseFloat(sl) === parseFloat(entry)
+      sl: parseFloat(sl),
+      isRiskFree: parseFloat(sl) === parseFloat(entry)
     });
 
     onClose();
@@ -75,22 +60,6 @@ export default function EditTradeModal({ trade, onClose }) {
           <div className="flex flex-col w-full">
             <label className="text-[10px] sm:text-xs font-semibold text-[#a28089] uppercase mb-1">Exit Date</label>
             <input type="date" className="w-full bg-[#f8f9fc] border border-[#e5eaf5] p-2.5 sm:p-3 rounded-lg sm:rounded-xl" value={exitDate} onChange={(e) => setExitDate(e.target.value)} />
-          </div>
-
-          <div className="flex flex-col w-full">
-            <label className="text-[10px] sm:text-xs font-semibold text-[#a28089] uppercase mb-1">Quantity</label>
-            <input type="number" className="w-full bg-[#f8f9fc] border border-[#e5eaf5] p-2.5 sm:p-3 rounded-lg sm:rounded-xl" value={qty} onChange={(e) => setQty(e.target.value)} />
-          </div>
-
-          {/* NEW FIELD */}
-          <div className="flex flex-col w-full">
-            <label className="text-[10px] sm:text-xs font-semibold text-[#a28089] uppercase mb-1">Booked Quantity</label>
-            <input 
-              type="number"
-              className="w-full bg-[#f8f9fc] border border-[#e5eaf5] p-2.5 sm:p-3 rounded-lg sm:rounded-xl"
-              value={bookedQty}
-              onChange={(e) => setBookedQty(e.target.value)}
-            />
           </div>
 
           <div className="flex flex-col w-full">

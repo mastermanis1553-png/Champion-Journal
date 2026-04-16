@@ -3,15 +3,19 @@ import React, { useState } from 'react';
 import { useTrades } from '../context/TradeContext';
 import { calculateLiveR, calculateDays } from '../utils/math';
 import EditTradeModal from './EditTradeModal';
-import { Edit3, CheckCircle2, Trash2 } from 'lucide-react';
+import { Edit3, CheckCircle2, Trash2, Info } from 'lucide-react';
 
 export default function TradeLogs({ preProcessedData, searchTerm = '', filterStatus = 'All Trades', showExitDate, showPositionSize }) {
   const { trades, updateTrade, settings, deleteTrade } = useTrades();
   const [editingTrade, setEditingTrade] = useState(null);
 
+  // ✅ NEW STATE FOR INLINE QTY EDIT
+  const [editingQtyTrade, setEditingQtyTrade] = useState(null);
+  const [tempQty, setTempQty] = useState('');
+  const [tempBookedQty, setTempBookedQty] = useState('');
+
   const safeSearchTerm = (searchTerm || '').toLowerCase();
 
-  // ✅ FIX: removed processTrade()
   const displayTrades = (preProcessedData || trades)
     .sort((a, b) => {
       const aDate = a.date?.seconds ? new Date(a.date.seconds * 1000) : new Date(a.date);
@@ -43,6 +47,27 @@ export default function TradeLogs({ preProcessedData, searchTerm = '', filterSta
     await deleteTrade(id);
   };
 
+  // ✅ SAVE QTY EDIT
+  const handleQtySave = async (trade) => {
+    const total = parseFloat(tempQty) || trade.qty;
+    const booked = parseFloat(tempBookedQty) || 0;
+
+    if (booked > total) {
+      alert('Booked qty cannot exceed total qty');
+      return;
+    }
+
+    const remaining = total - booked;
+
+    await updateTrade(trade.id, {
+      qty: total,
+      bookedQty: booked,
+      remainingQty: remaining
+    });
+
+    setEditingQtyTrade(null);
+  };
+
   return (
     <div className="w-full overflow-x-auto border border-gray-300">
       <table className="w-full border-collapse bg-white divide-x divide-gray-300 divide-y divide-gray-300">
@@ -67,134 +92,142 @@ export default function TradeLogs({ preProcessedData, searchTerm = '', filterSta
 
         <tbody className="divide-y divide-gray-300">
           {displayTrades.map((t) => {
-            const liveR = t.status === 'Open' ? calculateLiveR(t, t.cmp) : t.rMultiple;
 
             const remainingQty = t.remainingQty ?? t.qty;
             const bookedQty = t.bookedQty ?? 0;
+
+            const effectiveQty = t.qty;
+            const positionSize = (t.entry || 0) * effectiveQty;
 
             let pnl = t.netPnl;
             if (t.status === 'Open') {
               const currentPrice = Number(t.cmp) || t.entry;
 
-              const unrealized = t.isShort 
-                ? (t.entry - currentPrice) * remainingQty
-                : (currentPrice - t.entry) * remainingQty;
+              const unrealized = (currentPrice - t.entry) * remainingQty;
+              const realized = (currentPrice - t.entry) * bookedQty;
 
-              const realized = t.isShort
-                ? (t.entry - (t.cmp || t.entry)) * bookedQty
-                : ((t.cmp || t.entry) - t.entry) * bookedQty;
-
-              pnl = unrealized + realized - t.fees;
+              pnl = unrealized + realized;
             }
 
-            const daysHeld = calculateDays(
-              t.date?.seconds ? new Date(t.date.seconds * 1000) : new Date(t.date),
-              t.exitDate
-            );
-
-            // ✅ FIX: use remainingQty
-            const effectiveQty = t.remainingQty ?? t.qty;
-            const positionSize = (t.entry || 0) * effectiveQty;
-
             return (
-              <tr key={t.id} className="hover:bg-gray-50 transition-colors">
-                
-                <td className="px-3 py-2 border border-gray-300 text-center text-sm text-[#494D5F] whitespace-nowrap">
+              <tr key={t.id} className="hover:bg-gray-50">
+
+                <td className="px-3 py-2 border text-center text-sm">
                   {(t.date?.seconds ? new Date(t.date.seconds * 1000) : new Date(t.date)).toLocaleDateString('en-GB')}
                 </td>
 
                 {showExitDate && (
-                  <td className="px-3 py-2 border border-gray-300 text-center text-sm text-[#494D5F] whitespace-nowrap">
+                  <td className="px-3 py-2 border text-center text-sm">
                     {t.exitDate ? new Date(t.exitDate).toLocaleDateString('en-GB') : '-'}
                   </td>
                 )}
 
-                <td className="px-3 py-2 border border-gray-300 text-center whitespace-nowrap">
-                  <span className={`text-[10px] px-2 py-0.5 rounded font-bold uppercase ${
-                    t.type === 'SHORT' ? 'bg-rose-100 text-rose-600' : 'bg-emerald-100 text-emerald-600'
-                  }`}>
-                    {t.type}
-                  </span>
-                </td>
-
-                <td className="px-3 py-2 border border-gray-300 text-center text-sm font-bold text-[#8458B3] whitespace-nowrap">
-                  {t.symbol}
-                </td>
-
-                <td className="px-3 py-2 border border-gray-300 text-center text-sm font-semibold text-[#494D5F] whitespace-nowrap">
-                  ₹{t.entry}
-                </td>
+                <td className="px-3 py-2 border text-center">{t.type}</td>
+                <td className="px-3 py-2 border text-center font-bold">{t.symbol}</td>
+                <td className="px-3 py-2 border text-center">₹{t.entry}</td>
 
                 {showPositionSize && (
-                  <td className="px-3 py-2 border border-gray-300 text-center text-sm font-semibold text-[#494D5F] whitespace-nowrap">
-                    ₹{Math.floor(positionSize).toLocaleString()}
-                  </td>
+                  <td className="px-3 py-2 border text-center">₹{Math.floor(positionSize)}</td>
                 )}
 
-                {/* ✅ FIX: tooltip added */}
-                <td
-                  className="px-3 py-2 border border-gray-300 text-center text-sm font-semibold text-[#494D5F] whitespace-nowrap"
-                  title={`Total: ${t.qty}, Remaining: ${remainingQty}, Booked: ${bookedQty}`}
-                >
-                  {t.qty} → {remainingQty} | {bookedQty}
+                {/* 🔥 QTY COLUMN UPDATED */}
+                <td className="px-3 py-2 border text-center text-sm">
+                  
+                  {editingQtyTrade?.id === t.id ? (
+                    <div className="flex flex-col gap-1 items-center">
+
+                      <input
+                        type="number"
+                        value={tempQty}
+                        onChange={(e) => setTempQty(e.target.value)}
+                        className="border p-1 w-16 text-xs"
+                        placeholder="Qty"
+                      />
+
+                      <input
+                        type="number"
+                        value={tempBookedQty}
+                        onChange={(e) => setTempBookedQty(e.target.value)}
+                        className="border p-1 w-16 text-xs"
+                        placeholder="Booked"
+                      />
+
+                      <div className="text-xs text-gray-500">
+                        Rem: {(tempQty || t.qty) - (tempBookedQty || 0)}
+                      </div>
+
+                      <button
+                        onClick={() => handleQtySave(t)}
+                        className="text-xs text-green-600"
+                      >
+                        Save
+                      </button>
+
+                    </div>
+                  ) : (
+                    <div className="flex items-center justify-center gap-1">
+
+                      <span>
+                        {t.qty} → {remainingQty} | {bookedQty}
+                      </span>
+
+                      <button
+                        onClick={() => {
+                          setEditingQtyTrade(t);
+                          setTempQty(t.qty);
+                          setTempBookedQty(bookedQty);
+                        }}
+                        className="text-[#a28089] hover:text-[#8458B3]"
+                      >
+                        <Edit3 size={12}/>
+                      </button>
+
+                      {/* 🔥 INFO BUTTON */}
+                      <button
+                        title={`Total: ${t.qty}, Remaining: ${remainingQty}, Booked: ${bookedQty}`}
+                        className="text-[#a28089]"
+                      >
+                        <Info size={12}/>
+                      </button>
+
+                    </div>
+                  )}
+
                 </td>
 
-                <td className="px-3 py-2 border border-gray-300 text-center whitespace-nowrap">
-                  <div className="flex flex-col leading-tight items-center">
-                    <span className={`text-[10px] font-bold ${
-                      t.isRiskFree ? 'text-[#a0d2eb]' : 'text-rose-400'
-                    }`}>
-                      SL: {t.sl}
-                    </span>
-                    <span className="text-[10px] font-semibold text-[#a28089]">
-                      CMP: {t.cmp || t.entry}
-                    </span>
-                  </div>
+                <td className="px-3 py-2 border text-center text-xs">
+                  SL: {t.sl} <br/> CMP: {t.cmp}
                 </td>
 
-                <td className="px-3 py-2 border border-gray-300 text-center whitespace-nowrap">
-                  <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${
-                    t.status === 'Win' ? 'bg-emerald-100 text-emerald-600' :
-                    t.status === 'Loss' ? 'bg-rose-100 text-rose-600' :
-                    t.status === 'BE' ? 'bg-[#e5eaf5] text-[#8458B3]' :
-                    'bg-orange-100 text-orange-500'
-                  }`}>
-                    {t.status}
-                  </span>
+                <td className="px-3 py-2 border text-center">{t.status}</td>
+
+                <td className="px-3 py-2 border text-center">{t.rMultiple}</td>
+
+                <td className="px-3 py-2 border text-center">₹{Math.floor(pnl)}</td>
+
+                <td className="px-3 py-2 border text-center">
+                  {calculateDays(
+                    t.date?.seconds ? new Date(t.date.seconds * 1000) : new Date(t.date),
+                    t.exitDate
+                  )}
                 </td>
 
-                <td className={`px-3 py-2 border border-gray-300 text-center text-sm font-bold whitespace-nowrap ${
-                  liveR >= 0 ? 'text-emerald-500' : 'text-rose-500'
-                }`}>
-                  {liveR > 0 ? '+' : ''}{(liveR || 0).toFixed(2)}R
-                </td>
-
-                <td className={`px-3 py-2 border border-gray-300 text-center text-sm font-bold whitespace-nowrap ${
-                  pnl >= 0 ? 'text-emerald-500' : 'text-rose-500'
-                }`}>
-                  ₹{Math.floor(pnl || 0).toLocaleString()}
-                </td>
-
-                <td className="px-3 py-2 border border-gray-300 text-center text-sm text-[#494D5F] whitespace-nowrap">
-                  {daysHeld}
-                </td>
-
-                <td className="px-3 py-2 border border-gray-300 text-center whitespace-nowrap">
+                <td className="px-3 py-2 border text-center">
                   <div className="flex justify-center gap-2">
                     
                     {t.status === 'Open' && (
                       <>
-                        <button onClick={() => setEditingTrade(t)} className="hover:text-[#8458B3] text-[#a28089] transition-colors">
+                        <button onClick={() => setEditingTrade(t)}>
                           <Edit3 size={14}/>
                         </button>
 
-                        <button onClick={() => handleFinalClose(t)} className="hover:text-emerald-600 text-[#a28089] transition-colors">
+                        <button onClick={() => handleFinalClose(t)}>
                           <CheckCircle2 size={14}/>
                         </button>
                       </>
                     )}
 
-                    <button onClick={() => handleDelete(t.id)} className="hover:text-rose-600 text-[#a28089] transition-colors">
+                    <button onClick={() => handleDelete(t.id)}>
                       <Trash2 size={14}/>
                     </button>
 
