@@ -3,15 +3,16 @@ import React, { useState } from 'react';
 import { useTrades } from '../context/TradeContext';
 import { calculateLiveR, calculateDays } from '../utils/math';
 import EditTradeModal from './EditTradeModal';
+import EditQtyModal from './EditQtyModal'; // ✅ NEW
 import { Edit3, CheckCircle2, Trash2 } from 'lucide-react';
 
 export default function TradeLogs({ preProcessedData, searchTerm = '', filterStatus = 'All Trades', showExitDate, showPositionSize }) {
   const { trades, updateTrade, settings, deleteTrade } = useTrades();
   const [editingTrade, setEditingTrade] = useState(null);
+  const [editingQtyTrade, setEditingQtyTrade] = useState(null); // ✅ NEW
 
   const safeSearchTerm = (searchTerm || '').toLowerCase();
 
-  // ✅ FIX: removed processTrade()
   const displayTrades = (preProcessedData || trades)
     .sort((a, b) => {
       const aDate = a.date?.seconds ? new Date(a.date.seconds * 1000) : new Date(a.date);
@@ -49,152 +50,112 @@ export default function TradeLogs({ preProcessedData, searchTerm = '', filterSta
         
         <thead>
           <tr className="bg-gray-50">
-            <th className="px-3 py-2 border border-gray-300 text-center text-xs font-semibold text-[#494D5F] uppercase tracking-wider whitespace-nowrap">Date</th>
-            {showExitDate && <th className="px-3 py-2 border border-gray-300 text-center text-xs font-semibold text-[#494D5F] uppercase tracking-wider whitespace-nowrap">Exit Date</th>}
-            <th className="px-3 py-2 border border-gray-300 text-center text-xs font-semibold text-[#494D5F] uppercase tracking-wider whitespace-nowrap">Type</th>
-            <th className="px-3 py-2 border border-gray-300 text-center text-xs font-semibold text-[#494D5F] uppercase tracking-wider whitespace-nowrap">Symbol</th>
-            <th className="px-3 py-2 border border-gray-300 text-center text-xs font-semibold text-[#494D5F] uppercase tracking-wider whitespace-nowrap">Entry</th>
-            {showPositionSize && <th className="px-3 py-2 border border-gray-300 text-center text-xs font-semibold text-[#494D5F] uppercase tracking-wider whitespace-nowrap">Position Size</th>}
-            <th className="px-3 py-2 border border-gray-300 text-center text-xs font-semibold text-[#494D5F] uppercase tracking-wider whitespace-nowrap">QTY</th>
-            <th className="px-3 py-2 border border-gray-300 text-center text-xs font-semibold text-[#494D5F] uppercase tracking-wider whitespace-nowrap">SL / CMP</th>
-            <th className="px-3 py-2 border border-gray-300 text-center text-xs font-semibold text-[#494D5F] uppercase tracking-wider whitespace-nowrap">Status</th>
-            <th className="px-3 py-2 border border-gray-300 text-center text-xs font-semibold text-[#494D5F] uppercase tracking-wider whitespace-nowrap">R-Earned</th>
-            <th className="px-3 py-2 border border-gray-300 text-center text-xs font-semibold text-[#494D5F] uppercase tracking-wider whitespace-nowrap">Net PnL</th>
-            <th className="px-3 py-2 border border-gray-300 text-center text-xs font-semibold text-[#494D5F] uppercase tracking-wider whitespace-nowrap">Days</th>
-            <th className="px-3 py-2 border border-gray-300 text-center text-xs font-semibold text-[#494D5F] uppercase tracking-wider whitespace-nowrap">Actions</th>
+            <th className="px-3 py-2 border border-gray-300 text-center text-xs font-semibold text-[#494D5F] uppercase">Date</th>
+            {showExitDate && <th className="px-3 py-2 border border-gray-300 text-center text-xs font-semibold text-[#494D5F] uppercase">Exit Date</th>}
+            <th className="px-3 py-2 border border-gray-300 text-center text-xs font-semibold text-[#494D5F] uppercase">Type</th>
+            <th className="px-3 py-2 border border-gray-300 text-center text-xs font-semibold text-[#494D5F] uppercase">Symbol</th>
+            <th className="px-3 py-2 border border-gray-300 text-center text-xs font-semibold text-[#494D5F] uppercase">Entry</th>
+            {showPositionSize && <th className="px-3 py-2 border border-gray-300 text-center text-xs font-semibold text-[#494D5F] uppercase">Position Size</th>}
+            <th className="px-3 py-2 border border-gray-300 text-center text-xs font-semibold text-[#494D5F] uppercase">QTY</th>
+            <th className="px-3 py-2 border border-gray-300 text-center text-xs font-semibold text-[#494D5F] uppercase">SL / CMP</th>
+            <th className="px-3 py-2 border border-gray-300 text-center text-xs font-semibold text-[#494D5F] uppercase">Status</th>
+            <th className="px-3 py-2 border border-gray-300 text-center text-xs font-semibold text-[#494D5F] uppercase">R-Earned</th>
+            <th className="px-3 py-2 border border-gray-300 text-center text-xs font-semibold text-[#494D5F] uppercase">Net PnL</th>
+            <th className="px-3 py-2 border border-gray-300 text-center text-xs font-semibold text-[#494D5F] uppercase">Days</th>
+            <th className="px-3 py-2 border border-gray-300 text-center text-xs font-semibold text-[#494D5F] uppercase">Actions</th>
           </tr>
         </thead>
 
         <tbody className="divide-y divide-gray-300">
           {displayTrades.map((t) => {
-            const liveR = t.status === 'Open' ? calculateLiveR(t, t.cmp) : t.rMultiple;
 
             const remainingQty = t.remainingQty ?? t.qty;
             const bookedQty = t.bookedQty ?? 0;
 
-            let pnl = t.netPnl;
-            if (t.status === 'Open') {
-              const currentPrice = Number(t.cmp) || t.entry;
-
-              const unrealized = t.isShort 
-                ? (t.entry - currentPrice) * remainingQty
-                : (currentPrice - t.entry) * remainingQty;
-
-              const realized = t.isShort
-                ? (t.entry - (t.cmp || t.entry)) * bookedQty
-                : ((t.cmp || t.entry) - t.entry) * bookedQty;
-
-              pnl = unrealized + realized - t.fees;
-            }
-
-            const daysHeld = calculateDays(
-              t.date?.seconds ? new Date(t.date.seconds * 1000) : new Date(t.date),
-              t.exitDate
-            );
-
-            // ✅ FIX: use remainingQty
-            const effectiveQty = t.remainingQty ?? t.qty;
-            const positionSize = (t.entry || 0) * effectiveQty;
-
             return (
-              <tr key={t.id} className="hover:bg-gray-50 transition-colors">
-                
-                <td className="px-3 py-2 border border-gray-300 text-center text-sm text-[#494D5F] whitespace-nowrap">
+              <tr key={t.id} className="hover:bg-gray-50">
+
+                <td className="px-3 py-2 border text-center text-sm">
                   {(t.date?.seconds ? new Date(t.date.seconds * 1000) : new Date(t.date)).toLocaleDateString('en-GB')}
                 </td>
 
                 {showExitDate && (
-                  <td className="px-3 py-2 border border-gray-300 text-center text-sm text-[#494D5F] whitespace-nowrap">
+                  <td className="px-3 py-2 border text-center text-sm">
                     {t.exitDate ? new Date(t.exitDate).toLocaleDateString('en-GB') : '-'}
                   </td>
                 )}
 
-                <td className="px-3 py-2 border border-gray-300 text-center whitespace-nowrap">
-                  <span className={`text-[10px] px-2 py-0.5 rounded font-bold uppercase ${
-                    t.type === 'SHORT' ? 'bg-rose-100 text-rose-600' : 'bg-emerald-100 text-emerald-600'
-                  }`}>
-                    {t.type}
-                  </span>
+                <td className="px-3 py-2 border text-center">
+                  {t.type}
                 </td>
 
-                <td className="px-3 py-2 border border-gray-300 text-center text-sm font-bold text-[#8458B3] whitespace-nowrap">
+                <td className="px-3 py-2 border text-center font-bold text-[#8458B3]">
                   {t.symbol}
                 </td>
 
-                <td className="px-3 py-2 border border-gray-300 text-center text-sm font-semibold text-[#494D5F] whitespace-nowrap">
+                <td className="px-3 py-2 border text-center">
                   ₹{t.entry}
                 </td>
 
                 {showPositionSize && (
-                  <td className="px-3 py-2 border border-gray-300 text-center text-sm font-semibold text-[#494D5F] whitespace-nowrap">
-                    ₹{Math.floor(positionSize).toLocaleString()}
+                  <td className="px-3 py-2 border text-center">
+                    ₹{Math.floor((t.entry || 0) * (t.qty || 0))}
                   </td>
                 )}
 
-                {/* ✅ FIX: tooltip added */}
-                <td
-                  className="px-3 py-2 border border-gray-300 text-center text-sm font-semibold text-[#494D5F] whitespace-nowrap"
-                  title={`Total: ${t.qty}, Remaining: ${remainingQty}, Booked: ${bookedQty}`}
-                >
-                  {t.qty} → {remainingQty} | {bookedQty}
-                </td>
+                {/* ✅ UPDATED QTY COLUMN */}
+                <td className="px-3 py-2 border text-center">
+                  <div className="flex items-center justify-center gap-2">
+                    
+                    <span>
+                      {t.qty} → {bookedQty} | {remainingQty}
+                    </span>
 
-                <td className="px-3 py-2 border border-gray-300 text-center whitespace-nowrap">
-                  <div className="flex flex-col leading-tight items-center">
-                    <span className={`text-[10px] font-bold ${
-                      t.isRiskFree ? 'text-[#a0d2eb]' : 'text-rose-400'
-                    }`}>
-                      SL: {t.sl}
-                    </span>
-                    <span className="text-[10px] font-semibold text-[#a28089]">
-                      CMP: {t.cmp || t.entry}
-                    </span>
+                    {t.status === 'Open' && (
+                      <button onClick={() => setEditingQtyTrade(t)}>
+                        <Edit3 size={14} className="text-[#8458B3]" />
+                      </button>
+                    )}
+
                   </div>
                 </td>
 
-                <td className="px-3 py-2 border border-gray-300 text-center whitespace-nowrap">
-                  <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${
-                    t.status === 'Win' ? 'bg-emerald-100 text-emerald-600' :
-                    t.status === 'Loss' ? 'bg-rose-100 text-rose-600' :
-                    t.status === 'BE' ? 'bg-[#e5eaf5] text-[#8458B3]' :
-                    'bg-orange-100 text-orange-500'
-                  }`}>
-                    {t.status}
-                  </span>
+                <td className="px-3 py-2 border text-center">
+                  SL: {t.sl} | CMP: {t.cmp}
                 </td>
 
-                <td className={`px-3 py-2 border border-gray-300 text-center text-sm font-bold whitespace-nowrap ${
-                  liveR >= 0 ? 'text-emerald-500' : 'text-rose-500'
-                }`}>
-                  {liveR > 0 ? '+' : ''}{(liveR || 0).toFixed(2)}R
+                <td className="px-3 py-2 border text-center">
+                  {t.status}
                 </td>
 
-                <td className={`px-3 py-2 border border-gray-300 text-center text-sm font-bold whitespace-nowrap ${
-                  pnl >= 0 ? 'text-emerald-500' : 'text-rose-500'
-                }`}>
-                  ₹{Math.floor(pnl || 0).toLocaleString()}
+                <td className="px-3 py-2 border text-center">
+                  {(t.rMultiple || 0).toFixed(2)}R
                 </td>
 
-                <td className="px-3 py-2 border border-gray-300 text-center text-sm text-[#494D5F] whitespace-nowrap">
-                  {daysHeld}
+                <td className="px-3 py-2 border text-center">
+                  ₹{Math.floor(t.netPnl || 0)}
                 </td>
 
-                <td className="px-3 py-2 border border-gray-300 text-center whitespace-nowrap">
+                <td className="px-3 py-2 border text-center">
+                  {calculateDays(new Date(t.date), t.exitDate)}
+                </td>
+
+                <td className="px-3 py-2 border text-center">
                   <div className="flex justify-center gap-2">
-                    
+
                     {t.status === 'Open' && (
                       <>
-                        <button onClick={() => setEditingTrade(t)} className="hover:text-[#8458B3] text-[#a28089] transition-colors">
+                        <button onClick={() => setEditingTrade(t)}>
                           <Edit3 size={14}/>
                         </button>
 
-                        <button onClick={() => handleFinalClose(t)} className="hover:text-emerald-600 text-[#a28089] transition-colors">
+                        <button onClick={() => handleFinalClose(t)}>
                           <CheckCircle2 size={14}/>
                         </button>
                       </>
                     )}
 
-                    <button onClick={() => handleDelete(t.id)} className="hover:text-rose-600 text-[#a28089] transition-colors">
+                    <button onClick={() => handleDelete(t.id)}>
                       <Trash2 size={14}/>
                     </button>
 
@@ -208,6 +169,14 @@ export default function TradeLogs({ preProcessedData, searchTerm = '', filterSta
       </table>
 
       {editingTrade && <EditTradeModal trade={editingTrade} onClose={() => setEditingTrade(null)} />}
+
+      {/* ✅ NEW MODAL */}
+      {editingQtyTrade && (
+        <EditQtyModal 
+          trade={editingQtyTrade} 
+          onClose={() => setEditingQtyTrade(null)} 
+        />
+      )}
     </div>
   );
 }
