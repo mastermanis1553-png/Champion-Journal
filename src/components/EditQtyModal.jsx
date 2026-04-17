@@ -1,3 +1,4 @@
+// EditQtyModal.jsx
 import React, { useState, useMemo } from 'react';
 import { useTrades } from '../context/TradeContext';
 import { X } from 'lucide-react';
@@ -11,21 +12,35 @@ export default function EditQtyModal({ trade, onClose }) {
 
   const entry = Number(trade.entry || 0);
 
-  const remainingQty = useMemo(() => {
-    return buyingQty - ((trade.bookedQty || 0) + bookedQty);
-  }, [buyingQty, bookedQty, trade.bookedQty]);
+  const existingBookings = trade.bookings || [];
+  const existingBookedQty = existingBookings.reduce((sum, b) => sum + (Number(b.qty) || 0), 0);
 
-  const totalBooked = (trade.bookedQty || 0) + bookedQty;
+  const totalBooked = existingBookedQty + bookedQty;
+
+  const remainingQty = useMemo(() => {
+    return buyingQty - totalBooked;
+  }, [buyingQty, totalBooked]);
+
   const isInvalid = totalBooked > buyingQty;
 
   const handleSave = async () => {
-    if (isInvalid) return;
+    if (isInvalid || bookedQty <= 0) return;
+
+    const newBooking = {
+      qty: Number(bookedQty),
+      price: Number(cmp)
+    };
+
+    const updatedBookings = [...existingBookings, newBooking];
+
+    const finalBookedQty = updatedBookings.reduce((sum, b) => sum + (Number(b.qty) || 0), 0);
 
     await updateTrade(trade.id, {
       qty: Number(buyingQty),
-      bookedQty: Number(totalBooked),
-      remainingQty: Number(buyingQty - totalBooked),
-      cmp: Number(cmp)
+      bookedQty: Number(finalBookedQty),
+      remainingQty: Number(buyingQty - finalBookedQty),
+      cmp: Number(cmp),
+      bookings: updatedBookings
     });
 
     onClose();

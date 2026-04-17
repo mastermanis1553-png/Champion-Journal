@@ -1,3 +1,4 @@
+// TradeContext.jsx
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { db } from '../utils/firebase';
 import { collection, query, where, onSnapshot, addDoc, updateDoc, doc, deleteDoc, Timestamp } from 'firebase/firestore';
@@ -52,6 +53,13 @@ export const TradeProvider = ({ children }) => {
         parsedData[field] = isNaN(num) ? parsedData[field] : num;
       }
     });
+
+    if (parsedData.bookings && Array.isArray(parsedData.bookings)) {
+      parsedData.bookings = parsedData.bookings.map(b => ({
+        qty: Number(b.qty),
+        price: Number(b.price)
+      }));
+    }
 
     await updateDoc(doc(db, "trades", id), parsedData);
   };

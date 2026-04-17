@@ -1,3 +1,4 @@
+// TradeLogs.jsx
 import React, { useState } from 'react';
 import { useTrades } from '../context/TradeContext';
 import { calculateDays } from '../utils/math';
@@ -68,29 +69,39 @@ export default function TradeLogs({ preProcessedData, searchTerm = '', filterSta
         <tbody className="divide-y divide-gray-300">
           {displayTrades.map((t) => {
             const entry = Number(t.entry) || 0;
-            const bookedQty = Number(t.bookedQty) || 0;
-            const qty = Number(t.qty) || 0;
             const sl = Number(t.sl) || 0;
-            const cmp = Number(t.cmp) || entry;
-            const exitPrice = t.exitPrice !== undefined ? Number(t.exitPrice) : null;
+            const qty = Number(t.qty) || 0;
             const isShort = t.type === 'SHORT';
             const fees = Number(t.fees) || 0;
 
-            const usedPrice = exitPrice ?? cmp;
-
             let pnl = 0;
-            if (bookedQty > 0) {
-              pnl = isShort
-                ? (entry - usedPrice) * bookedQty
-                : (usedPrice - entry) * bookedQty;
+            let totalBookedQty = 0;
 
+            if (t.bookings && t.bookings.length > 0) {
+              pnl = t.bookings.reduce((sum, b) => {
+                const diff = isShort
+                  ? (entry - Number(b.price))
+                  : (Number(b.price) - entry);
+                return sum + (diff * Number(b.qty));
+              }, 0);
+
+              totalBookedQty = t.bookings.reduce((sum, b) => sum + Number(b.qty), 0);
+              pnl = pnl - fees;
+            } else {
+              const bookedQty = Number(t.bookedQty) || 0;
+              const cmp = Number(t.cmp) || entry;
+              pnl = isShort
+                ? (entry - cmp) * bookedQty
+                : (cmp - entry) * bookedQty;
+
+              totalBookedQty = bookedQty;
               pnl = pnl - fees;
             }
 
             let liveR = 0;
             const riskPerShare = Math.abs(entry - sl);
-            if (bookedQty > 0 && riskPerShare > 0) {
-              liveR = pnl / (riskPerShare * bookedQty);
+            if (totalBookedQty > 0 && riskPerShare > 0) {
+              liveR = pnl / (riskPerShare * totalBookedQty);
             }
 
             const remainingQty = t.remainingQty ?? t.qty;
@@ -104,7 +115,6 @@ export default function TradeLogs({ preProcessedData, searchTerm = '', filterSta
 
             return (
               <tr key={t.id} className="hover:bg-gray-50 transition-colors">
-                
                 <td className="px-3 py-2 border border-gray-300 text-center text-sm text-[#494D5F] whitespace-nowrap">
                   {(t.date?.seconds ? new Date(t.date.seconds * 1000) : new Date(t.date)).toLocaleDateString('en-GB')}
                 </td>
@@ -139,10 +149,10 @@ export default function TradeLogs({ preProcessedData, searchTerm = '', filterSta
 
                 <td
                   className="px-3 py-2 border border-gray-300 text-center text-sm font-semibold text-[#494D5F] whitespace-nowrap"
-                  title={`Total: ${t.qty}, Remaining: ${remainingQty}, Booked: ${bookedQty}`}
+                  title={`Total: ${t.qty}, Remaining: ${remainingQty}, Booked: ${totalBookedQty}`}
                 >
                   <div className="flex items-center justify-center gap-2">
-                    {t.qty} → {remainingQty} | {bookedQty}
+                    {t.qty} → {remainingQty} | {totalBookedQty}
 
                     {t.status === 'Open' && (
                       <button onClick={() => setEditingQtyTrade(t)}>
@@ -213,7 +223,6 @@ export default function TradeLogs({ preProcessedData, searchTerm = '', filterSta
 
                   </div>
                 </td>
-
               </tr>
             );
           })}
