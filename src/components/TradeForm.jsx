@@ -29,7 +29,7 @@ export default function TradeForm() {
       symbol: form.symbol.toUpperCase(),
       type: form.type,
       entry, sl: sl, target: parseFloat(form.target) || 0, 
-      quantity: customQty, fees: parseFloat(form.fees) || 0,
+      qty: customQty, fees: parseFloat(form.fees) || 0, // ✅ FIXED HERE
       initialSl: sl, riskAmount: currentR, 
       status: 'Open', rMultiple: 0, cmp: entry, exitDate: null
     });
