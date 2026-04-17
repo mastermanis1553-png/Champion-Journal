@@ -1,15 +1,14 @@
-// TradeLogs.jsx
 import React, { useState } from 'react';
 import { useTrades } from '../context/TradeContext';
-import { calculateLiveR, calculateDays } from '../utils/math';
+import { calculateDays } from '../utils/math';
 import EditTradeModal from './EditTradeModal';
-import EditQtyModal from './EditQtyModal'; // ✅ NEW
+import EditQtyModal from './EditQtyModal';
 import { Edit3, CheckCircle2, Trash2 } from 'lucide-react';
 
 export default function TradeLogs({ preProcessedData, searchTerm = '', filterStatus = 'All Trades', showExitDate, showPositionSize }) {
   const { trades, updateTrade, settings, deleteTrade } = useTrades();
   const [editingTrade, setEditingTrade] = useState(null);
-  const [editingQtyTrade, setEditingQtyTrade] = useState(null); // ✅ NEW
+  const [editingQtyTrade, setEditingQtyTrade] = useState(null);
 
   const safeSearchTerm = (searchTerm || '').toLowerCase();
 
@@ -68,33 +67,40 @@ export default function TradeLogs({ preProcessedData, searchTerm = '', filterSta
 
         <tbody className="divide-y divide-gray-300">
           {displayTrades.map((t) => {
-            const liveR = t.status === 'Open' ? calculateLiveR(t, t.cmp) : t.rMultiple;
+            const entry = Number(t.entry) || 0;
+            const bookedQty = Number(t.bookedQty) || 0;
+            const qty = Number(t.qty) || 0;
+            const sl = Number(t.sl) || 0;
+            const cmp = Number(t.cmp) || entry;
+            const exitPrice = t.exitPrice !== undefined ? Number(t.exitPrice) : null;
+            const isShort = t.type === 'SHORT';
+            const fees = Number(t.fees) || 0;
+
+            const usedPrice = exitPrice ?? cmp;
+
+            let pnl = 0;
+            if (bookedQty > 0) {
+              pnl = isShort
+                ? (entry - usedPrice) * bookedQty
+                : (usedPrice - entry) * bookedQty;
+
+              pnl = pnl - fees;
+            }
+
+            let liveR = 0;
+            const riskPerShare = Math.abs(entry - sl);
+            if (bookedQty > 0 && riskPerShare > 0) {
+              liveR = pnl / (riskPerShare * bookedQty);
+            }
 
             const remainingQty = t.remainingQty ?? t.qty;
-            const bookedQty = t.bookedQty ?? 0;
-
-            let pnl = t.netPnl;
-            if (t.status === 'Open') {
-              const currentPrice = Number(t.cmp) || t.entry;
-
-              const unrealized = t.isShort 
-                ? (t.entry - currentPrice) * remainingQty
-                : (currentPrice - t.entry) * remainingQty;
-
-              const realized = t.isShort
-                ? (t.entry - (t.cmp || t.entry)) * bookedQty
-                : ((t.cmp || t.entry) - t.entry) * bookedQty;
-
-              pnl = unrealized + realized - t.fees;
-            }
 
             const daysHeld = calculateDays(
               t.date?.seconds ? new Date(t.date.seconds * 1000) : new Date(t.date),
               t.exitDate
             );
 
-            const effectiveQty = t.remainingQty ?? t.qty;
-            const positionSize = (t.entry || 0) * effectiveQty;
+            const positionSize = entry * qty;
 
             return (
               <tr key={t.id} className="hover:bg-gray-50 transition-colors">
@@ -131,7 +137,6 @@ export default function TradeLogs({ preProcessedData, searchTerm = '', filterSta
                   </td>
                 )}
 
-                {/* ✅ ONLY CHANGE HERE */}
                 <td
                   className="px-3 py-2 border border-gray-300 text-center text-sm font-semibold text-[#494D5F] whitespace-nowrap"
                   title={`Total: ${t.qty}, Remaining: ${remainingQty}, Booked: ${bookedQty}`}
@@ -217,7 +222,6 @@ export default function TradeLogs({ preProcessedData, searchTerm = '', filterSta
 
       {editingTrade && <EditTradeModal trade={editingTrade} onClose={() => setEditingTrade(null)} />}
 
-      {/* ✅ ONLY ADDITION */}
       {editingQtyTrade && (
         <EditQtyModal 
           trade={editingQtyTrade} 

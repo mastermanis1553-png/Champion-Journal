@@ -10,7 +10,6 @@ export const TradeProvider = ({ children }) => {
   const [trades, setTrades] = useState([]);
   const [loading, setLoading] = useState(true);
   
-  // R-Value Settings Logic
   const [settings, setSettings] = useState(() => {
     const saved = localStorage.getItem('journal_settings');
     return saved ? JSON.parse(saved) : { rValue: 1250 };
@@ -37,13 +36,24 @@ export const TradeProvider = ({ children }) => {
     await addDoc(collection(db, "trades"), {
       ...tradeData,
       userId: user.uid,
-      riskAmount: parseFloat(settings.rValue), // Force parse
+      riskAmount: parseFloat(settings.rValue),
       createdAt: Timestamp.now()
     });
   };
 
   const updateTrade = async (id, data) => {
-    await updateDoc(doc(db, "trades", id), data);
+    const parsedData = {
+      ...data,
+      entry: data.entry !== undefined ? Number(data.entry) : data.entry,
+      qty: data.qty !== undefined ? Number(data.qty) : data.qty,
+      bookedQty: data.bookedQty !== undefined ? Number(data.bookedQty) : data.bookedQty,
+      remainingQty: data.remainingQty !== undefined ? Number(data.remainingQty) : data.remainingQty,
+      sl: data.sl !== undefined ? Number(data.sl) : data.sl,
+      cmp: data.cmp !== undefined ? Number(data.cmp) : data.cmp,
+      exitPrice: data.exitPrice !== undefined ? Number(data.exitPrice) : data.exitPrice,
+    };
+
+    await updateDoc(doc(db, "trades", id), parsedData);
   };
 
   const deleteTrade = async (id) => {
