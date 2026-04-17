@@ -75,26 +75,27 @@ export default function TradeLogs({ preProcessedData, searchTerm = '', filterSta
             const fees = Number(t.fees) || 0;
 
             let pnl = 0;
-            let totalBookedQty = 0;
+
+            // ✅ FIXED totalBookedQty
+            const totalBookedQty = t.bookings && t.bookings.length > 0
+              ? t.bookings.reduce((sum, b) => sum + Number(b.qty || 0), 0)
+              : Number(t.bookedQty) || 0;
 
             if (t.bookings && t.bookings.length > 0) {
               pnl = t.bookings.reduce((sum, b) => {
                 const diff = isShort
                   ? (entry - Number(b.price))
                   : (Number(b.price) - entry);
-                return sum + (diff * Number(b.qty));
+                return sum + (diff * Number(b.qty || 0));
               }, 0);
 
-              totalBookedQty = t.bookings.reduce((sum, b) => sum + Number(b.qty), 0);
               pnl = pnl - fees;
             } else {
-              const bookedQty = Number(t.bookedQty) || 0;
               const cmp = Number(t.cmp) || entry;
               pnl = isShort
-                ? (entry - cmp) * bookedQty
-                : (cmp - entry) * bookedQty;
+                ? (entry - cmp) * totalBookedQty
+                : (cmp - entry) * totalBookedQty;
 
-              totalBookedQty = bookedQty;
               pnl = pnl - fees;
             }
 
@@ -104,7 +105,10 @@ export default function TradeLogs({ preProcessedData, searchTerm = '', filterSta
               liveR = pnl / (riskPerShare * totalBookedQty);
             }
 
-            const remainingQty = t.remainingQty ?? t.qty;
+            // ✅ FIXED remainingQty
+            const remainingQty = t.bookings && t.bookings.length > 0
+              ? (Number(t.qty) - totalBookedQty)
+              : (t.remainingQty ?? t.qty);
 
             const daysHeld = calculateDays(
               t.date?.seconds ? new Date(t.date.seconds * 1000) : new Date(t.date),
