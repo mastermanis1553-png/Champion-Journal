@@ -70,7 +70,42 @@ export default function TradeLogs({ preProcessedData, searchTerm = '', filterSta
           {displayTrades.map((t) => {
             const entry = Number(t.entry) || 0;
             const qty = Number(t.qty) || 0;
+            const sl = Number(t.sl) || 0;
+            const isShort = t.type === 'SHORT';
+            const fees = Number(t.fees) || 0;
+
             const positionSize = entry * qty;
+
+            let pnl = 0;
+            let totalBookedQty = 0;
+
+            if (t.bookings && t.bookings.length > 0) {
+              pnl = t.bookings.reduce((sum, b) => {
+                const diff = isShort
+                  ? (entry - Number(b.price))
+                  : (Number(b.price) - entry);
+                return sum + (diff * Number(b.qty));
+              }, 0);
+
+              totalBookedQty = t.bookings.reduce((sum, b) => sum + Number(b.qty), 0);
+              pnl = pnl - fees;
+            } else {
+              const bookedQty = Number(t.bookedQty) || 0;
+              const cmp = Number(t.cmp) || entry;
+
+              pnl = isShort
+                ? (entry - cmp) * bookedQty
+                : (cmp - entry) * bookedQty;
+
+              totalBookedQty = bookedQty;
+              pnl = pnl - fees;
+            }
+
+            let liveR = 0;
+            const riskPerShare = Math.abs(entry - sl);
+            if (totalBookedQty > 0 && riskPerShare > 0) {
+              liveR = pnl / (riskPerShare * totalBookedQty);
+            }
 
             const remainingQty = t.remainingQty ?? t.qty;
 
@@ -132,12 +167,16 @@ export default function TradeLogs({ preProcessedData, searchTerm = '', filterSta
                   {t.status}
                 </td>
 
-                <td className="px-3 py-2 border border-gray-300 text-center text-sm font-bold whitespace-nowrap">
-                  0.00R
+                <td className={`px-3 py-2 border border-gray-300 text-center text-sm font-bold whitespace-nowrap ${
+                  liveR >= 0 ? 'text-emerald-500' : 'text-rose-500'
+                }`}>
+                  {liveR > 0 ? '+' : ''}{(liveR || 0).toFixed(2)}R
                 </td>
 
-                <td className="px-3 py-2 border border-gray-300 text-center text-sm font-bold whitespace-nowrap">
-                  ₹0
+                <td className={`px-3 py-2 border border-gray-300 text-center text-sm font-bold whitespace-nowrap ${
+                  pnl >= 0 ? 'text-emerald-500' : 'text-rose-500'
+                }`}>
+                  ₹{Math.floor(pnl || 0).toLocaleString()}
                 </td>
 
                 <td className="px-3 py-2 border border-gray-300 text-center text-sm text-[#494D5F] whitespace-nowrap">
@@ -146,15 +185,23 @@ export default function TradeLogs({ preProcessedData, searchTerm = '', filterSta
 
                 <td className="px-3 py-2 border border-gray-300 text-center whitespace-nowrap">
                   <div className="flex justify-center gap-2">
-                    <button onClick={() => setEditingTrade(t)}>
-                      <Edit3 size={14}/>
-                    </button>
-                    <button onClick={() => setEditingQtyTrade(t)}>
-                      <Edit3 size={14}/>
-                    </button>
-                    <button onClick={() => handleDelete(t.id)}>
+                    
+                    {t.status === 'Open' && (
+                      <>
+                        <button onClick={() => setEditingTrade(t)} className="hover:text-[#8458B3] text-[#a28089] transition-colors">
+                          <Edit3 size={14}/>
+                        </button>
+
+                        <button onClick={() => handleFinalClose(t)} className="hover:text-emerald-600 text-[#a28089] transition-colors">
+                          <CheckCircle2 size={14}/>
+                        </button>
+                      </>
+                    )}
+
+                    <button onClick={() => handleDelete(t.id)} className="hover:text-rose-600 text-[#a28089] transition-colors">
                       <Trash2 size={14}/>
                     </button>
+
                   </div>
                 </td>
               </tr>
