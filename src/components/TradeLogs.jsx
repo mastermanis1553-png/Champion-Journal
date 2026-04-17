@@ -69,19 +69,10 @@ export default function TradeLogs({ preProcessedData, searchTerm = '', filterSta
         <tbody className="divide-y divide-gray-300">
           {displayTrades.map((t) => {
             const entry = Number(t.entry) || 0;
-            const qty = Number(t.qty) || 0;
             const sl = Number(t.sl) || 0;
+            const qty = Number(t.qty) || 0;
             const isShort = t.type === 'SHORT';
             const fees = Number(t.fees) || 0;
-
-            const positionSize = entry * qty;
-
-            // ✅ FIXED QTY LOGIC
-            const bookedQty = (t.bookings && t.bookings.length > 0)
-              ? t.bookings.reduce((sum, b) => sum + (Number(b.qty) || 0), 0)
-              : (Number(t.bookedQty) || 0);
-
-            const remainingQty = t.remainingQty ?? (qty - bookedQty);
 
             let pnl = 0;
             let totalBookedQty = 0;
@@ -94,11 +85,11 @@ export default function TradeLogs({ preProcessedData, searchTerm = '', filterSta
                 return sum + (diff * Number(b.qty));
               }, 0);
 
-              totalBookedQty = bookedQty;
+              totalBookedQty = t.bookings.reduce((sum, b) => sum + Number(b.qty), 0);
               pnl = pnl - fees;
             } else {
+              const bookedQty = Number(t.bookedQty) || 0;
               const cmp = Number(t.cmp) || entry;
-
               pnl = isShort
                 ? (entry - cmp) * bookedQty
                 : (cmp - entry) * bookedQty;
@@ -113,10 +104,14 @@ export default function TradeLogs({ preProcessedData, searchTerm = '', filterSta
               liveR = pnl / (riskPerShare * totalBookedQty);
             }
 
+            const remainingQty = t.remainingQty ?? t.qty;
+
             const daysHeld = calculateDays(
               t.date?.seconds ? new Date(t.date.seconds * 1000) : new Date(t.date),
               t.exitDate
             );
+
+            const positionSize = entry * qty;
 
             return (
               <tr key={t.id} className="hover:bg-gray-50 transition-colors">
@@ -152,13 +147,26 @@ export default function TradeLogs({ preProcessedData, searchTerm = '', filterSta
                   </td>
                 )}
 
-                <td className="px-3 py-2 border border-gray-300 text-center text-sm font-semibold text-[#494D5F] whitespace-nowrap">
-                  {t.qty} → {remainingQty} | {bookedQty}
+                <td
+                  className="px-3 py-2 border border-gray-300 text-center text-sm font-semibold text-[#494D5F] whitespace-nowrap"
+                  title={`Total: ${t.qty}, Remaining: ${remainingQty}, Booked: ${totalBookedQty}`}
+                >
+                  <div className="flex items-center justify-center gap-2">
+                    {t.qty} → {remainingQty} | {totalBookedQty}
+
+                    {t.status === 'Open' && (
+                      <button onClick={() => setEditingQtyTrade(t)}>
+                        <Edit3 size={14} className="text-[#8458B3]" />
+                      </button>
+                    )}
+                  </div>
                 </td>
 
                 <td className="px-3 py-2 border border-gray-300 text-center whitespace-nowrap">
                   <div className="flex flex-col leading-tight items-center">
-                    <span className="text-[10px] font-bold text-rose-400">
+                    <span className={`text-[10px] font-bold ${
+                      t.isRiskFree ? 'text-[#a0d2eb]' : 'text-rose-400'
+                    }`}>
                       SL: {t.sl}
                     </span>
                     <span className="text-[10px] font-semibold text-[#a28089]">
@@ -168,7 +176,14 @@ export default function TradeLogs({ preProcessedData, searchTerm = '', filterSta
                 </td>
 
                 <td className="px-3 py-2 border border-gray-300 text-center whitespace-nowrap">
-                  {t.status}
+                  <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${
+                    t.status === 'Win' ? 'bg-emerald-100 text-emerald-600' :
+                    t.status === 'Loss' ? 'bg-rose-100 text-rose-600' :
+                    t.status === 'BE' ? 'bg-[#e5eaf5] text-[#8458B3]' :
+                    'bg-orange-100 text-orange-500'
+                  }`}>
+                    {t.status}
+                  </span>
                 </td>
 
                 <td className={`px-3 py-2 border border-gray-300 text-center text-sm font-bold whitespace-nowrap ${
@@ -190,7 +205,7 @@ export default function TradeLogs({ preProcessedData, searchTerm = '', filterSta
                 <td className="px-3 py-2 border border-gray-300 text-center whitespace-nowrap">
                   <div className="flex justify-center gap-2">
                     
-                    {t.status?.toLowerCase() === 'open' && (
+                    {t.status === 'Open' && (
                       <>
                         <button onClick={() => setEditingTrade(t)} className="hover:text-[#8458B3] text-[#a28089] transition-colors">
                           <Edit3 size={14}/>
