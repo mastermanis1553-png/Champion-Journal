@@ -76,6 +76,13 @@ export default function TradeLogs({ preProcessedData, searchTerm = '', filterSta
 
             const positionSize = entry * qty;
 
+            // ✅ FIXED QTY LOGIC
+            const bookedQty = (t.bookings && t.bookings.length > 0)
+              ? t.bookings.reduce((sum, b) => sum + (Number(b.qty) || 0), 0)
+              : (Number(t.bookedQty) || 0);
+
+            const remainingQty = t.remainingQty ?? (qty - bookedQty);
+
             let pnl = 0;
             let totalBookedQty = 0;
 
@@ -87,10 +94,9 @@ export default function TradeLogs({ preProcessedData, searchTerm = '', filterSta
                 return sum + (diff * Number(b.qty));
               }, 0);
 
-              totalBookedQty = t.bookings.reduce((sum, b) => sum + Number(b.qty), 0);
+              totalBookedQty = bookedQty;
               pnl = pnl - fees;
             } else {
-              const bookedQty = Number(t.bookedQty) || 0;
               const cmp = Number(t.cmp) || entry;
 
               pnl = isShort
@@ -106,8 +112,6 @@ export default function TradeLogs({ preProcessedData, searchTerm = '', filterSta
             if (totalBookedQty > 0 && riskPerShare > 0) {
               liveR = pnl / (riskPerShare * totalBookedQty);
             }
-
-            const remainingQty = t.remainingQty ?? t.qty;
 
             const daysHeld = calculateDays(
               t.date?.seconds ? new Date(t.date.seconds * 1000) : new Date(t.date),
@@ -149,7 +153,7 @@ export default function TradeLogs({ preProcessedData, searchTerm = '', filterSta
                 )}
 
                 <td className="px-3 py-2 border border-gray-300 text-center text-sm font-semibold text-[#494D5F] whitespace-nowrap">
-                  {t.qty} → {remainingQty}
+                  {t.qty} → {remainingQty} | {bookedQty}
                 </td>
 
                 <td className="px-3 py-2 border border-gray-300 text-center whitespace-nowrap">
@@ -186,7 +190,7 @@ export default function TradeLogs({ preProcessedData, searchTerm = '', filterSta
                 <td className="px-3 py-2 border border-gray-300 text-center whitespace-nowrap">
                   <div className="flex justify-center gap-2">
                     
-                    {t.status === 'Open' && (
+                    {t.status?.toLowerCase() === 'open' && (
                       <>
                         <button onClick={() => setEditingTrade(t)} className="hover:text-[#8458B3] text-[#a28089] transition-colors">
                           <Edit3 size={14}/>
