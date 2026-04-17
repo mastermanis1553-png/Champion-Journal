@@ -34,8 +34,15 @@ export const TradeProvider = ({ children }) => {
   }, [user]);
 
   const addTrade = async (tradeData) => {
-    const qty = Number(tradeData.qty) || 0;
-    const entry = Number(tradeData.entry) || 0;
+    // ✅ FIXED qty initialization
+    const qty = tradeData.qty !== undefined && tradeData.qty !== ''
+      ? Number(tradeData.qty)
+      : 0;
+
+    // ✅ FIXED entry initialization
+    const entry = tradeData.entry !== undefined && tradeData.entry !== ''
+      ? Number(tradeData.entry)
+      : 0;
 
     await addDoc(collection(db, "trades"), {
       ...tradeData,
