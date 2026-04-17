@@ -13,19 +13,15 @@ export default function EditTradeModal({ trade, onClose }) {
   };
 
   const [date, setDate] = useState(formatDate(trade.date));
-  const [exitDate, setExitDate] = useState(formatDate(trade.exitDate));
   const [entry, setEntry] = useState(trade.entry || '');
-  const [cmp, setCmp] = useState(trade.cmp || trade.entry);
   const [sl, setSl] = useState(trade.sl);
 
   const handleSave = async () => {
     await updateTrade(trade.id, { 
       date: date ? new Date(date).toISOString() : trade.date,
-      exitDate: exitDate ? new Date(exitDate).toISOString() : trade.exitDate,
-      entry: parseFloat(entry),
-      cmp: parseFloat(cmp), 
-      sl: parseFloat(sl),
-      isRiskFree: parseFloat(sl) === parseFloat(entry)
+      entry: Number(entry),
+      sl: Number(sl),
+      isRiskFree: Number(sl) === Number(entry)
     });
 
     onClose();
@@ -58,18 +54,8 @@ export default function EditTradeModal({ trade, onClose }) {
           </div>
 
           <div className="flex flex-col w-full">
-            <label className="text-[10px] sm:text-xs font-semibold text-[#a28089] uppercase mb-1">Exit Date</label>
-            <input type="date" className="w-full bg-[#f8f9fc] border border-[#e5eaf5] p-2.5 sm:p-3 rounded-lg sm:rounded-xl" value={exitDate} onChange={(e) => setExitDate(e.target.value)} />
-          </div>
-
-          <div className="flex flex-col w-full">
             <label className="text-[10px] sm:text-xs font-semibold text-[#a28089] uppercase mb-1">Entry Price</label>
             <input type="number" step="any" className="w-full bg-[#f8f9fc] border border-[#e5eaf5] p-2.5 sm:p-3 rounded-lg sm:rounded-xl" value={entry} onChange={(e) => setEntry(e.target.value)} />
-          </div>
-
-          <div className="flex flex-col w-full">
-            <label className="text-[10px] sm:text-xs font-semibold text-[#a28089] uppercase mb-1">Current Market Price (CMP)</label>
-            <input type="number" step="any" className="w-full bg-[#f8f9fc] border border-[#e5eaf5] p-2.5 sm:p-3 rounded-lg sm:rounded-xl" value={cmp} onChange={(e) => setCmp(e.target.value)} />
           </div>
 
           <div className="flex flex-col w-full">

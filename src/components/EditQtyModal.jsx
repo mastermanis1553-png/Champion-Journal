@@ -6,54 +6,26 @@ export default function EditQtyModal({ trade, onClose }) {
   const { updateTrade } = useTrades();
 
   const [buyingQty, setBuyingQty] = useState(trade.qty || 0);
-  const [bookedQty, setBookedQty] = useState(0); // ✅ reset for new partial entry
+  const [bookedQty, setBookedQty] = useState(0);
+  const [cmp, setCmp] = useState(trade.cmp || trade.entry);
 
-  const entry = parseFloat(trade.entry || 0);
-  const cmp = parseFloat(trade.cmp || trade.entry);
-  const sl = parseFloat(trade.sl || 0);
+  const entry = Number(trade.entry || 0);
 
-  // ✅ CALCULATIONS (LIVE)
   const remainingQty = useMemo(() => {
     return buyingQty - ((trade.bookedQty || 0) + bookedQty);
   }, [buyingQty, bookedQty, trade.bookedQty]);
-
-  const positionSize = useMemo(() => {
-    return buyingQty * entry;
-  }, [buyingQty, entry]);
-
-  const pnl = useMemo(() => {
-    return bookedQty * (cmp - entry);
-  }, [bookedQty, cmp, entry]);
-
-  const risk = useMemo(() => {
-    return (entry - sl) * buyingQty;
-  }, [entry, sl, buyingQty]);
-
-  const rEarned = useMemo(() => {
-    if (!risk) return 0;
-    return pnl / risk;
-  }, [pnl, risk]);
 
   const totalBooked = (trade.bookedQty || 0) + bookedQty;
   const isInvalid = totalBooked > buyingQty;
 
   const handleSave = async () => {
-    if (isInvalid || bookedQty <= 0) return;
-
-    // ✅ NEW PARTIAL ENTRY
-    const newPartial = {
-      qty: bookedQty,
-      price: cmp
-    };
-
-    const updatedPartials = [...(trade.partials || []), newPartial];
+    if (isInvalid) return;
 
     await updateTrade(trade.id, {
-      qty: buyingQty,
-      bookedQty: totalBooked,
-      remainingQty: buyingQty - totalBooked,
-      positionSize: positionSize,
-      partials: updatedPartials // ✅ MAIN FIX
+      qty: Number(buyingQty),
+      bookedQty: Number(totalBooked),
+      remainingQty: Number(buyingQty - totalBooked),
+      cmp: Number(cmp)
     });
 
     onClose();
@@ -63,7 +35,6 @@ export default function EditQtyModal({ trade, onClose }) {
     <div className="fixed inset-0 bg-[#494D5F]/80 backdrop-blur-sm flex items-center justify-center z-50 p-3 sm:p-4">
       <div className="bg-white rounded-2xl sm:rounded-3xl p-5 sm:p-6 md:p-8 w-full max-w-sm shadow-2xl border border-[#d0bdf4] relative">
         
-        {/* Close */}
         <button 
           onClick={onClose} 
           className="absolute top-4 right-4 text-[#a28089] hover:text-[#8458B3]"
@@ -71,7 +42,6 @@ export default function EditQtyModal({ trade, onClose }) {
           <X size={18}/>
         </button>
         
-        {/* Header */}
         <h2 className="text-lg font-bold text-[#8458B3] mb-1 uppercase tracking-tight">
           Edit Quantity
         </h2>
@@ -82,7 +52,6 @@ export default function EditQtyModal({ trade, onClose }) {
 
         <div className="space-y-4">
 
-          {/* Buying Qty */}
           <div>
             <label className="text-xs font-semibold text-[#a28089] uppercase mb-1">
               Buying Quantity
@@ -95,7 +64,6 @@ export default function EditQtyModal({ trade, onClose }) {
             />
           </div>
 
-          {/* Booked Qty */}
           <div>
             <label className="text-xs font-semibold text-[#a28089] uppercase mb-1">
               Booked Quantity
@@ -113,7 +81,6 @@ export default function EditQtyModal({ trade, onClose }) {
             )}
           </div>
 
-          {/* Remaining Qty (Read Only) */}
           <div>
             <label className="text-xs font-semibold text-[#a28089] uppercase mb-1">
               Remaining Quantity
@@ -126,18 +93,18 @@ export default function EditQtyModal({ trade, onClose }) {
             />
           </div>
 
-          {/* LIVE PREVIEW */}
-          <div className="bg-[#f8f9fc] p-3 rounded-xl border border-[#e5eaf5] text-xs">
-            <p>Position Size: ₹{positionSize.toFixed(0)}</p>
-            <p className={pnl >= 0 ? "text-green-600" : "text-red-500"}>
-              PnL: ₹{pnl.toFixed(0)}
-            </p>
-            <p className={rEarned >= 0 ? "text-green-600" : "text-red-500"}>
-              R: {rEarned.toFixed(2)}
-            </p>
+          <div>
+            <label className="text-xs font-semibold text-[#a28089] uppercase mb-1">
+              Current Market Price (CMP)
+            </label>
+            <input
+              type="number"
+              className="w-full bg-[#f8f9fc] border border-[#e5eaf5] p-3 rounded-xl"
+              value={cmp}
+              onChange={(e) => setCmp(Number(e.target.value))}
+            />
           </div>
 
-          {/* Save */}
           <button
             onClick={handleSave}
             disabled={isInvalid}

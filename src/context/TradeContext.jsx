@@ -42,16 +42,16 @@ export const TradeProvider = ({ children }) => {
   };
 
   const updateTrade = async (id, data) => {
-    const parsedData = {
-      ...data,
-      entry: data.entry !== undefined ? Number(data.entry) : data.entry,
-      qty: data.qty !== undefined ? Number(data.qty) : data.qty,
-      bookedQty: data.bookedQty !== undefined ? Number(data.bookedQty) : data.bookedQty,
-      remainingQty: data.remainingQty !== undefined ? Number(data.remainingQty) : data.remainingQty,
-      sl: data.sl !== undefined ? Number(data.sl) : data.sl,
-      cmp: data.cmp !== undefined ? Number(data.cmp) : data.cmp,
-      exitPrice: data.exitPrice !== undefined ? Number(data.exitPrice) : data.exitPrice,
-    };
+    const parsedData = { ...data };
+
+    const numericFields = ['entry', 'qty', 'bookedQty', 'remainingQty', 'sl', 'cmp', 'exitPrice'];
+
+    numericFields.forEach((field) => {
+      if (parsedData[field] !== undefined && parsedData[field] !== null && parsedData[field] !== '') {
+        const num = Number(parsedData[field]);
+        parsedData[field] = isNaN(num) ? parsedData[field] : num;
+      }
+    });
 
     await updateDoc(doc(db, "trades", id), parsedData);
   };
