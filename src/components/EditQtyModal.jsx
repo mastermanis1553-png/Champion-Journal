@@ -6,11 +6,9 @@ import { X } from 'lucide-react';
 export default function EditQtyModal({ trade, onClose }) {
   const { updateTrade } = useTrades();
 
-  const [buyingQty, setBuyingQty] = useState(trade.qty || 0);
+  const [buyingQty, setBuyingQty] = useState(Number(trade.qty) || 0);
   const [bookedQty, setBookedQty] = useState(0);
   const [cmp, setCmp] = useState(trade.cmp || trade.entry);
-
-  const entry = Number(trade.entry || 0);
 
   const existingBookings = trade.bookings || [];
   const existingBookedQty = existingBookings.reduce((sum, b) => sum + (Number(b.qty) || 0), 0);

@@ -34,8 +34,15 @@ export const TradeProvider = ({ children }) => {
   }, [user]);
 
   const addTrade = async (tradeData) => {
+    const qty = Number(tradeData.qty) || 0;
+    const entry = Number(tradeData.entry) || 0;
+
     await addDoc(collection(db, "trades"), {
       ...tradeData,
+      entry,
+      qty,
+      bookedQty: 0,
+      remainingQty: qty,
       userId: user.uid,
       riskAmount: parseFloat(settings.rValue),
       createdAt: Timestamp.now()
