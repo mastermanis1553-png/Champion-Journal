@@ -16,18 +16,29 @@ app.get("/api/cmp", async (req, res) => {
 
     console.log("Fetching:", cleanSymbol);
 
-    // ✅ DIRECT YAHOO API (stable)
     const response = await fetch(
       `https://query1.finance.yahoo.com/v8/finance/chart/${cleanSymbol}.NS`
     );
 
     const data = await response.json();
 
-    const cmp =
-      data?.chart?.result?.[0]?.meta?.regularMarketPrice;
+    // ✅ SAFE CHECK
+    const result = data?.chart?.result;
+
+    if (!result || !result[0]) {
+      return res.status(200).json({
+        cmp: null,
+        error: "Invalid symbol or no data"
+      });
+    }
+
+    const cmp = result[0]?.meta?.regularMarketPrice;
 
     if (!cmp) {
-      return res.status(404).json({ error: "Invalid symbol" });
+      return res.status(200).json({
+        cmp: null,
+        error: "CMP not found"
+      });
     }
 
     res.json({ cmp });
@@ -35,8 +46,10 @@ app.get("/api/cmp", async (req, res) => {
   } catch (err) {
     console.error("Backend Error:", err.message);
 
-    res.status(500).json({
-      error: "Failed to fetch CMP"
+    // ✅ NEVER CRASH
+    res.status(200).json({
+      cmp: null,
+      error: "Fallback error"
     });
   }
 });
