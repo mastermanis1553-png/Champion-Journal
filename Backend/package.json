@@ -2,14 +2,18 @@
   "name": "backend",
   "version": "1.0.0",
   "type": "module",
-  "description": "",
+  "description": "CMP API Server",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js",
+    "dev": "node server.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
+  "engines": {
+    "node": ">=18"
+  },
   "dependencies": {
     "cors": "^2.8.6",
     "express": "^5.2.1",

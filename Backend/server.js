@@ -15,30 +15,38 @@ app.get("/api/cmp", async (req, res) => {
 
     const cleanSymbol = symbol.replace(/\s+/g, "").toUpperCase();
 
-    // ✅ YAHOO FINANCE LIB (stable)
-    const quote = await yahooFinance.quote(`${cleanSymbol}.NS`);
+    // ✅ NSE symbol
+    const fullSymbol = `${cleanSymbol}.NS`;
 
-    const cmp = quote?.regularMarketPrice;
+    console.log("Fetching CMP:", fullSymbol);
 
-    if (!cmp) {
-      return res.status(200).json({
+    // ✅ STABLE METHOD
+    const quote = await yahooFinance.quote(fullSymbol);
+
+    if (!quote || !quote.regularMarketPrice) {
+      return res.json({
         cmp: null,
-        error: "No CMP"
+        error: "No data found"
       });
     }
 
-    res.json({ cmp });
+    res.json({
+      cmp: quote.regularMarketPrice
+    });
 
   } catch (err) {
-    console.error("Backend Error:", err.message);
+    console.error("CMP ERROR:", err.message);
 
-    res.status(200).json({
+    res.json({
       cmp: null,
       error: "Fetch failed"
     });
   }
 });
 
-app.listen(5000, () =>
-  console.log("Server running on http://localhost:5000")
+// ✅ PORT FIX (IMPORTANT FOR RENDER)
+const PORT = process.env.PORT || 5000;
+
+app.listen(PORT, () =>
+  console.log(`Server running on port ${PORT}`)
 );
