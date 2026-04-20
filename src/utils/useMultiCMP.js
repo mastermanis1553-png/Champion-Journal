@@ -20,7 +20,7 @@ export default function useMultiCMP(symbols = []) {
           cleanSymbols.map(async (symbol) => {
             try {
               const res = await fetch(
-                `https://champion-journal.onrender.com/api/cmp?symbol=${symbol}`
+                `/api/cmp?symbol=${symbol}`
               );
               const data = await res.json();
               return { symbol, cmp: data?.cmp ?? null };
