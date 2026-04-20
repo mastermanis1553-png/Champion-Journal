@@ -12,7 +12,7 @@ export default function useCMP(symbol) {
     const fetchCMP = async () => {
       try {
         const res = await fetch(
-          `http://localhost:5000/api/cmp?symbol=${cleanSymbol}`
+          `https://champion-journal.onrender.com/api/cmp?symbol=${cleanSymbol}`
         );
 
         const data = await res.json();
