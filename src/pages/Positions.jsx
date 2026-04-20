@@ -1,7 +1,7 @@
 import React from 'react';
 import { useTrades } from '../context/TradeContext';
 import { processTrade } from '../utils/math';
-import useCMP from '../utils/useCMP';
+import useMultiCMP from '../utils/useMultiCMP';
 
 export default function Positions() {
   const { trades, settings } = useTrades();
@@ -10,11 +10,9 @@ export default function Positions() {
   const processedTrades = trades.map(t => processTrade(t, globalR));
   const openTrades = processedTrades.filter(t => t.status === 'Open');
 
-  // ✅ Safe symbol handling
-  const firstSymbol = openTrades[0]?.symbol || null;
-
-  // ✅ Live CMP (safe)
-  const liveCmp = useCMP(firstSymbol);
+  // ✅ MULTI CMP
+  const symbols = openTrades.map(t => t.symbol);
+  const cmpMap = useMultiCMP(symbols);
 
   // ✅ Exposure
   const totalExposure = openTrades.reduce((s, t) => s + (t.entry * t.qty), 0);
@@ -22,12 +20,10 @@ export default function Positions() {
   // ✅ Risk
   const totalOpenRisk = openTrades.reduce((s, t) => s + (t.riskDist * t.qty), 0);
 
-  // ✅ Unrealized PnL (FIXED LOGIC)
+  // ✅ Unrealized PnL
   const totalUnrealized = openTrades.reduce((s, t) => {
     const currentPrice =
-      t.symbol === firstSymbol
-        ? (liveCmp ?? Number(t.cmp) ?? t.entry)
-        : (Number(t.cmp) ?? t.entry);
+      cmpMap[t.symbol] ?? Number(t.cmp) ?? t.entry;
 
     const reward = t.isShort
       ? (t.entry - currentPrice)
@@ -99,11 +95,9 @@ export default function Positions() {
 
             <tbody className="divide-y divide-gray-300">
               {openTrades.map(t => {
-                // ✅ FIX: live CMP use karo if same symbol
+                // ✅ FINAL FIX (NO OLD VARIABLES)
                 const currentPrice =
-                  t.symbol === firstSymbol
-                    ? (liveCmp ?? Number(t.cmp) ?? t.entry)
-                    : (Number(t.cmp) ?? t.entry);
+                  cmpMap[t.symbol] ?? Number(t.cmp) ?? t.entry;
 
                 const reward = t.isShort
                   ? (t.entry - currentPrice)
