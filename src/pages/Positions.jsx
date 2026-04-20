@@ -1,6 +1,7 @@
 import React from 'react';
 import { useTrades } from '../context/TradeContext';
 import { processTrade } from '../utils/math';
+import useCMP from '../utils/useCMP';
 
 export default function Positions() {
   const { trades, settings } = useTrades();
@@ -8,11 +9,17 @@ export default function Positions() {
 
   const processedTrades = trades.map(t => processTrade(t, globalR));
   const openTrades = processedTrades.filter(t => t.status === 'Open');
+  const firstSymbol = openTrades[0]?.symbol;
+  const liveCmp = useCMP(firstSymbol);
+ 
 
   const totalExposure = openTrades.reduce((s, t) => s + (t.entry * t.qty), 0);
   const totalOpenRisk = openTrades.reduce((s, t) => s + (t.riskDist * t.qty), 0);
-  const totalUnrealized = openTrades.reduce((s, t) => {
-    const currentPrice = Number(t.cmp) || t.entry;
+ const totalUnrealized = openTrades.reduce((s, t) => {
+  const currentPrice =
+    t.symbol === firstSymbol
+      ? (liveCmp || Number(t.cmp) || t.entry)
+      : (Number(t.cmp) || t.entry);
     const reward = t.isShort ? (t.entry - currentPrice) : (currentPrice - t.entry);
     return s + (reward * t.qty) - t.fees;
   }, 0);
