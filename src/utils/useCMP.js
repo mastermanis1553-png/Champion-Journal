@@ -6,15 +6,22 @@ export default function useCMP(symbol) {
   useEffect(() => {
     if (!symbol) return;
 
+    // ✅ CLEAN SYMBOL (main fix)
+    const cleanSymbol = symbol.replace(/\s+/g, "").toUpperCase();
+
     const fetchCMP = async () => {
       try {
         const res = await fetch(
-          `http://localhost:5000/api/cmp?symbol=${symbol}.NS`
+          `http://localhost:5000/api/cmp?symbol=${cleanSymbol}`
         );
+
         const data = await res.json();
-        setCmp(data.cmp);
+
+        if (data?.cmp) {
+          setCmp(data.cmp);
+        }
       } catch (err) {
-        console.error(err);
+        console.error("CMP Fetch Error:", err);
       }
     };
 
