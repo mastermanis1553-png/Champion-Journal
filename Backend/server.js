@@ -1,5 +1,6 @@
 import express from "express";
 import cors from "cors";
+import yahooFinance from "yahoo-finance2";
 
 const app = express();
 app.use(cors());
@@ -14,30 +15,15 @@ app.get("/api/cmp", async (req, res) => {
 
     const cleanSymbol = symbol.replace(/\s+/g, "").toUpperCase();
 
-    console.log("Fetching:", cleanSymbol);
+    // ✅ YAHOO FINANCE LIB (stable)
+    const quote = await yahooFinance.quote(`${cleanSymbol}.NS`);
 
-    const response = await fetch(
-      `https://query1.finance.yahoo.com/v8/finance/chart/${cleanSymbol}.NS`
-    );
-
-    const data = await response.json();
-
-    // ✅ SAFE CHECK
-    const result = data?.chart?.result;
-
-    if (!result || !result[0]) {
-      return res.status(200).json({
-        cmp: null,
-        error: "Invalid symbol or no data"
-      });
-    }
-
-    const cmp = result[0]?.meta?.regularMarketPrice;
+    const cmp = quote?.regularMarketPrice;
 
     if (!cmp) {
       return res.status(200).json({
         cmp: null,
-        error: "CMP not found"
+        error: "No CMP"
       });
     }
 
@@ -46,10 +32,9 @@ app.get("/api/cmp", async (req, res) => {
   } catch (err) {
     console.error("Backend Error:", err.message);
 
-    // ✅ NEVER CRASH
     res.status(200).json({
       cmp: null,
-      error: "Fallback error"
+      error: "Fetch failed"
     });
   }
 });
