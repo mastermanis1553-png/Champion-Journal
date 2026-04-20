@@ -1,6 +1,5 @@
 import express from "express";
 import cors from "cors";
-import yahooFinance from "yahoo-finance2";
 
 const app = express();
 app.use(cors());
@@ -13,40 +12,30 @@ app.get("/api/cmp", async (req, res) => {
       return res.status(400).json({ error: "Symbol required" });
     }
 
-    // ✅ CLEAN + CONTROL SYMBOL HERE ONLY
-    const cleanSymbol =
-      symbol.replace(/\s+/g, "").toUpperCase() + ".NS";
+    const cleanSymbol = symbol.replace(/\s+/g, "").toUpperCase();
 
     console.log("Fetching:", cleanSymbol);
 
-    let data;
+    // ✅ DIRECT YAHOO API (stable)
+    const response = await fetch(
+      `https://query1.finance.yahoo.com/v8/finance/chart/${cleanSymbol}.NS`
+    );
 
-    // ✅ TRY NORMAL QUOTE
-    try {
-      data = await yahooFinance.quote(cleanSymbol);
-    } catch (err) {
-      console.log("Quote failed, trying fallback...");
-      data = await yahooFinance.quoteSummary(cleanSymbol, {
-        modules: ["price"]
-      });
-    }
+    const data = await response.json();
 
-    // ✅ SAFE CMP EXTRACTION
     const cmp =
-      data?.regularMarketPrice ||
-      data?.price?.regularMarketPrice;
+      data?.chart?.result?.[0]?.meta?.regularMarketPrice;
 
     if (!cmp) {
       return res.status(404).json({ error: "Invalid symbol" });
     }
 
-    // ✅ ONLY ONE RESPONSE (important fix)
-    return res.json({ cmp });
+    res.json({ cmp });
 
   } catch (err) {
     console.error("Backend Error:", err.message);
 
-    return res.status(500).json({
+    res.status(500).json({
       error: "Failed to fetch CMP"
     });
   }
