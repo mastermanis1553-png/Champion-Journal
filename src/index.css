@@ -1,14 +1,21 @@
-/* ================= INDEX.CSS (RESPONSIVE FIXED TABLE) ================= */
+/* ================= INDEX.CSS (RESPONSIVE FIXED TABLE - DARK THEME) ================= */
 
 @import "tailwindcss";
 
 :root {
-  --bg-freeze: #e5eaf5;
-  --ice-cold: #a0d2eb;
-  --med-purple: #d0bdf4;
-  --purple-pain: #8458B3;
-  --heavy-purple: #a28089;
-  --dark-slate: #494D5F;
+  /* Dark Theme Variables mapped to your existing variable names */
+  --bg-freeze: #0f172a;    /* Main Background (Slate 900) */
+  --ice-cold: #38bdf8;     /* Accent Light Blue (Sky 400) */
+  --med-purple: #1e293b;   /* Card & Table Background (Slate 800) */
+  --purple-pain: #10b981;  /* Primary Accent (Emerald 500) */
+  --heavy-purple: #94a3b8; /* Subtext & Table Headers (Slate 400) */
+  --dark-slate: #f1f5f9;   /* Main Text (Slate 100) */
+  
+  /* Additional vars for App.css */
+  --accent: #10b981;
+  --accent-bg: rgba(16, 185, 129, 0.1);
+  --accent-border: #059669;
+  --border: #334155;
 }
 
 /* GLOBAL RESET */
@@ -44,10 +51,11 @@ svg {
   display: block;
 }
 
-/* SCROLLBAR */
+/* SCROLLBAR (Dark Theme Adapted) */
 ::-webkit-scrollbar { width: 6px; height: 6px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: var(--med-purple); border-radius: 10px; }
+::-webkit-scrollbar-track { background: var(--bg-freeze); }
+::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
+::-webkit-scrollbar-thumb:hover { background: #475569; }
 
 /* ================= TABLE FIX ================= */
 
@@ -60,7 +68,7 @@ svg {
 
 /* Header */
 .soft-table th {
-  background-color: #ffffff;
+  background-color: var(--med-purple);
   color: var(--heavy-purple);
   font-weight: 600;
   border-bottom: 2px solid var(--bg-freeze);
@@ -71,7 +79,7 @@ svg {
 
 /* Body */
 .soft-table td {
-  background-color: #ffffff;
+  background-color: var(--med-purple);
   border-bottom: 1px solid var(--bg-freeze);
   color: var(--dark-slate);
   font-size: 13px;
