@@ -1,99 +1,79 @@
-/* ================= INDEX.CSS (RESPONSIVE FIXED TABLE - DARK THEME) ================= */
-
+/* ================= INDEX.CSS (RESPONSIVE FIXED TABLE) ================= */
 @import "tailwindcss";
-
 :root {
-  /* Dark Theme Variables mapped to your existing variable names */
-  --bg-freeze: #0f172a;    /* Main Background (Slate 900) */
-  --ice-cold: #38bdf8;     /* Accent Light Blue (Sky 400) */
-  --med-purple: #1e293b;   /* Card & Table Background (Slate 800) */
-  --purple-pain: #10b981;  /* Primary Accent (Emerald 500) */
-  --heavy-purple: #94a3b8; /* Subtext & Table Headers (Slate 400) */
-  --dark-slate: #f1f5f9;   /* Main Text (Slate 100) */
-  
-  /* Additional vars for App.css */
-  --accent: #10b981;
-  --accent-bg: rgba(16, 185, 129, 0.1);
-  --accent-border: #059669;
-  --border: #334155;
+--bg-freeze: #e5eaf5;
+--ice-cold: #a0d2eb;
+--med-purple: #d0bdf4;
+--purple-pain: #8458B3;
+--heavy-purple: #a28089;
+--dark-slate: #494D5F;
 }
-
 /* GLOBAL RESET */
 *,
 *::before,
 *::after {
-  box-sizing: border-box;
+box-sizing: border-box;
 }
-
 html {
-  width: 100%;
-  overflow-x: hidden;
+width: 100%;
+overflow-x: hidden;
 }
-
 body {
-  width: 100%;
-  max-width: 100%;
-  overflow-x: hidden;
-  background-color: var(--bg-freeze);
-  color: var(--dark-slate);
-  font-family: 'Inter', system-ui, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  font-size: 14px;
+width: 100%;
+max-width: 100%;
+overflow-x: hidden;
+background-color: var(--bg-freeze);
+color: var(--dark-slate);
+font-family: 'Inter', system-ui, sans-serif;
+-webkit-font-smoothing: antialiased;
+font-size: 14px;
 }
-
 /* MEDIA FIX */
 img,
 video,
 canvas,
 svg {
-  max-width: 100%;
-  height: auto;
-  display: block;
+max-width: 100%;
+height: auto;
+display: block;
 }
-
-/* SCROLLBAR (Dark Theme Adapted) */
+/* SCROLLBAR */
 ::-webkit-scrollbar { width: 6px; height: 6px; }
-::-webkit-scrollbar-track { background: var(--bg-freeze); }
-::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
-::-webkit-scrollbar-thumb:hover { background: #475569; }
-
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--med-purple); border-radius: 10px; }
 /* ================= TABLE FIX ================= */
-
 /* Wrapper only handles scroll */
 .soft-table {
-  width: 100%;
-  max-width: 100%;
-  border-collapse: collapse;
+width: 100%;
+max-width: 100%;
+border-collapse: collapse;
 }
-
 /* Header */
 .soft-table th {
-  background-color: var(--med-purple);
-  color: var(--heavy-purple);
-  font-weight: 600;
-  border-bottom: 2px solid var(--bg-freeze);
-  font-size: 12px;
-  padding: 10px;
-  white-space: nowrap;
+background-color: #ffffff;
+color: var(--heavy-purple);
+font-weight: 600;
+border-bottom: 2px solid var(--bg-freeze);
+font-size: 12px;
+padding: 10px;
+white-space: nowrap;
 }
-
 /* Body */
 .soft-table td {
-  background-color: var(--med-purple);
-  border-bottom: 1px solid var(--bg-freeze);
-  color: var(--dark-slate);
-  font-size: 13px;
-  padding: 10px;
-  word-break: break-word;
-  overflow-wrap: break-word;
+background-color: #ffffff;
+border-bottom: 1px solid var(--bg-freeze);
+color: var(--dark-slate);
+font-size: 13px;
+padding: 10px;
+word-break: break-word;
+overflow-wrap: break-word;
 }
-
 /* RESPONSIVE TEXT */
 @media (min-width: 768px) {
-  .soft-table th {
-    font-size: 13px;
-  }
-  .soft-table td {
-    font-size: 14px;
-  }
+.soft-table th {
+font-size: 13px;
+}
+.soft-table td {
+font-size: 14px;
+}
 }
